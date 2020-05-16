@@ -19,5 +19,6 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif(NOT CMAKE_BUILD_TYPE)
 
+include_directories(../../eve/include)
 include_directories(./)
 add_subdirectory(test)

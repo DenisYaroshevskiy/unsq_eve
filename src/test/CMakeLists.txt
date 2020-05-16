@@ -17,10 +17,12 @@
 add_executable(tests)
 
 target_sources(tests PRIVATE
+               eve_extra.t.cc
                catch_main.cc)
 
 target_compile_options(tests PRIVATE
                        -Werror -Wall -Wextra -Wpedantic -Og -g
+                       -Wno-unused-parameter
                        -fsanitize=address -fno-omit-frame-pointer
                        --std=c++17
                        -stdlib=libc++
