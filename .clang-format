@@ -1,0 +1,7 @@
+Language:        Cpp
+BasedOnStyle:  Google
+SpacesInAngles: false
+AllowShortCaseLabelsOnASingleLine: true
+AllowShortFunctionsOnASingleLine: true
+AllowShortIfStatementsOnASingleLine: true
+IncludeBlocks: Preserve
