@@ -73,4 +73,36 @@ TEMPLATE_TEST_CASE("eve_extra.load_unsafe", "[eve_extra]", ALL_TEST_PACKS) {
   REQUIRE(eve::any(expected == actual));
 }
 
+TEMPLATE_TEST_CASE("eve_extra.first_true", "[eve_extra]", ALL_TEST_PACKS) {
+  using wide = TestType;
+  using scalar = typename wide::value_type;
+  constexpr std::ptrdiff_t size = wide::static_size;
+
+  wide x{scalar(1)}, y{scalar(2)};
+
+  REQUIRE(std::nullopt == eve_extra::first_true(x == y, eve_extra::ignore_nothing{}));
+
+  for (std::size_t i = 0; i != size; ++i) {
+    x[i] = scalar(2);
+    auto found = eve_extra::first_true(x == y, eve_extra::ignore_nothing{});
+    REQUIRE(found);
+    REQUIRE(i == found);
+    x[i] = scalar(1);
+  }
+
+  for (std::size_t i = 0; i != size; ++i) {
+    auto found = eve_extra::first_true(x == y, eve_extra::ignore_first_n{i});
+    REQUIRE(!found);
+
+    x[i] = scalar(2);
+
+    found = eve_extra::first_true(x == y, eve_extra::ignore_first_n{i});
+    REQUIRE(found);
+    REQUIRE(i == *found);
+
+    found = eve_extra::first_true(x == y, eve_extra::ignore_first_n{i + 1});
+    REQUIRE(!found);
+  }
+}
+
 }  // namespace
