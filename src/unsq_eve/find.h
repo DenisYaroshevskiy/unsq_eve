@@ -15,7 +15,6 @@
  */
 
 #include <array>
-#include <iostream>
 
 #include "eve_extra/eve_extra.h"
 
