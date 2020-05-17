@@ -26,9 +26,30 @@ function replaceStringValuesWithNumbers(loaded) {
   ));
 }
 
+function valuesByKeys(measurements) {
+  let res = {};
+  for (const m of measurements) {
+    for (const [k, v] of Object.entries(m)) {
+      if (!res[k]) res[k] = [];
+      res[k].push(v);
+    }
+  }
+  return res;
+}
+
 async function loadMeasurements() {
-  const loaded = await fetch("data/all.json").then(async (raw) => raw.json());
-  return loaded.map(replaceStringValuesWithNumbers);
+  if (!loadMeasurements.cache) {
+    const loaded = await fetch("data/all.json").then(async (raw) => raw.json());
+    loadMeasurements.cache = loaded.map(replaceStringValuesWithNumbers);
+  }
+  return loadMeasurements.cache;
+}
+
+async function measurementsByKeys() {
+  if (!measurementsByKeys.cache){
+    measurementsByKeys.cache = valuesByKeys(await loadMeasurements());
+  }
+  return measurementsByKeys.cache;
 }
 
 function isSubset(small, big) {
@@ -220,25 +241,80 @@ function drawBenchmark(element, data) {
   Plotly.newPlot(element, traces, layout);
 }
 
-async function entryPoint(elementID) {
+function addTextInput(parent, defaultInput, onChanged) {
+  let input = document.createElement("INPUT");
+  input.setAttribute('type', 'text');
+  input.style.width = '400px'
+  input.setAttribute('value', defaultInput);
+
+  input.addEventListener('input', () => {
+    console.log(input.value);
+    onChanged(input.value);
+  });
+  parent.appendChild(input);
+  return input;
+}
+
+const CONTROL_VALUES = ['x', 'y', 'min', 'max', 'minmax', 'selection'];
+
+function inputParseValueCheck(input, keys2values) {
+  for (const [k, v] of Object.entries(input)) {
+    if (CONTROL_VALUES.includes(v)) continue;
+    if (!keys2values[k].includes(v)) {
+      throw Error(`No matches for ${k} : ${v}`);
+    }
+  }
+}
+
+function inputParse(text, byKeys) {
+  const input = JSON.parse(text);
+
+  const inputKeys = Object.keys(input);
+  const benchKeys = Object.keys(byKeys);
+
+  for (const key of inputKeys) {
+    if (!benchKeys.includes(key)) {
+      throw new Error(`unknown key:${key}`);
+    }
+  }
+  inputParseValueCheck(input, byKeys);
+  const varying =
+    Object.fromEntries(Object.entries(input).filter((kv) => CONTROL_VALUES.includes(kv[1])));
+  const fixed =
+      Object.fromEntries(Object.entries(input).filter((kv) => !CONTROL_VALUES.includes(kv[1])));
+  return [varying, fixed];
+}
+
+async function dynamicEntryPoint(elementID) {
   const element = document.getElementById(elementID);
   const measurements = await loadMeasurements();
-  const asVisualized = visualizationDataFromMeasurements
-    (
-      {
-        size: 'x',
-        time: 'y',
-        padding: 'min',
-        algorithm: 'selection',
-        type: 'selection'
-      },
-      {
-        name: "find 0",
-        percentage: 100
-      },
-      measurements
-    );
-  drawBenchmark(element, asVisualized);
+  const byKeys = await measurementsByKeys();
+
+  const defaultInput = {
+    size: 'x',
+    time: 'y',
+    padding: 'min',
+    algorithm: 'selection',
+    type: 'selection',
+    name: 'find 0',
+    percentage : 100
+  };
+
+  let drawHere = undefined;
+
+  const redrawCallback = (text) => {
+    try {
+      const [varying, fixed] = inputParse(text, byKeys);
+      const asVisualized = visualizationDataFromMeasurements(varying, fixed, measurements);
+      drawBenchmark(drawHere, asVisualized);
+    } catch (er) {
+      console.log(er);
+    }
+  };
+
+  let input = addTextInput(element, JSON.stringify(defaultInput, undefined, 2), redrawCallback);
+  drawHere = element.appendChild(document.createElement('div'));
+  redrawCallback(input.value);
 }
 
 /// tests ---------------------------------
@@ -254,6 +330,16 @@ function expectEqual(expected, actual, msg = '') {
 
   if (expectedStr !== actualStr) {
     throw new Error(`Expectation failed: expected=${expectedStr},  actual=${actualStr}\n${msg}`);
+  }
+}
+
+function expectThrows(callback, msg_part) {
+  try {
+    callback();
+    throw new Error(`expected to throw: ${msg_part}`);
+  } catch (ex) {
+    if (ex.message.includes(msg_part)) return;
+    throw new Error(`unexpected error: ${ex.message} instead of ${msg_part}`);
   }
 }
 
@@ -410,6 +496,47 @@ function visualizationDataFromMeasurementsTests() {
   expectEqual(expected, visualizationDataFromMeasurements(varying, fixed, data));
 }
 
+function inputParseTests() {
+  const keys2values = {
+    group: ['intel_9700K'],
+    algorithm: ['std::find', 'unsq::find_unguarded'],
+    percentage: [ 10 ],
+    time: []
+  };
+
+  expectThrows(() => {
+    inputParse('{"some_key": "value"}', keys2values);
+  }, 'unknown key');
+
+  expectThrows(() => {
+    inputParse('{"group": "blabla"}', keys2values);
+  }, 'No matches');
+
+  const [varying, fixed] =
+    inputParse('{"group": "intel_9700K", "algorithm": "selection", "percentage": "x", "time": "y"}', keys2values);
+  expectEqual(varying, {
+    algorithm : 'selection',
+    percentage : 'x',
+    time : 'y'
+  });
+  expectEqual(fixed, {
+    group: 'intel_9700K'
+  });
+}
+
+function valuesByKeysTests() {
+  const measurements = [
+    { a : 3, b : 5},
+    { a : 4, c : 6}
+  ];
+  const expected = {
+    a : [3, 4],
+    b : [5],
+    c : [6]
+  };
+  expectEqual(expected, valuesByKeys(measurements));
+}
+
 async function listOfTests() {
   isSubsetTests();
   setDifferenceTests();
@@ -417,6 +544,8 @@ async function listOfTests() {
   partitionByKeysTests();
   reductionsTests();
   visualizationDataFromMeasurementsTests();
+  inputParseTests();
+  valuesByKeysTests();
 }
 
 async function runTests(elementID) {
