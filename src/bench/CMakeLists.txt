@@ -17,7 +17,7 @@
 find_package(benchmark)
 
 function(add_benchmark name source)
-    set(compiler_options --std=c++17 --stdlib=libc++ -g -Werror -Wall -Wextra -Wpedantic -O3 -march=native -mllvm -align-all-functions=7)
+    set(compiler_options --std=c++17 --stdlib=libc++ -DNDEBUG -g -Werror -Wall -Wextra -Wpedantic -Wno-unused-parameter -O3 -march=native -mllvm -align-all-functions=7)
     add_executable(${name})
     target_sources(${name} PRIVATE ${source})
     target_compile_options(${name} PRIVATE ${compiler_options})
@@ -26,4 +26,4 @@ function(add_benchmark name source)
 endfunction()
 
 add_benchmark(std_find std_find.cc)
-# add_benchmark(unsq_find unsq_find.cc)
+add_benchmark(unsq_eve_find_unguarded unsq_eve_find_unguarded.cc)
