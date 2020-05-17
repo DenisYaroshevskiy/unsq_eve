@@ -16,15 +16,59 @@ _Z9my_strlenPc:                         # @_Z9my_strlenPc
 	shrx	eax, eax, edi
 	shlx	eax, eax, edi
 	test	eax, eax
-	jne	.LBB0_3
-	.p2align	4, 0x90
-.LBB0_1:                                # =>This Inner Loop Header: Depth=1
-	vpcmpeqb	ymm1, ymm0, ymmword ptr [rcx + 32]
+	je	.LBB0_1
+.LBB0_10:
+	tzcnt	eax, eax
+	add	rax, rcx
+	sub	rax, rdi
+	vzeroupper
+	ret
+.LBB0_1:
+	vpcmpeqb	ymm0, ymm0, ymmword ptr [rcx + 32]
+	vpmovmskb	eax, ymm0
+	test	eax, eax
+	je	.LBB0_2
+.LBB0_9:
 	add	rcx, 32
+	tzcnt	eax, eax
+	add	rax, rcx
+	sub	rax, rdi
+	vzeroupper
+	ret
+.LBB0_2:
+	add	rcx, 96
+	vpxor	xmm0, xmm0, xmm0
+	.p2align	4, 0x90
+.LBB0_3:                                # =>This Inner Loop Header: Depth=1
+	vpcmpeqb	ymm1, ymm0, ymmword ptr [rcx - 32]
 	vpmovmskb	eax, ymm1
 	test	eax, eax
-	je	.LBB0_1
-.LBB0_3:
+	jne	.LBB0_8
+# %bb.4:                                #   in Loop: Header=BB0_3 Depth=1
+	vpcmpeqb	ymm1, ymm0, ymmword ptr [rcx]
+	vpmovmskb	eax, ymm1
+	test	eax, eax
+	jne	.LBB0_10
+# %bb.5:                                #   in Loop: Header=BB0_3 Depth=1
+	vpcmpeqb	ymm1, ymm0, ymmword ptr [rcx + 32]
+	vpmovmskb	eax, ymm1
+	test	eax, eax
+	jne	.LBB0_9
+# %bb.6:                                #   in Loop: Header=BB0_3 Depth=1
+	vpcmpeqb	ymm1, ymm0, ymmword ptr [rcx + 64]
+	vpmovmskb	eax, ymm1
+	sub	rcx, -128
+	test	eax, eax
+	je	.LBB0_3
+# %bb.7:
+	add	rcx, -64
+	tzcnt	eax, eax
+	add	rax, rcx
+	sub	rax, rdi
+	vzeroupper
+	ret
+.LBB0_8:
+	add	rcx, -32
 	tzcnt	eax, eax
 	add	rax, rcx
 	sub	rax, rdi
