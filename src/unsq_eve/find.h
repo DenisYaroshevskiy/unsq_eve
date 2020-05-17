@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+#ifndef UNSQ_EVE_FIND_H_
+#define UNSQ_EVE_FIND_H_
+
 #include <array>
 
 #include "eve_extra/eve_extra.h"
@@ -71,3 +74,5 @@ I find_unguarded(I f, const T& x) {
 }
 
 }  // namespace unsq_eve
+
+#endif   // UNSQ_EVE_FIND_H_

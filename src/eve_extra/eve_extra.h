@@ -18,6 +18,7 @@
 #define EVE_EXTRA_LOAD_UNSAFE_H_
 
 #include <optional>
+#include <type_traits>
 
 #include <eve/eve.hpp>
 #include <eve/memory/align.hpp>
@@ -41,9 +42,11 @@ T* end_of_page(T* addr) {
                               upage_size);
 }
 
-template <typename T, typename N>
-auto previous_aligned_address(const eve::as_<eve::wide<T, N>>&, T* p) {
-  static constexpr eve::under A{alignof(eve::wide<T, N>)};
+template <typename U, typename N, typename T>
+auto previous_aligned_address(const eve::as_<eve::wide<U, N>>&, T* p) {
+  static_assert(std::is_same_v<std::decay_t<T>, U>);
+
+  static constexpr eve::under A{alignof(eve::wide<U, N>)};
   return eve::aligned_ptr<T, A.value>{eve::align(p, A)};
 }
 

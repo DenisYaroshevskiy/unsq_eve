@@ -14,22 +14,36 @@
  * limitations under the License.
  */
 
-#ifndef UNSQ_EVE_ITERATION_TRAITS_H_
-#define UNSQ_EVE_ITERATION_TRAITS_H_
+#ifndef UNSQ_EVE_ITERATOR_H_
+#define UNSQ_EVE_ITERATOR_H_
 
+#include <cstddef>
 #include <iterator>
+
+#include <eve/eve.hpp>
 
 namespace unsq_eve {
 
-template <std::size_t i>
-using indx_c = std::integral_constant<std::size_t, i>;
+template <typename I>
+using ValueType = typename std::iterator_traits<I>::value_type;
 
-template <std::size_t _width, std::size_t _unroll>
-struct iteration_traits {
-  static constexpr indx_c<_width> width;
-  static constexpr indx_c<_unroll> unroll;
+template <typename I>
+using Reference = typename std::iterator_traits<I>::reference;
+
+template <typename Ptr, typename Size>
+struct wide_iterator {
+  using value_type = ValueType<Ptr>;
+  using reference = Reference<Ptr>;
+  using pointer = Ptr;
+  using difference_type = std::ptrdiff_t;
+  using iterator_category = std::random_assess_iterator_tag;
+
+  using wide = eve::
+  using size = Size;
+
+  Ptr body_;
 };
 
 }  // namespace unsq_eve
 
-#endif  // UNSQ_EVE_ITERATION_TRAITS_H_
+#endif  // UNSQ_EVE_ITERATOR_H_

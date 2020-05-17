@@ -17,6 +17,7 @@
 #include "unsq_eve/find.h"
 
 #include <ostream>
+#include <string>
 
 #include <eve/memory/aligned_allocator.hpp>
 
@@ -37,6 +38,21 @@ struct variation {
 };
 
 template <typename Variation, typename Alg>
+void specific_tests(Alg alg) {
+  using T = typename Variation::type;
+  using traits = typename Variation::traits;
+  {
+    std::vector<T> v(13u, T(1));
+    v.back() = T(2);
+
+    const T* f = v.data();
+    const T* l = f + v.size();
+
+    REQUIRE(alg(traits{}, f, l, v.back()) - f == 12);
+  }
+}
+
+template <typename Variation, typename Alg>
 void common_find_test_impl(Alg alg) {
   INFO("" << Variation{});
 
@@ -47,7 +63,7 @@ void common_find_test_impl(Alg alg) {
   auto* f = page.data();
   auto* before_l = f + 16;
 
-  auto run = [&] () {
+  auto run = [&]() {
     typename Variation::traits traits{};
     REQUIRE(alg(traits, f, before_l + 1, 1) == before_l);
   };
@@ -84,6 +100,7 @@ void common_find_test_traits_combinations(Alg alg) {
 
 template <typename Alg>
 void common_find_test(Alg alg) {
+  // specific_tests<variation<char, 16, 1>>(alg);
   common_find_test_traits_combinations<std::int8_t>(alg);
   common_find_test_traits_combinations<std::uint8_t>(alg);
   common_find_test_traits_combinations<std::int16_t>(alg);
