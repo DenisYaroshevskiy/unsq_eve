@@ -1,0 +1,21 @@
+<!doctype html>
+<html>
+<meta charset='utf-8'>
+
+<title>New benchmarking framework results</title>
+<script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
+<script type='text/javascript' src='scripts/bench.js'></script>
+
+</html>
+
+<body>
+
+  <h1>Benchmarking results</h1>
+
+  <div id='test_status'></div>
+  <script>runTests('test_status');</script>
+
+  <div id='benchmarks_div'></div>
+  <script>entryPoint('benchmarks_div')</script>
+
+</body>
