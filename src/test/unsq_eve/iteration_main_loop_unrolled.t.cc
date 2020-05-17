@@ -16,8 +16,9 @@
 
 #include "unsq_eve/iteration_main_loop_unrolled.h"
 
-#include <iostream>
 #include <vector>
+
+#include <eve/eve.hpp>
 
 #include "test/catch.h"
 
@@ -28,7 +29,7 @@ namespace {
       (unsq_eve::indx_c<4>)
 
 TEMPLATE_TEST_CASE("iteration_main_loop_unrolled", "[unsq_eve]", ALL_UNROLLS) {
-  using traits = unsq_eve::iteration_traits<8, TestType{}()>;
+  using traits = unsq_eve::iteration_traits<eve::fixed<8>, TestType{}()>;
 
   std::vector<int> v(1024, 15);
   constexpr std::ptrdiff_t stop_at = 248;

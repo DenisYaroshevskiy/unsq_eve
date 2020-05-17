@@ -11,25 +11,19 @@ _Z9my_strlenPc:                         # @_Z9my_strlenPc
 	mov	rcx, rdi
 	and	rcx, -32
 	vpxor	xmm0, xmm0, xmm0
-	vpcmpeqb	xmm1, xmm0, xmmword ptr [rcx]
-	vpcmpeqb	xmm2, xmm0, xmmword ptr [rcx + 16]
-	vinserti128	ymm1, ymm1, xmm2, 1
+	vpcmpeqb	ymm1, ymm0, ymmword ptr [rcx]
 	vpmovmskb	eax, ymm1
 	shrx	eax, eax, edi
 	shlx	eax, eax, edi
 	test	eax, eax
 	jne	.LBB0_3
-# %bb.1:
-	add	rcx, -32
 	.p2align	4, 0x90
-.LBB0_2:                                # =>This Inner Loop Header: Depth=1
-	vpcmpeqb	xmm1, xmm0, xmmword ptr [rcx + 32]
-	vpcmpeqb	xmm2, xmm0, xmmword ptr [rcx + 48]
+.LBB0_1:                                # =>This Inner Loop Header: Depth=1
+	vpcmpeqb	ymm1, ymm0, ymmword ptr [rcx + 32]
 	add	rcx, 32
-	vinserti128	ymm1, ymm1, xmm2, 1
 	vpmovmskb	eax, ymm1
 	test	eax, eax
-	je	.LBB0_2
+	je	.LBB0_1
 .LBB0_3:
 	tzcnt	eax, eax
 	add	rax, rcx

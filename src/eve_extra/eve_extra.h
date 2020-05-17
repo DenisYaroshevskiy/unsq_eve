@@ -19,6 +19,7 @@
 
 #include <optional>
 #include <type_traits>
+#include <iostream>
 
 #include <eve/eve.hpp>
 #include <eve/memory/align.hpp>
@@ -61,9 +62,9 @@ namespace _eve_extra {
 template <typename Logical>
 std::uint32_t movemask(Logical logical) {
   if constexpr (sizeof(Logical) == 16) {
-    return _mm_movemask_epi8((__m128i)logical.storage());
+    return _mm_movemask_epi8(logical.mask());
   } else {
-    return _mm256_movemask_epi8((__m256i)logical.storage());
+    return _mm256_movemask_epi8(logical.mask());
   }
 }
 
@@ -82,7 +83,9 @@ constexpr std::uint32_t set_lower_n_bits(std::uint32_t n) {
 template <typename Logical>
 std::uint32_t clear_ingored(std::uint32_t mmask, ignore_first_n ignore) {
   using scalar = typename Logical::value_type;
-  return ~set_lower_n_bits(ignore.n * sizeof(scalar)) & mmask;
+
+  std::uint32_t ignore_mask = ~set_lower_n_bits(ignore.n * sizeof(scalar));
+  return ignore_mask & mmask;
 }
 
 }  // namespace _eve_extra

@@ -23,11 +23,11 @@
 
 namespace unsq_eve {
 
-template <typename Traits, typename I, typename P>
+template <typename Traits, typename T, typename P>
 // require ContigiousIterator<I> &&
 //         Predictate<P, wide<ValueType<I, width>>, index_c, ignore>
-P iteration_aligned_unguarded(I f, P p) {
-  using wide = eve::wide<ValueType<I>, eve::fixed<Traits::width>>;
+P iteration_aligned_unguarded(T* f, P p) {
+  using wide = eve::wide<ValueType<T*>, eve::fixed<Traits::width>>;
 
   auto aligned_f = eve_extra::previous_aligned_address(eve::as_<wide>{}, f);
   using aligned_ptr = decltype(aligned_f);
@@ -38,6 +38,7 @@ P iteration_aligned_unguarded(I f, P p) {
     auto ignore = eve_extra::ignore_first_n { to_ignore };
     if (p(aligned_f, indx_c<0>{}, ignore)) return p;
   }
+  aligned_f += Traits::width();
 
   // Everything else is on the caller.
   iteration_main_loop_unrolled_unguarded<Traits>(

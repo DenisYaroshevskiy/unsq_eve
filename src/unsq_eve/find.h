@@ -26,17 +26,17 @@
 namespace unsq_eve {
 namespace _find {
 
-template <typename Traits, typename I, typename PV>
+template <typename Traits, typename StrippedI, typename PV>
 // require ContigiousIterator<I> && VectorPredicate<PV, ValueType<I>>
 struct find_if_body {
-  using wide = eve::wide<ValueType<I>, eve::fixed<Traits::width()>>;
+  using wide = eve::wide<ValueType<StrippedI>, eve::fixed<Traits::width()>>;
 
   PV p;
-  I found;
+  StrippedI found;
 
   std::array<wide, Traits::unroll()> regs;
 
-  find_if_body(PV p, I found) : p(p), found(found) {}
+  find_if_body(PV p, StrippedI found) : p(p), found(found) {}
 
   template <typename Ptr, std::size_t idx, typename Ignore>
   bool operator()(Ptr from, indx_c<idx>, Ignore ignore) {
@@ -62,9 +62,13 @@ auto equal_to(const U& y) {
 
 template <typename Traits, typename I, typename PV>
 // require ContigiousIterator<I> && VectorPredicate<PV, ValueType<I>>
-I find_if_unguarded(I f, PV p) {
-  _find::find_if_body<Traits, I, PV> body{p, f};
-  return iteration_aligned_unguarded<Traits>(f, body).found;
+I find_if_unguarded(I _f, PV p) {
+  auto* f = drill_down(_f);
+
+  _find::find_if_body<Traits, decltype(f), PV> body{p, f};
+  auto* found = iteration_aligned_unguarded<Traits>(f, body).found;
+
+  return undo_drill_down(_f, found);
 }
 
 template <typename Traits, typename I, typename T>

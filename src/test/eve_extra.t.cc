@@ -46,7 +46,7 @@ namespace {
       (eve::wide<std::uint64_t, eve::fixed<4>>),                            \
       (eve::wide<float, eve::fixed<4>>), (eve::wide<float, eve::fixed<8>>), \
       (eve::wide<double, eve::fixed<2>>), (eve::wide<double, eve::fixed<4>>)
-
+/*
 TEMPLATE_TEST_CASE("eve_extra.load_unsafe", "[eve_extra]", ALL_TEST_PACKS) {
   using wide = TestType;
   using scalar = typename wide::value_type;
@@ -72,6 +72,7 @@ TEMPLATE_TEST_CASE("eve_extra.load_unsafe", "[eve_extra]", ALL_TEST_PACKS) {
       eve::as_<wide>{});
   REQUIRE(eve::any(expected == actual));
 }
+*/
 
 TEMPLATE_TEST_CASE("eve_extra.first_true", "[eve_extra]", ALL_TEST_PACKS) {
   using wide = TestType;
@@ -103,6 +104,17 @@ TEMPLATE_TEST_CASE("eve_extra.first_true", "[eve_extra]", ALL_TEST_PACKS) {
     found = eve_extra::first_true(x == y, eve_extra::ignore_first_n{i + 1});
     REQUIRE(!found);
   }
+}
+
+TEST_CASE("eve_extra.load_const_aligned_ptr", "[eve_extra]") {
+  using wide = eve::wide<char, eve::fixed<16>>;
+  alignas(wide) std::array<char, 16> data;
+  data.fill(1);
+
+  eve::aligned_ptr<char, 16> ptr{data.begin()};
+  wide loaded = eve::load(ptr, eve::as_<wide>{});
+
+  REQUIRE(eve::all(loaded == wide{1}));
 }
 
 }  // namespace
