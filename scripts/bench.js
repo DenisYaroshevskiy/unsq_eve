@@ -46,7 +46,7 @@ async function loadMeasurements() {
 }
 
 async function measurementsByKeys() {
-  if (!measurementsByKeys.cache){
+  if (!measurementsByKeys.cache) {
     measurementsByKeys.cache = valuesByKeys(await loadMeasurements());
   }
   return measurementsByKeys.cache;
@@ -243,15 +243,29 @@ function drawBenchmark(element, data) {
 
 function addTextInput(parent, defaultInput, onChanged) {
   let input = document.createElement("INPUT");
+
+  let errorMessage = document.createElement('div');
+  const NO_ERROR = '<br>Parsed succesfully<br/>'
+  errorMessage.innerHTML = NO_ERROR
+
   input.setAttribute('type', 'text');
   input.style.width = '400px'
   input.setAttribute('value', defaultInput);
 
   input.addEventListener('input', () => {
     console.log(input.value);
-    onChanged(input.value);
+
+    try {
+      onChanged(input.value);
+      errorMessage.innerHTML =NO_ERROR
+    } catch (er) {
+      console.log(er);
+      errorMessage.innerHTML = `<br/>${er.message}<br/>`;
+    }
   });
   parent.appendChild(input);
+  parent.appendChild(errorMessage);
+
   return input;
 }
 
@@ -281,7 +295,7 @@ function inputParse(text, byKeys) {
   const varying =
     Object.fromEntries(Object.entries(input).filter((kv) => CONTROL_VALUES.includes(kv[1])));
   const fixed =
-      Object.fromEntries(Object.entries(input).filter((kv) => !CONTROL_VALUES.includes(kv[1])));
+    Object.fromEntries(Object.entries(input).filter((kv) => !CONTROL_VALUES.includes(kv[1])));
   return [varying, fixed];
 }
 
@@ -297,19 +311,15 @@ async function dynamicEntryPoint(elementID) {
     algorithm: 'selection',
     type: 'selection',
     name: 'find 0',
-    percentage : 100
+    percentage: 100
   };
 
   let drawHere = undefined;
 
   const redrawCallback = (text) => {
-    try {
-      const [varying, fixed] = inputParse(text, byKeys);
-      const asVisualized = visualizationDataFromMeasurements(varying, fixed, measurements);
-      drawBenchmark(drawHere, asVisualized);
-    } catch (er) {
-      console.log(er);
-    }
+    const [varying, fixed] = inputParse(text, byKeys);
+    const asVisualized = visualizationDataFromMeasurements(varying, fixed, measurements);
+    drawBenchmark(drawHere, asVisualized);
   };
 
   let input = addTextInput(element, JSON.stringify(defaultInput, undefined, 2), redrawCallback);
@@ -500,7 +510,7 @@ function inputParseTests() {
   const keys2values = {
     group: ['intel_9700K'],
     algorithm: ['std::find', 'unsq::find_unguarded'],
-    percentage: [ 10 ],
+    percentage: [10],
     time: []
   };
 
@@ -515,9 +525,9 @@ function inputParseTests() {
   const [varying, fixed] =
     inputParse('{"group": "intel_9700K", "algorithm": "selection", "percentage": "x", "time": "y"}', keys2values);
   expectEqual(varying, {
-    algorithm : 'selection',
-    percentage : 'x',
-    time : 'y'
+    algorithm: 'selection',
+    percentage: 'x',
+    time: 'y'
   });
   expectEqual(fixed, {
     group: 'intel_9700K'
@@ -526,13 +536,13 @@ function inputParseTests() {
 
 function valuesByKeysTests() {
   const measurements = [
-    { a : 3, b : 5},
-    { a : 4, c : 6}
+    { a: 3, b: 5 },
+    { a: 4, c: 6 }
   ];
   const expected = {
-    a : [3, 4],
-    b : [5],
-    c : [6]
+    a: [3, 4],
+    b: [5],
+    c: [6]
   };
   expectEqual(expected, valuesByKeys(measurements));
 }
