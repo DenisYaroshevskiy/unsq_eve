@@ -21,10 +21,9 @@
 #include <cstdint>
 #include <utility>
 
-namespace unsq_eve {
+#include "unsq_eve/iteration_traits.h"
 
-template <std::size_t i>
-using indx_c = std::integral_constant<std::size_t, i>;
+namespace unsq_eve {
 
 namespace _iteration_main_loop_unrolled {
 
@@ -129,19 +128,18 @@ void unroll_unguarded(T* f, Op op, std::index_sequence<unroll_idxs...>) {
 
 }  // namespace _iteration_main_loop_unrolled
 
-template <std::size_t unroll_size, std::ptrdiff_t width, typename T,
-          typename Op>
+template <typename Traits, typename T, typename Op>
 void iteration_main_loop_unrolled(T* f, T* l, Op op) {
   // assert(l - f) % width == 0
-  _iteration_main_loop_unrolled::duffs_device<unroll_size, width> device;
+  _iteration_main_loop_unrolled::duffs_device<Traits::unroll(), Traits::width()>
+      device;
   device(f, l, op);
 }
 
-template <std::size_t unroll_size, std::ptrdiff_t width, typename T,
-          typename Op>
+template <typename Traits, typename T, typename Op>
 void iteration_main_loop_unrolled_unguarded(T* f, Op op) {
-  _iteration_main_loop_unrolled::unroll_unguarded<width>(
-      f, op, std::make_index_sequence<unroll_size>{});
+  _iteration_main_loop_unrolled::unroll_unguarded<Traits::width()>(
+      f, op, std::make_index_sequence<Traits::unroll()>{});
 }
 
 }  // namespace unsq_eve

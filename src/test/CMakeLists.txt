@@ -18,15 +18,17 @@ add_executable(tests)
 
 target_sources(tests PRIVATE
                eve_extra.t.cc
+               unsq_eve/find.t.cc
                unsq_eve/iteration_main_loop_unrolled.t.cc
                catch_main.cc)
 
 target_compile_options(tests PRIVATE
                        -Werror -Wall -Wextra -Wpedantic -Og -g
                        -Wno-unused-parameter
-                       -fsanitize=address -fno-omit-frame-pointer
+                        -fno-omit-frame-pointer
                        --std=c++17
                        -stdlib=libc++
+                       -fsanitize=address
                        -march=native)
 target_link_options(tests PRIVATE -fsanitize=address -stdlib=libc++)
 set_target_properties(tests PROPERTIES CXX_STANDARD 17)
