@@ -129,7 +129,6 @@ function processVaryingKeys(varying) {
 
   if (!x) throw new Error('x is not defined');
   if (!y) throw new Error('y is not defined');
-  if (selection.length == 0) throw new Error('selection options are not specified');
   return { x, y, selection, reduce, reduction_keys };
 }
 
@@ -249,7 +248,7 @@ function addTextInput(parent, defaultInput, onChanged) {
   errorMessage.innerHTML = NO_ERROR
 
   input.setAttribute('type', 'text');
-  input.style.width = '400px'
+  input.style.width = '800px'
   input.setAttribute('value', defaultInput);
 
   input.addEventListener('input', () => {
@@ -299,32 +298,47 @@ function inputParse(text, byKeys) {
   return [varying, fixed];
 }
 
-async function dynamicEntryPoint(elementID) {
+async function dynamicEntryPoint(elementID, defaultInput) {
   const element = document.getElementById(elementID);
   const measurements = await loadMeasurements();
   const byKeys = await measurementsByKeys();
-
-  const defaultInput = {
-    size: 'x',
-    time: 'y',
-    padding: 'min',
-    algorithm: 'selection',
-    type: 'selection',
-    name: 'find 0',
-    percentage: 100
-  };
 
   let drawHere = undefined;
 
   const redrawCallback = (text) => {
     const [varying, fixed] = inputParse(text, byKeys);
     const asVisualized = visualizationDataFromMeasurements(varying, fixed, measurements);
+    console.log('drawHere', drawHere);
     drawBenchmark(drawHere, asVisualized);
   };
 
   let input = addTextInput(element, JSON.stringify(defaultInput, undefined, 2), redrawCallback);
   drawHere = element.appendChild(document.createElement('div'));
   redrawCallback(input.value);
+}
+
+function miniumTimesBySizeTemplate(elementID) {
+  dynamicEntryPoint(elementID, {
+      name: 'find 0',
+      algorithm: 'selection',
+      type: 'char',
+      size: 'x',
+      time: 'y',
+      padding: 'min',
+      percentage: 100
+  });
+}
+
+function codeAlignmentTemplate(elementID) {
+  dynamicEntryPoint(elementID, {
+    name: 'find 0',
+    size: 10000,
+    type: 'char',
+    algorithm: 'selection',
+    padding: 'x',
+    time: 'y',
+    percentage: 100
+  });
 }
 
 /// tests ---------------------------------
@@ -563,7 +577,6 @@ async function runTests(elementID) {
 
   try {
     listOfTests();
-    element.innerHTML = `Tests passed<br/><br/>`
   } catch (er) {
     element.innerHTML = `Tests failed. error=${er.message}<br/><br/>`
   }

@@ -15,8 +15,15 @@
   <div id='test_status'></div>
   <script>runTests('test_status');</script>
 
-  <div id='test_bench'></div>
-  <script>dynamicEntryPoint('test_bench');</script>
+  <h2>Main results</h2>
+  <div id='main_bench'></div>
+  <script>miniumTimesBySizeTemplate('main_bench');</script>
+
+  <h2> Code alignment impact</h2>
+  <div id='code_alginment_bench'></div>
+  <script>codeAlignmentTemplate('code_alginment_bench');</script>
+
+
 
 
 </body>
