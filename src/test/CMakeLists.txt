@@ -18,6 +18,7 @@ add_executable(tests)
 
 target_sources(tests PRIVATE
                eve_extra.t.cc
+               unsq_eve/iteration_main_loop_unrolled.t.cc
                catch_main.cc)
 
 target_compile_options(tests PRIVATE
