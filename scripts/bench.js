@@ -127,7 +127,6 @@ function processVaryingKeys(varying) {
     throw new Error('unknown variation on ${key}: ${value}');
   }
 
-  if (!x) throw new Error('x is not defined');
   if (!y) throw new Error('y is not defined');
   return { x, y, selection, reduce, reduction_keys };
 }
@@ -140,14 +139,18 @@ function maxByKey(xs, key) {
   return xs.reduce((x1, x2) => x2[key] >= x1[key] ? x2 : x1);
 }
 
-function reduceInGroups(objects, groupKey, redaction) {
+function reduceInGroups(objects, groupKey, reduction) {
   const sameKey = partitionByKeys(objects, [groupKey]);
-  const valuesForKey = sameKey.map(redaction);
+  const valuesForKey = sameKey.map(reduction);
   return valuesForKey.flat();
 }
 
 function applyReduction(selections, varying) {
   if (!varying.reduce) return selections;
+
+  const doReduction = varying.x ?
+     (objects, reduction) => reduceInGroups(objects, varying.x, reduction) :
+     (objects, reduction) => [reduction(objects)];
 
   if (varying.reduce === 'minmax') {
     varying.selection.push('variation');
@@ -157,12 +160,12 @@ function applyReduction(selections, varying) {
 
   for (const sel of selections) {
     if (varying.reduce === 'min') {
-      res.push(reduceInGroups(sel, varying.x, ms => minByKey(ms, varying.y)));
+      res.push(doReduction(sel, ms => minByKey(ms, varying.y)));
     } else if (varying.reduce === 'max') {
-      res.push(reduceInGroups(sel, varying.x, ms => maxByKey(ms, varying.y)));
+      res.push(doReduction(sel, ms => maxByKey(ms, varying.y)));
     } else if (varying.reduce === 'minmax') {
-      let min = reduceInGroups(sel, varying.x, ms => minByKey(ms, varying.y));
-      let max = reduceInGroups(sel, varying.x, ms => maxByKey(ms, varying.y));
+      let min = doReduction(sel, ms => minByKey(ms, varying.y));
+      let max = doReduction(sel, ms => maxByKey(ms, varying.y));
       min = JSON.parse(JSON.stringify(min));
       max = JSON.parse(JSON.stringify(max));
       min.variation = 'min';
@@ -175,7 +178,7 @@ function applyReduction(selections, varying) {
   return res;
 }
 
-function makeSelectionObject(ms, varying) {
+function makeLinesSelectionObject(ms, varying) {
   const name = varying.selection.map(key => ms[0][key]).join('/');
   const x = ms.map(m => m[varying.x]);
   const y = ms.map(m => m[varying.y]);
@@ -191,21 +194,55 @@ function makeTitle(varying, fixed) {
   return title_elements.join(' | ');
 }
 
+function makeBarsTrace(ms, traceSelections, varying) {
+  const name = varying.selection.map(key => ms[0][0][key]).join('/');
+  const x = ms.map(m => {
+    return varying.selection.map(key => m[0][key]).join('/')
+  });
+  const y = ms.map(m => m[0][varying.y]);
+  return {name, x, y};
+}
+
+function makeBarsTraces(selections, varying) {
+  let traceGroups = selections.map(s => [s]);
+  let traceSelections = [];
+
+  /*if (varying.selection.length > 1) {
+    traceSelections = [varying.selection]
+    traceGroups = partitionByKeys(selections.flat(), traceSelections);
+  }*/
+  console.log('traceGroups: ', traceGroups);
+
+  return traceGroups.map(ms => makeBarsTrace(ms, traceSelections, varying));
+}
+
 function visualizationDataFromMeasurements(varying, fixed, measurements) {
   measurements = measurements.filter(e => isSubset(fixed, e));
   measurements = measurements.map(e => setDifference(e, fixed));
   varying = processVaryingKeys(varying);
   let selections = partitionByKeys(measurements, varying.selection);
   selections = applyReduction(selections, varying);
+  const title = makeTitle(varying, fixed);
+
+  if (varying.x) {
+    // Lines
+    return {
+      title,
+      x_title: varying.x,
+      y_title: varying.y,
+      lines: selections.map(ms => makeLinesSelectionObject(ms, varying))
+    };
+  }
+
+  // Bars
   return {
-    title: makeTitle(varying, fixed),
-    x_title: varying.x,
+    title,
     y_title: varying.y,
-    lines: selections.map(ms => makeSelectionObject(ms, varying))
-  };
+    traces: makeBarsTraces(selections, varying)
+  }
 }
 
-function drawBenchmark(element, data) {
+function drawLinesBenchmark(element, data) {
   const traces = data.lines.map(line => {
     return {
       name: line.name,
@@ -216,8 +253,6 @@ function drawBenchmark(element, data) {
       type: 'scatter'
     };
   });
-
-  console.log(data);
 
   const layout = {
     title: data.title,
@@ -238,6 +273,40 @@ function drawBenchmark(element, data) {
   };
 
   Plotly.newPlot(element, traces, layout);
+}
+
+function drawBarsBenchmars(element, data) {
+  const traces = data.traces.map((trace) => {
+    return {
+      name: trace.name,
+      x : trace.x,
+      y : trace.y,
+      type : 'bar'
+    }
+  });
+
+  console.log(traces);
+
+  const layout = {
+    title: data.title,
+    barmode: 'group',
+    width: 1024,
+    height: 600,
+    yaxis: {
+      title: {
+        text: data.y_title,
+      }
+    }
+  };
+  Plotly.newPlot(element, traces, layout);
+}
+
+function drawBenchmark(element, data) {
+  if (data.x_title) {
+    drawLinesBenchmark(element, data);
+  } else {
+    drawBarsBenchmars(element, data);
+  }
 }
 
 function addTextInput(parent, defaultInput, onChanged) {
@@ -308,7 +377,6 @@ async function dynamicEntryPoint(elementID, defaultInput) {
   const redrawCallback = (text) => {
     const [varying, fixed] = inputParse(text, byKeys);
     const asVisualized = visualizationDataFromMeasurements(varying, fixed, measurements);
-    console.log('drawHere', drawHere);
     drawBenchmark(drawHere, asVisualized);
   };
 
@@ -332,10 +400,10 @@ function miniumTimesBySizeTemplate(elementID) {
 function codeAlignmentTemplate(elementID) {
   dynamicEntryPoint(elementID, {
     name: 'find 0',
-    size: 10000,
+    size: 1000,
     type: 'char',
     algorithm: 'selection',
-    padding: 'x',
+    padding: 'minmax',
     time: 'y',
     percentage: 100
   });
