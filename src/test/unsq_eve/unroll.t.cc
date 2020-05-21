@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "unsq_eve/iteration_main_loop_unrolled.h"
+#include "unsq_eve/unroll.h"
 
 #include <vector>
 
@@ -46,8 +46,7 @@ TEMPLATE_TEST_CASE("iteration_main_loop_unrolled", "[unsq_eve]", ALL_UNROLLS) {
   };
 
   SECTION("guarded") {
-    unsq_eve::iteration_main_loop_unrolled<traits>(v.data(),
-                                                   v.data() + v.size(), op);
+    unsq_eve::duffs_device_iteration<traits>(v.data(), v.data() + v.size(), op);
     for (int i = 0, j = 0; i < 1024; i += 8) {
       if (i >= stop_at) {
         REQUIRE(v[i] == 15);
@@ -62,7 +61,7 @@ TEMPLATE_TEST_CASE("iteration_main_loop_unrolled", "[unsq_eve]", ALL_UNROLLS) {
   }
 
   SECTION("unguarded") {
-    unsq_eve::iteration_main_loop_unrolled_unguarded<traits>(v.data(), op);
+    unsq_eve::unroll_iteration<traits>(v.data(), op);
     for (int i = 0, j = 0; i < 1024; i += 8) {
       if (i >= stop_at) {
         REQUIRE(v[i] == 15);

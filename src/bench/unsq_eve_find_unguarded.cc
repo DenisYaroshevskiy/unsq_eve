@@ -25,7 +25,7 @@ using make_traits = unsq_eve::iteration_traits<
     eve::fixed<width / sizeof(unsq_eve::ValueType<I>)>, unroll>;
 
 struct unsq_find_unguarded_128_1 {
-  const char* name() const { return "unsq::find_unguarded<128, 1>"; }
+  const char* name() const { return "unsq_eve::find_unguarded<128, 1>"; }
 
   template <typename I, typename T>
   I operator()(I f, I, const T& x) {
@@ -34,7 +34,7 @@ struct unsq_find_unguarded_128_1 {
 };
 
 struct unsq_find_unguarded_256_1 {
-  const char* name() const { return "unsq::find_unguarded<256, 1>"; }
+  const char* name() const { return "unsq_eve::find_unguarded<256, 1>"; }
 
   template <typename I, typename T>
   I operator()(I f, I, const T& x) {
@@ -43,7 +43,7 @@ struct unsq_find_unguarded_256_1 {
 };
 
 struct unsq_find_unguarded_256_4 {
-  const char* name() const { return "unsq::find_unguarded<256, 4>"; }
+  const char* name() const { return "unsq_eve::find_unguarded<256, 4>"; }
 
   template <typename I, typename T>
   I operator()(I f, I, const T& x) {

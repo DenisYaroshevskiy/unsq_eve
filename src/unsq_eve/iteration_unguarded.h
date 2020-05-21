@@ -15,7 +15,7 @@
  */
 
 #include "eve_extra/eve_extra.h"
-#include "unsq_eve/iteration_main_loop_unrolled.h"
+#include "unsq_eve/unroll.h"
 #include "unsq_eve/iteration_traits.h"
 
 #ifndef UNSQ_EVE_ITERATION_UNGUARDED_H_
@@ -30,21 +30,19 @@ P iteration_aligned_unguarded(T* f, P p) {
   using wide = eve::wide<ValueType<T*>, eve::fixed<Traits::width>>;
 
   auto aligned_f = eve_extra::previous_aligned_address(eve::as_<wide>{}, f);
-  using aligned_ptr = decltype(aligned_f);
 
   // Deal with first bit, maybe not fully in the data
   {
-    std::size_t to_ignore = static_cast<std::size_t>(f -  aligned_f.get());
-    auto ignore = eve_extra::ignore_first_n { to_ignore };
+    std::size_t to_ignore = static_cast<std::size_t>(f - aligned_f.get());
+    auto ignore = eve_extra::ignore_first_n{to_ignore};
     if (p(aligned_f, indx_c<0>{}, ignore)) return p;
   }
   aligned_f += Traits::width();
 
   // Everything else is on the caller.
-  iteration_main_loop_unrolled_unguarded<Traits>(
-      aligned_f.get(), [&](auto* cur, auto reg_idx) mutable {
-        return p(aligned_ptr(cur), reg_idx, eve_extra::ignore_nothing{});
-      });
+  unroll_iteration<Traits>(aligned_f, [&](auto cur, auto reg_idx) mutable {
+    return p(cur, reg_idx, eve_extra::ignore_nothing{});
+  });
 
   return p;
 }
