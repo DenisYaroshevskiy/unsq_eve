@@ -29,7 +29,7 @@ namespace _find {
 template <typename Traits, typename StrippedI, typename PV>
 // require ContigiousIterator<I> && VectorPredicate<PV, ValueType<I>>
 struct find_if_body {
-  using wide = eve::wide<ValueType<StrippedI>, eve::fixed<Traits::width()>>;
+  using wide = eve::wide<ValueType<StrippedI>, width_t<Traits>>;
 
   PV p;
   StrippedI found;
@@ -53,7 +53,7 @@ struct find_if_body {
 template <typename Traits, typename I, typename U>
 auto equal_to(const U& y) {
   using T = ValueType<I>;
-  using wide = eve::wide<T, eve::fixed<Traits::width()>>;
+  using wide = eve::wide<T, width_t<Traits>>;
   wide ys{static_cast<T>(y)};
   return [ys](const wide& xs) { return xs == ys; };
 }

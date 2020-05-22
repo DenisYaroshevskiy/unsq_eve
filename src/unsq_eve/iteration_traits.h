@@ -29,7 +29,11 @@ template <typename Width, std::size_t _unroll>
 struct iteration_traits {
   static constexpr Width width;
   static constexpr indx_c<_unroll> unroll;
+  using width_type = Width;
 };
+
+template <typename Traits>
+using width_t = typename Traits::width_type;
 
 template <typename I>
 using ValueType = typename std::iterator_traits<I>::value_type;

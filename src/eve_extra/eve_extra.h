@@ -17,13 +17,13 @@
 #ifndef EVE_EXTRA_LOAD_UNSAFE_H_
 #define EVE_EXTRA_LOAD_UNSAFE_H_
 
+#include <iostream>
 #include <optional>
 #include <type_traits>
-#include <iostream>
 
 #include <eve/eve.hpp>
-#include <eve/memory/align.hpp>
 #include <eve/function/load.hpp>
+#include <eve/memory/align.hpp>
 
 namespace eve_extra {
 
@@ -57,6 +57,23 @@ struct ignore_first_n {
   std::size_t n;
 };
 
+struct ignore_last_n {
+  std::size_t n;
+};
+
+struct ignore_first_last {
+  std::size_t first_n;
+  std::size_t last_n;
+};
+
+constexpr ignore_first_last combine(ignore_first_n x, ignore_last_n y) {
+  return ignore_first_last{x.n, y.n};
+}
+
+constexpr ignore_first_last combine(ignore_last_n x, ignore_first_n y) {
+  return combine(y, x);
+}
+
 namespace _eve_extra {
 
 template <typename Logical>
@@ -88,11 +105,25 @@ std::uint32_t clear_ingored(std::uint32_t mmask, ignore_first_n ignore) {
   return ignore_mask & mmask;
 }
 
+template <typename Logical>
+std::uint32_t clear_ingored(std::uint32_t mmask, ignore_last_n ignore) {
+  using scalar = typename Logical::value_type;
+
+  std::uint32_t ignore_mask =
+      set_lower_n_bits(sizeof(Logical) - ignore.n * sizeof(scalar));
+  return ignore_mask & mmask;
+}
+
+template <typename Logical>
+std::uint32_t clear_ingored(std::uint32_t mmask, ignore_first_last ignore) {
+  mmask = clear_ingored<Logical>(mmask, ignore_first_n{ignore.first_n});
+  return clear_ingored<Logical>(mmask, ignore_last_n{ignore.last_n});
+};
+
 }  // namespace _eve_extra
 
 template <typename Logical, typename Ignore>
-std::optional<std::size_t> first_true(Logical logical,
-                                      Ignore ignore) {
+std::optional<std::size_t> first_true(Logical logical, Ignore ignore) {
   std::uint32_t mmask = _eve_extra::movemask(logical);
   mmask = _eve_extra::clear_ingored<Logical>(mmask, ignore);
 
