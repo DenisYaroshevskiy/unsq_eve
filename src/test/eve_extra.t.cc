@@ -229,4 +229,16 @@ TEMPLATE_TEST_CASE("eve_extra.any", "[eve_extra]", ALL_TEST_PACKS) {
   }
 }
 
+TEST_CASE("load extra wide from real aligned ptr", "[eve_extra]") {
+  using wide = eve::wide<char, eve::fixed<32 * 2>>;
+  using real_wide = eve::wide<char, eve::fixed<32>>;
+
+  alignas(real_wide) std::array<char, 32 * 2> data{};
+
+  using aligned_ptr = eve::aligned_ptr<char, alignof(real_wide)>;
+
+  wide test{aligned_ptr(data.data())};
+  REQUIRE(eve::all(test == wide{0}));
+}
+
 }  // namespace

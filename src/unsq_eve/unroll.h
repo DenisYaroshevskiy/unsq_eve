@@ -113,16 +113,12 @@ struct duffs_device<4u, width> {
   }
 };
 
-template <std::ptrdiff_t width, typename Ptr, typename Op,
-          std::size_t... unroll_idxs>
-std::pair<Ptr, bool> do_unroll(Ptr f, Op op,
-                               std::index_sequence<unroll_idxs...>) {
-  const bool test = ([&] () mutable {
-    if (op(f, indx_c<unroll_idxs>{})) return true;
-    f += width;
+template <typename Op, std::size_t... unroll_idxs>
+bool do_unroll(Op op, std::index_sequence<unroll_idxs...>) {
+  return ([&]() mutable {
+    if (op(indx_c<unroll_idxs>{})) return true;
     return false;
   }() || ...);
-  return {f, test};
 }
 
 }  // namespace _unroll
@@ -134,20 +130,22 @@ void duffs_device_iteration(Ptr f, Ptr l, Op op) {
   device(f, l, op);
 }
 
-template <typename Traits, typename Ptr, typename Op>
-std::pair<Ptr, bool> unroll(Ptr f, Op op) {
-  return _unroll::do_unroll<Traits::width()>(
-      f, op, std::make_index_sequence<Traits::unroll()>{});
+template <std::size_t how_much, typename Op>
+bool unroll(Op op) {
+  return _unroll::do_unroll(op, std::make_index_sequence<how_much>{});
 }
 
 template <typename Traits, typename Ptr, typename Op>
 void unroll_iteration(Ptr f, Op op) {
-  while (true) {
-    auto [f_, test] = unroll<Traits>(f, op);
-    f = f_;
-    if (test) return;
+  auto tranformed_op = [&](auto idx) mutable {
+    Ptr offset_ptr = f + Traits::width() * idx;
+    return op(offset_ptr, idx);
+  };
+
+  while (!unroll<Traits::unroll()>(tranformed_op)) {
+    f += Traits::width() * Traits::unroll();
   }
-}
+}  // namespace unsq_eve
 
 }  // namespace unsq_eve
 
