@@ -68,6 +68,12 @@ I undo_drill_down(I f, T* ptr) {
 template <typename I>
 using DrillDownI = Pointer<I>;
 
+enum class StopReason {
+  No,
+  EndReached,
+  Terminated,
+};
+
 }  // namespace unsq_eve
 
 #endif  // UNSQ_EVE_ITERATION_TRAITS_H_

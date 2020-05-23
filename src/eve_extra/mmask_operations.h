@@ -21,19 +21,43 @@
 
 namespace eve_extra {
 
-struct ignore_nothing {};
+struct ignore_nothing {
+  friend std::ostream& operator<<(std::ostream& out, const ignore_nothing&) {
+    out << "ignore_noting";
+    return out;
+  }
+};
 
 struct ignore_first_n {
   std::size_t n;
+
+  friend std::ostream& operator<<(std::ostream& out,
+                                  const ignore_first_n& ignore) {
+    out << "ignore_first{" << ignore.n << "}";
+    return out;
+  }
 };
 
 struct ignore_last_n {
   std::size_t n;
+
+  friend std::ostream& operator<<(std::ostream& out,
+                                  const ignore_last_n& ignore) {
+    out << "ignore_last{" << ignore.n << "}";
+    return out;
+  }
 };
 
 struct ignore_first_last {
   std::size_t first_n;
   std::size_t last_n;
+
+  friend std::ostream& operator<<(std::ostream& out,
+                                  const ignore_first_last& ignore) {
+    out << "ignore_first_last{" << ignore.first_n << ',' << ignore.last_n
+        << "}";
+    return out;
+  }
 };
 
 constexpr ignore_first_last combine(ignore_first_n x, ignore_last_n y) {

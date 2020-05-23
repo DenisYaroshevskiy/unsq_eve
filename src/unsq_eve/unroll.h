@@ -114,11 +114,14 @@ struct duffs_device<4u, width> {
 };
 
 template <typename Op, std::size_t... unroll_idxs>
-bool do_unroll(Op op, std::index_sequence<unroll_idxs...>) {
-  return ([&]() mutable {
-    if (op(indx_c<unroll_idxs>{})) return true;
-    return false;
-  }() || ...);
+StopReason do_unroll(Op op, std::index_sequence<unroll_idxs...>) {
+  StopReason res = StopReason::No;
+  ([&]() mutable {
+    res = op(indx_c<unroll_idxs>{});
+    return res != StopReason::No;
+  }() ||
+   ...);
+  return res;
 }
 
 }  // namespace _unroll
@@ -131,7 +134,7 @@ void duffs_device_iteration(Ptr f, Ptr l, Op op) {
 }
 
 template <std::size_t how_much, typename Op>
-bool unroll(Op op) {
+auto unroll(Op op) {
   return _unroll::do_unroll(op, std::make_index_sequence<how_much>{});
 }
 
@@ -139,10 +142,10 @@ template <typename Traits, typename Ptr, typename Op>
 void unroll_iteration(Ptr f, Op op) {
   auto tranformed_op = [&](auto idx) mutable {
     Ptr offset_ptr = f + Traits::width() * idx;
-    return op(offset_ptr, idx);
+    return op(offset_ptr, idx) ? StopReason::Terminated : StopReason::No;
   };
 
-  while (!unroll<Traits::unroll()>(tranformed_op)) {
+  while (unroll<Traits::unroll()>(tranformed_op) == StopReason::No) {
     f += Traits::width() * Traits::unroll();
   }
 }  // namespace unsq_eve

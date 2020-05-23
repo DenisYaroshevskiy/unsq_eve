@@ -1,18 +1,8 @@
 #include "eve_extra/eve_extra.h"
+#include "unsq_eve/all_any_none.h"
 
-using logical = eve::logical<eve::wide<char, eve::fixed<32 * 4>>>;
-/*using small_wide = eve::wide<char, eve::fixed<32>>;
+struct traits : unsq_eve::iteration_traits<eve::fixed<32>, 4> {
+  static constexpr bool use_extra_any = true;
+};
 
-bool eve_greater(const small_wide& x, const small_wide& y) {
-  return eve::any(x > y);
-}*/
-
-bool eve_extra_any(const logical& vbool) {
-  return eve_extra::any(vbool, eve_extra::ignore_nothing{});
-}
-
-/*
-bool eve_any(const logical& vbool) {
-  return eve::any(vbool);
-}
-*/
+bool any_zeroes(const char* f, const char* l) { return unsq_eve::any_of_is<traits>(f, l, 0); }

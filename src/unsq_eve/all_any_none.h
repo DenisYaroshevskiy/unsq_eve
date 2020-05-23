@@ -17,6 +17,9 @@
 #ifndef UNSQ_EVE_ALL_ANY_NONE_H_
 #define UNSQ_EVE_ALL_ANY_NONE_H_
 
+#include <algorithm>
+#include <array>
+
 #include "eve_extra/eve_extra.h"
 
 #include "unsq_eve/iteration_guarded.h"
@@ -27,38 +30,69 @@ namespace _all_any_none {
 template <typename Traits, typename StrippedI, typename PV>
 // require ContigiousIterator<I> && VectorPredicate<PV, ValueType<I>>
 struct any_body {
-  using wide = eve::wide<ValueType<StrippedI>, width_t<Traits>>;
-  using extra_wide = eve::wide<ValueType<StrippedI>, extra_width_t<Traits>>;
+  using T = ValueType<StrippedI>;
+  using wide = eve::wide<T, width_t<Traits>>;
 
   PV p;
   bool res = false;
 
-  any_body(PV p) : p(p) {}
+  // Intentionally unitilialized
+  std::array<wide, Traits::unroll()> regs;
 
-  template <typename Ptr, typename Ignore>
-  bool small_step(Ptr ptr, Ignore ignore) {
-    wide reg;
+  explicit any_body(PV p) : p(p) {}
+
+  template <typename Ptr, std::size_t idx, typename Ignore>
+  bool small_step(Ptr ptr, indx_c<idx>, Ignore ignore) {
     if constexpr (std::is_same_v<Ignore, eve_extra::ignore_nothing>) {
-      reg = wide{ptr};
+      regs[idx] = wide{ptr};
     } else {
-      reg = eve_extra::load_unsafe(ptr, eve::as_<wide>{});
+      regs[idx] = eve_extra::load_unsafe(ptr, eve::as_<wide>{});
     }
-    res = eve_extra::any(p(reg), ignore);
+
+    res = eve_extra::any(p(regs[idx]), ignore);
+
     return res;
   }
 
-  template <typename Ptr>
-  bool big_step(Ptr ptr, eve_extra::ignore_nothing ignore) {
-    extra_wide reg{ptr};
-    auto applied = eve_extra::widened_predicate<wide, extra_wide>(p)(reg);
+  // All registers are already intialized with small steps
+  // before invoking big steps.
+  // Big step will be invoked for each register, in order, once each step.
 
-    if constexpr(Traits::use_extra_any) {
-      res = eve_extra::any(applied, ignore);
-    } else {
-      res = eve::any(applied);
-    }
+  void before_big_steps() {}
+  void start_big_step() {}
+
+  template <typename Ptr, std::size_t idx>
+  bool big_step(Ptr ptr, indx_c<idx>) {
+    regs[idx] = wide{ptr};
+    return false;
+  }
+
+  bool complete_big_step() {
+    using logical = eve::logical<wide>;
+    using extra_fixed = eve::fixed<Traits::width() * Traits::unroll()>;
+    using extra_wide = eve::wide<T, extra_fixed>;
+    using extra_logical = eve::logical<extra_wide>;
+
+    using bool_t = typename extra_logical::value_type;
+    using aligned_ptr = eve::aligned_ptr<bool_t, alignof(extra_logical)>;
+
+    // Compute predicate for each register
+    alignas(extra_logical) std::array<logical, Traits::unroll()> tests;
+    std::transform(regs.begin(), regs.end(), tests.begin(), p);
+
+    // Pretened this is 'eve::wide'
+    aligned_ptr tests_ptr{reinterpret_cast<bool_t*>(tests.data())};
+    const extra_logical as_extra_wide{tests_ptr};
+
+    // Do a smarter any
+    if constexpr (Traits::use_extra_any)
+      res = eve_extra::any(as_extra_wide, eve_extra::ignore_nothing{});
+    else
+      res = eve::any(as_extra_wide);
     return res;
   }
+
+  void after_big_steps() {}
 };
 
 template <typename Traits, typename I, typename U>

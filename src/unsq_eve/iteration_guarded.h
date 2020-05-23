@@ -22,47 +22,88 @@
 #define UNSQ_EVE_ITERATION_GUARDED_H_
 
 namespace unsq_eve {
+namespace _iteration_guarded {
 
-template <typename Traits, typename T, typename P>
+template <typename Traits, typename Ptr, typename Delegate>
+StopReason main_loop(Ptr aligned_f, Ptr aligned_l, Delegate& delegate) {
+  while (true) {  // To the beginning at most twice
+    // initialize every register with small steps
+    // (also can help for smaller range size)
+    // (also reusable for when not enough for big step)
+    StopReason res = unroll<Traits::unroll()>([&](auto idx) mutable {
+      if (aligned_f.get() == aligned_l.get()) return StopReason::EndReached;
+
+      if (delegate.small_step(aligned_f, idx, eve_extra::ignore_nothing{}))
+        return StopReason::Terminated;
+
+      aligned_f += Traits::width();
+      return StopReason::No;
+    });
+
+    if (res != StopReason::No) return res;
+
+    static constexpr std::ptrdiff_t big_step =
+        Traits::width() * Traits::unroll();
+
+    std::ptrdiff_t big_steps_count =
+        (aligned_l.get() - aligned_f.get()) / big_step;
+    if (!big_steps_count) continue;
+
+    delegate.before_big_steps();
+
+    do {
+      delegate.start_big_step();
+
+      res = unroll<Traits::unroll()>([&](auto idx) mutable {
+        Ptr offset_ptr{aligned_f + Traits::width() * idx};
+        if (delegate.big_step(offset_ptr, idx)) return StopReason::Terminated;
+        return StopReason::No;
+      });
+
+      if (res != StopReason::No) return res;
+
+      if (delegate.complete_big_step()) return StopReason::Terminated;
+
+      aligned_f += big_step;
+      --big_steps_count;
+    } while (big_steps_count);
+
+    delegate.after_big_steps();
+  }
+}
+
+}  //  namespace _iteration_guarded
+
+template <typename Traits, typename T, typename Delegate>
 // require ContigiousIterator<I> && IterationAlignedDelegate<P>
-P iteration_aligned(T* f, T* l, P p) {
+Delegate iteration_aligned(T* f, T* l, Delegate delegate) {
   using wide = eve::wide<ValueType<T*>, eve::fixed<Traits::width()>>;
-  using extra_wide =
-      eve::wide<ValueType<T*>, eve::fixed<Traits::width() * Traits::unroll()>>;
 
   auto aligned_f = eve_extra::previous_aligned_address(eve::as_<wide>{}, f);
   auto aligned_l = eve_extra::previous_aligned_address(eve::as_<wide>{}, l);
 
-  // Deal with first bit, maybe not fully in the data
   eve_extra::ignore_first_n ignore_first{
       static_cast<std::size_t>(f - aligned_f.get())};
 
   if (aligned_f.get() != aligned_l.get()) {
-    if (p.small_step(aligned_f, ignore_first)) return p;
+    // first chunk, maybe partial
+    if (delegate.small_step(aligned_f, indx_c<0>{}, ignore_first))
+      return delegate;
     ignore_first = eve_extra::ignore_first_n{0};
     aligned_f += Traits::width();
 
-    std::ptrdiff_t unrolled_steps =
-        (aligned_l.get() - aligned_f.get()) / extra_wide::static_size;
+    StopReason stop =
+        _iteration_guarded::main_loop<Traits>(aligned_f, aligned_l, delegate);
 
-    while (unrolled_steps) {
-      if (p.big_step(aligned_f, eve_extra::ignore_nothing{})) return p;
-      --unrolled_steps;
-      aligned_f += extra_wide::static_size;
-    }
-
-    while (aligned_f.get() != aligned_l.get()) {
-      p.small_step(aligned_f, eve_extra::ignore_nothing{});
-      aligned_f += Traits::width();
-    }
-
-    if (aligned_l.get() == l) return p;
+    if (stop == StopReason::Terminated || aligned_l.get() == l) return delegate;
   }
 
-  eve_extra::ignore_last_n ignore_last{
-      static_cast<std::size_t>(aligned_l.get() + Traits::width() - l)};
-  p.small_step(aligned_l, eve_extra::combine(ignore_first, ignore_last));
-  return p;
+  const std::ptrdiff_t last_offset = aligned_l.get() + Traits::width() - l;
+
+  eve_extra::ignore_last_n ignore_last{static_cast<std::size_t>(last_offset)};
+  delegate.small_step(aligned_l, indx_c<0>{},
+                      eve_extra::combine(ignore_first, ignore_last));
+  return delegate;
 }
 
 }  // namespace unsq_eve
