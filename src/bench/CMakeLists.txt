@@ -27,3 +27,5 @@ endfunction()
 
 add_benchmark(std_find std_find.cc)
 add_benchmark(unsq_eve_find_unguarded unsq_eve_find_unguarded.cc)
+add_benchmark(unsq_eve_any_of_use_extra_any unsq_eve_any_of_use_extra_any.cc)
+add_benchmark(unsq_eve_any_of_default_any unsq_eve_any_of_default_any.cc)
