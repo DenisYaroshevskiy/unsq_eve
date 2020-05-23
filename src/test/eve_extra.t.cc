@@ -178,8 +178,6 @@ TEST_CASE("eve_extra.load_const_aligned_ptr", "[eve_extra]") {
 }
 
 TEST_CASE("eve_extra.extra_wide_movemask", "[eve_extra]") {
-  using namespace eve_extra::_eve_extra;
-
   using wide = eve::wide<char, eve::fixed<32 * 4>>;
   wide x {char(0)}, y{char(1)};
   x[0] = char(1);
@@ -188,14 +186,47 @@ TEST_CASE("eve_extra.extra_wide_movemask", "[eve_extra]") {
   expected_res_type expected{0};
   expected[0] = 1;
 
-  expected_res_type actual = extra_wide_movemask(x == y);
+  expected_res_type actual = eve_extra::extra_wide_movemask(x == y);
 
   const expected_res_type zeroes{0};
 
-  std::cout << actual << std::endl;
-  std::cout << movemask((actual > zeroes).bits()) << std::endl;
-
   REQUIRE(eve::all(actual == expected));
+}
+
+TEMPLATE_TEST_CASE("eve_extra.any", "[eve_extra]", ALL_TEST_PACKS) {
+  using wide = TestType;
+
+  wide x{0}, y{1};
+
+  REQUIRE(!eve_extra::any(x == y, eve_extra::ignore_nothing{}));
+  x[0] = 1;
+  REQUIRE(eve_extra::any(x == y, eve_extra::ignore_nothing{}));
+  REQUIRE(!eve_extra::any(x == y, eve_extra::ignore_first_n{1}));
+
+  SECTION("extra_wide") {
+    using T = typename wide::value_type;
+    constexpr std::ptrdiff_t size = wide::static_size;
+
+    auto run = [](auto reg) {
+      using extra_wide = decltype(reg);
+
+      extra_wide x{0};
+      extra_wide y{1};
+
+      REQUIRE(!eve_extra::any(x == y, eve_extra::ignore_nothing{}));
+
+      for (auto& elem : x) {
+        elem = 1;
+        REQUIRE(eve_extra::any(x == y, eve_extra::ignore_nothing{}));
+        elem = 0;
+      }
+    };
+
+    run(eve::wide<T, eve::fixed<size>>{});
+    run(eve::wide<T, eve::fixed<2 * size>>{});
+    run(eve::wide<T, eve::fixed<4 * size>>{});
+    run(eve::wide<T, eve::fixed<8 * size>>{});
+  }
 }
 
 }  // namespace

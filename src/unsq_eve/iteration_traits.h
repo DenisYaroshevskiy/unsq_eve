@@ -27,8 +27,8 @@ using indx_c = std::integral_constant<std::size_t, i>;
 
 template <typename Width, std::size_t _unroll>
 struct iteration_traits {
-  static constexpr Width width;
-  static constexpr indx_c<_unroll> unroll;
+  static constexpr Width width{};
+  static constexpr indx_c<_unroll> unroll{};
   using width_type = Width;
 };
 

@@ -1,81 +1,34 @@
 	.text
 	.intel_syntax noprefix
 	.file	"disassemble.cc"
-	.globl	_Z9my_strlenPc          # -- Begin function _Z9my_strlenPc
+	.globl	_Z13eve_extra_anyRKN3eve7logicalINS_4wideIcNS_5fixedILl128EEENS_11aggregated_EEEEE # -- Begin function _Z13eve_extra_anyRKN3eve7logicalINS_4wideIcNS_5fixedILl128EEENS_11aggregated_EEEEE
 	.p2align	4, 0x90
-	.type	_Z9my_strlenPc,@function
-_Z9my_strlenPc:                         # @_Z9my_strlenPc
-.L_Z9my_strlenPc$local:
+	.type	_Z13eve_extra_anyRKN3eve7logicalINS_4wideIcNS_5fixedILl128EEENS_11aggregated_EEEEE,@function
+_Z13eve_extra_anyRKN3eve7logicalINS_4wideIcNS_5fixedILl128EEENS_11aggregated_EEEEE: # @_Z13eve_extra_anyRKN3eve7logicalINS_4wideIcNS_5fixedILl128EEENS_11aggregated_EEEEE
+.L_Z13eve_extra_anyRKN3eve7logicalINS_4wideIcNS_5fixedILl128EEENS_11aggregated_EEEEE$local:
 	.cfi_startproc
 # %bb.0:
-	mov	rcx, rdi
-	and	rcx, -32
-	vpxor	xmm0, xmm0, xmm0
-	vpcmpeqb	ymm1, ymm0, ymmword ptr [rcx]
-	vpmovmskb	eax, ymm1
-	shrx	eax, eax, edi
-	shlx	eax, eax, edi
-	test	eax, eax
-	je	.LBB0_1
-.LBB0_10:
-	tzcnt	eax, eax
-	add	rax, rcx
-	sub	rax, rdi
-	vzeroupper
-	ret
-.LBB0_1:
-	vpcmpeqb	ymm0, ymm0, ymmword ptr [rcx + 32]
+	vmovdqa	ymm0, ymmword ptr [rdi]
+	vmovdqa	ymm1, ymmword ptr [rdi + 32]
+	vmovdqa	ymm2, ymmword ptr [rdi + 64]
+	vmovdqa	ymm3, ymmword ptr [rdi + 96]
 	vpmovmskb	eax, ymm0
-	test	eax, eax
-	je	.LBB0_2
-.LBB0_9:
-	add	rcx, 32
-	tzcnt	eax, eax
-	add	rax, rcx
-	sub	rax, rdi
-	vzeroupper
-	ret
-.LBB0_2:
-	add	rcx, 96
-	vpxor	xmm0, xmm0, xmm0
-	.p2align	4, 0x90
-.LBB0_3:                                # =>This Inner Loop Header: Depth=1
-	vpcmpeqb	ymm1, ymm0, ymmword ptr [rcx - 32]
-	vpmovmskb	eax, ymm1
-	test	eax, eax
-	jne	.LBB0_8
-# %bb.4:                                #   in Loop: Header=BB0_3 Depth=1
-	vpcmpeqb	ymm1, ymm0, ymmword ptr [rcx]
-	vpmovmskb	eax, ymm1
-	test	eax, eax
-	jne	.LBB0_10
-# %bb.5:                                #   in Loop: Header=BB0_3 Depth=1
-	vpcmpeqb	ymm1, ymm0, ymmword ptr [rcx + 32]
-	vpmovmskb	eax, ymm1
-	test	eax, eax
-	jne	.LBB0_9
-# %bb.6:                                #   in Loop: Header=BB0_3 Depth=1
-	vpcmpeqb	ymm1, ymm0, ymmword ptr [rcx + 64]
-	vpmovmskb	eax, ymm1
-	sub	rcx, -128
-	test	eax, eax
-	je	.LBB0_3
-# %bb.7:
-	add	rcx, -64
-	tzcnt	eax, eax
-	add	rax, rcx
-	sub	rax, rdi
-	vzeroupper
-	ret
-.LBB0_8:
-	add	rcx, -32
-	tzcnt	eax, eax
-	add	rax, rcx
-	sub	rax, rdi
+	vpmovmskb	ecx, ymm1
+	vpmovmskb	edx, ymm2
+	vpmovmskb	esi, ymm3
+	vmovd	xmm0, eax
+	vpinsrd	xmm0, xmm0, ecx, 1
+	vpinsrd	xmm0, xmm0, edx, 2
+	vpinsrd	xmm0, xmm0, esi, 3
+	vpxor	xmm1, xmm1, xmm1
+	vpcmpeqd	xmm0, xmm0, xmm1
+	vpmovmskb	eax, xmm0
+	xor	ax, -1
+	setne	al
 	vzeroupper
 	ret
 .Lfunc_end0:
-	.size	_Z9my_strlenPc, .Lfunc_end0-_Z9my_strlenPc
+	.size	_Z13eve_extra_anyRKN3eve7logicalINS_4wideIcNS_5fixedILl128EEENS_11aggregated_EEEEE, .Lfunc_end0-_Z13eve_extra_anyRKN3eve7logicalINS_4wideIcNS_5fixedILl128EEENS_11aggregated_EEEEE
 	.cfi_endproc
                                         # -- End function
 	.section	.text.startup,"ax",@progbits
