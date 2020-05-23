@@ -177,4 +177,25 @@ TEST_CASE("eve_extra.load_const_aligned_ptr", "[eve_extra]") {
   REQUIRE(eve::all(loaded == wide{1}));
 }
 
+TEST_CASE("eve_extra.extra_wide_movemask", "[eve_extra]") {
+  using namespace eve_extra::_eve_extra;
+
+  using wide = eve::wide<char, eve::fixed<32 * 4>>;
+  wide x {char(0)}, y{char(1)};
+  x[0] = char(1);
+
+  using expected_res_type = eve::wide<std::uint32_t, eve::fixed<4>>;
+  expected_res_type expected{0};
+  expected[0] = 1;
+
+  expected_res_type actual = extra_wide_movemask(x == y);
+
+  const expected_res_type zeroes{0};
+
+  std::cout << actual << std::endl;
+  std::cout << movemask((actual > zeroes).bits()) << std::endl;
+
+  REQUIRE(eve::all(actual == expected));
+}
+
 }  // namespace

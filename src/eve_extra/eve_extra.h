@@ -76,13 +76,33 @@ constexpr ignore_first_last combine(ignore_last_n x, ignore_first_n y) {
 
 namespace _eve_extra {
 
-template <typename Logical>
-std::uint32_t movemask(Logical logical) {
-  if constexpr (sizeof(Logical) == 16) {
-    return _mm_movemask_epi8(logical.mask());
+template <typename Register>
+std::uint32_t movemask(Register reg) {
+  if constexpr (sizeof(reg) == 16) {
+    return _mm_movemask_epi8(reg);
   } else {
-    return _mm256_movemask_epi8(logical.mask());
+    return _mm256_movemask_epi8(reg);
   }
+}
+
+template<typename T, typename N, typename ABI>
+auto extra_wide_movemask(eve::logical<eve::wide<T, N, ABI>> vbool) {
+  using storage_type = typename eve::logical<eve::wide<T, N, ABI>>::storage_type;
+  static constexpr std::size_t replication = storage_type::replication;
+
+  static_assert(replication <= 8,
+                "Can't do one register operation for more than 8");
+
+  const auto& segments = vbool.storage().segments;
+
+  static constexpr std::size_t mmask_count = replication > 4 ? 8 : 4;
+
+  eve::wide<std::uint32_t, eve::fixed<mmask_count>> mmasks {0};
+  for (std::size_t i = 0; i != replication; ++i) {
+    mmasks[i] = movemask(segments[i].storage());
+  }
+
+  return mmasks;
 }
 
 template <typename Logical>
@@ -110,7 +130,7 @@ std::uint32_t clear_ingored(std::uint32_t mmask, ignore_last_n ignore) {
   using scalar = typename Logical::value_type;
 
   std::uint32_t ignore_mask =
-      set_lower_n_bits(sizeof(Logical) - ignore.n * sizeof(scalar));
+      set_lower_n_bits(sizeof(typename Logical::storage_type) - ignore.n * sizeof(scalar));
   return ignore_mask & mmask;
 }
 
@@ -122,13 +142,21 @@ std::uint32_t clear_ingored(std::uint32_t mmask, ignore_first_last ignore) {
 
 }  // namespace _eve_extra
 
-template <typename Logical, typename Ignore>
-std::optional<std::size_t> first_true(Logical logical, Ignore ignore) {
-  std::uint32_t mmask = _eve_extra::movemask(logical);
-  mmask = _eve_extra::clear_ingored<Logical>(mmask, ignore);
+template<typename T, typename N, typename ABI, typename Ignore>
+std::optional<std::size_t> first_true(eve::logical<eve::wide<T, N, ABI>> logical,
+                                      Ignore ignore) {
+  if constexpr (eve::detail::is_aggregated_v<ABI>) {
+    static_assert(std::is_same_v<Ignore, ignore_nothing>,
+                  "ignore is not supported for extra wide");
 
-  if (!mmask) return {};
-  return __builtin_ctz(mmask) / sizeof(typename Logical::value_type);
+  } else {
+    using logical_t = eve::logical<eve::wide<T, N, ABI>>;
+    std::uint32_t mmask = _eve_extra::movemask(logical.mask());
+    mmask = _eve_extra::clear_ingored<logical_t>(mmask, ignore);
+
+    if (!mmask) return {};
+    return __builtin_ctz(mmask) / sizeof(typename logical_t::value_type);
+  }
 }
 
 }  // namespace eve_extra
