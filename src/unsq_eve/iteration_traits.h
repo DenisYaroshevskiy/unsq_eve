@@ -20,6 +20,8 @@
 #include <iterator>
 #include <utility>
 
+#include "eve_extra/eve_extra.h"
+
 namespace unsq_eve {
 
 template <std::size_t i>
@@ -34,6 +36,9 @@ struct iteration_traits {
 
 template <typename Traits>
 using width_t = typename Traits::width_type;
+
+template <typename Traits>
+using extra_width_t = eve::fixed<Traits::width() * Traits::unroll()>;
 
 template <typename I>
 using ValueType = typename std::iterator_traits<I>::value_type;
@@ -51,7 +56,7 @@ template <typename I>
 // require ContigiousIterator<I>
 std::pair<Pointer<I>, Pointer<I>> drill_down_range(I f, I l) {
   auto _f = drill_down(f);
-  return {_f, f + (l - f)};
+  return {_f, _f + (l - f)};
 }
 
 template <typename I, typename T>

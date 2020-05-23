@@ -104,11 +104,9 @@ template <typename T, typename Alg>
 void common_find_test_traits_combinations(Alg alg) {
   common_find_test_impl<variation<T, 16, 1>>(alg);
   common_find_test_impl<variation<T, 16, 2>>(alg);
-  common_find_test_impl<variation<T, 16, 3>>(alg);
   common_find_test_impl<variation<T, 16, 4>>(alg);
   common_find_test_impl<variation<T, 32, 1>>(alg);
   common_find_test_impl<variation<T, 32, 2>>(alg);
-  common_find_test_impl<variation<T, 32, 3>>(alg);
   common_find_test_impl<variation<T, 32, 4>>(alg);
 }
 

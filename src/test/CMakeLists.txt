@@ -18,6 +18,7 @@ add_executable(tests)
 
 target_sources(tests PRIVATE
                eve_extra.t.cc
+               unsq_eve/all_any_none.t.cc
                unsq_eve/find.t.cc
                unsq_eve/unroll.t.cc
                catch_main.cc)

@@ -8,22 +8,12 @@ _Z13eve_extra_anyRKN3eve7logicalINS_4wideIcNS_5fixedILl128EEENS_11aggregated_EEE
 .L_Z13eve_extra_anyRKN3eve7logicalINS_4wideIcNS_5fixedILl128EEENS_11aggregated_EEEEE$local:
 	.cfi_startproc
 # %bb.0:
-	vmovdqa	ymm0, ymmword ptr [rdi]
-	vmovdqa	ymm1, ymmword ptr [rdi + 32]
-	vmovdqa	ymm2, ymmword ptr [rdi + 64]
-	vmovdqa	ymm3, ymmword ptr [rdi + 96]
+	vmovdqa	ymm0, ymmword ptr [rdi + 32]
+	vpor	ymm0, ymm0, ymmword ptr [rdi]
+	vpor	ymm0, ymm0, ymmword ptr [rdi + 64]
+	vpor	ymm0, ymm0, ymmword ptr [rdi + 96]
 	vpmovmskb	eax, ymm0
-	vpmovmskb	ecx, ymm1
-	vpmovmskb	edx, ymm2
-	vpmovmskb	esi, ymm3
-	vmovd	xmm0, eax
-	vpinsrd	xmm0, xmm0, ecx, 1
-	vpinsrd	xmm0, xmm0, edx, 2
-	vpinsrd	xmm0, xmm0, esi, 3
-	vpxor	xmm1, xmm1, xmm1
-	vpcmpeqd	xmm0, xmm0, xmm1
-	vpmovmskb	eax, xmm0
-	xor	ax, -1
+	test	eax, eax
 	setne	al
 	vzeroupper
 	ret

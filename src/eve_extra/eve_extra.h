@@ -70,20 +70,68 @@ std::optional<std::size_t> first_true(
   }
 }
 
+/*
+Compiler does not generate this properly, instead of doing things one
+after another if you ask it.
+*/
+
+template <typename Wide, typename Op>
+Wide segment_reduction(const std::array<Wide, 2>& arr, Op op) {
+  return op(arr[0], arr[1]);
+}
+
+template <typename Wide, typename Op>
+Wide segment_reduction(const std::array<Wide, 4>& arr, Op op) {
+  auto x = op(arr[0], arr[2]);
+  auto y = op(arr[1], arr[3]);
+  return op(x, y);
+}
+
+template <typename Wide, typename Op>
+Wide segment_reduction(const std::array<Wide, 8>& arr, Op op) {
+  auto x1 = op(arr[0], arr[4]);
+  auto x2 = op(arr[1], arr[5]);
+  auto x3 = op(arr[2], arr[6]);
+  auto x4 = op(arr[3], arr[7]);
+  x1 = op(x1, x2);
+  x3 = op(x3, x4);
+  return op(x1, x3);
+}
+
 template <typename T, typename N, typename ABI, typename Ignore>
-bool any(eve::logical<eve::wide<T, N, ABI>> logical, Ignore ignore) {
+bool any(const eve::logical<eve::wide<T, N, ABI>>& vbool, Ignore ignore) {
   using logical_t = eve::logical<eve::wide<T, N, ABI>>;
 
   if constexpr (eve::detail::is_aggregated_v<ABI>) {
     static_assert(std::is_same_v<Ignore, ignore_nothing>,
                   "ignore is not supported for extra wide");
-    auto wide_mmask = extra_wide_movemask(logical);
-    decltype(wide_mmask) zeroes{0};
-    return eve::any(wide_mmask > zeroes);
+    return eve::any(segment_reduction(vbool.storage().segments, eve::max));
   } else {
-    std::uint32_t mmask = eve_extra::movemask(logical.mask());
+    std::uint32_t mmask = eve_extra::movemask(vbool.mask());
     mmask = _eve_extra::clear_ingored<logical_t>(mmask, ignore);
     return mmask;
+  }
+}
+
+template <typename Wide, typename ExtraWide, typename SmallP>
+auto widened_predicate(SmallP p) {
+  if constexpr (eve::detail::is_aggregated_v<typename ExtraWide::abi_type>) {
+    return [p](const ExtraWide& extra_wide) {
+      eve::logical<ExtraWide> res;
+      const auto& in_segments = extra_wide.storage().segments;
+      auto& out_segments = res.storage().segments;
+      std::transform(in_segments.begin(), in_segments.end(),
+                     out_segments.begin(), p);
+      return res;
+    };
+  } else if constexpr(sizeof(ExtraWide) == 2 * sizeof(Wide)) {
+    return [p](const ExtraWide& extra_wide) {
+      auto low = extra_wide.slice(eve::lower_slice{});
+      auto high = extra_wide.slice(eve::upper_slice{});
+      return eve::logical<ExtraWide>{p(low), p(high)};
+    };
+  } else {
+    return p;
   }
 }
 

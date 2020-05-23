@@ -37,20 +37,21 @@ P iteration_aligned(T* f, T* l, P p) {
   eve_extra::ignore_first_n ignore_first{
       static_cast<std::size_t>(f - aligned_f.get())};
 
-  if (aligned_f != aligned_l) {
+  if (aligned_f.get() != aligned_l.get()) {
     if (p.small_step(aligned_f, ignore_first)) return p;
     ignore_first = eve_extra::ignore_first_n{0};
+    aligned_f += Traits::width();
 
     std::ptrdiff_t unrolled_steps =
         (aligned_l.get() - aligned_f.get()) / extra_wide::static_size;
 
     while (unrolled_steps) {
-      if (p.big_step(aligned_f, eve_extra::ignore_nothing{})) return;
+      if (p.big_step(aligned_f, eve_extra::ignore_nothing{})) return p;
       --unrolled_steps;
       aligned_f += extra_wide::static_size;
     }
 
-    while (aligned_f != aligned_l) {
+    while (aligned_f.get() != aligned_l.get()) {
       p.small_step(aligned_f, eve_extra::ignore_nothing{});
       aligned_f += Traits::width();
     }
