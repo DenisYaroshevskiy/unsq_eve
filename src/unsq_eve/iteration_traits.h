@@ -27,11 +27,11 @@ namespace unsq_eve {
 template <std::size_t i>
 using indx_c = std::integral_constant<std::size_t, i>;
 
-template <typename Width, std::size_t _unroll>
+template <std::size_t _width, std::size_t _unroll>
 struct iteration_traits {
-  static constexpr Width width{};
+  using width_type = eve::fixed<_width>;
+  static constexpr width_type width{};
   static constexpr indx_c<_unroll> unroll{};
-  using width_type = Width;
 };
 
 template <typename Traits>

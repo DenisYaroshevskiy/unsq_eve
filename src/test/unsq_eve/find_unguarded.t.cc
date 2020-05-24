@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "unsq_eve/find.h"
+#include "unsq_eve/find_unguarded.h"
 
 #include <ostream>
 #include <string>
@@ -28,8 +28,7 @@ namespace {
 template <typename T, std::size_t byte_width, std::size_t unroll>
 struct variation {
   using type = T;
-  using traits =
-      unsq_eve::iteration_traits<eve::fixed<byte_width / sizeof(T)>, unroll>;
+  using traits = unsq_eve::iteration_traits<byte_width / sizeof(T), unroll>;
 
   friend std::ostream& operator<<(std::ostream& out, variation) {
     out << "{sizeof(T): " << sizeof(T) << " byte_width: " << byte_width

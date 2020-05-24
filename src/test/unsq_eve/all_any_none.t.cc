@@ -28,7 +28,7 @@ namespace {
 template <typename T, std::size_t byte_width, std::size_t unroll>
 struct variation {
   using type = T;
-  using traits = unsq_eve::iteration_traits<eve::fixed<byte_width / sizeof(T)>, unroll>;
+  using traits = unsq_eve::iteration_traits<byte_width / sizeof(T), unroll>;
   using wide = eve::wide<type, unsq_eve::width_t<traits>>;
 
   friend std::ostream& operator<<(std::ostream& out, variation) {
