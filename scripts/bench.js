@@ -393,7 +393,8 @@ function miniumTimesBySizeTemplate(elementID) {
       size: 'x',
       time: 'y',
       padding: 'min',
-      percentage: 100
+      percentage: 100,
+      group: "intel_9700K"
   });
 }
 
@@ -405,7 +406,8 @@ function codeAlignmentTemplate(elementID) {
     algorithm: 'selection',
     padding: 'minmax',
     time: 'y',
-    percentage: 100
+    percentage: 100,
+    group: "intel_9700K"
   });
 }
 
