@@ -24,7 +24,7 @@ template <typename I, std::size_t width, std::size_t unroll>
 using make_traits = unsq_eve::iteration_traits<
     eve::fixed<width / sizeof(unsq_eve::ValueType<I>)>, unroll>;
 
-struct unsq_find_unguarded_128_1 {
+struct unsq_eve_find_unguarded_128_1 {
   const char* name() const { return "unsq_eve::find_unguarded<128, 1>"; }
 
   template <typename I, typename T>
@@ -33,7 +33,7 @@ struct unsq_find_unguarded_128_1 {
   }
 };
 
-struct unsq_find_unguarded_256_1 {
+struct unsq_eve_find_unguarded_256_1 {
   const char* name() const { return "unsq_eve::find_unguarded<256, 1>"; }
 
   template <typename I, typename T>
@@ -42,7 +42,7 @@ struct unsq_find_unguarded_256_1 {
   }
 };
 
-struct unsq_find_unguarded_256_4 {
+struct unsq_eve_find_unguarded_256_4 {
   const char* name() const { return "unsq_eve::find_unguarded<256, 4>"; }
 
   template <typename I, typename T>
@@ -54,7 +54,8 @@ struct unsq_find_unguarded_256_4 {
 }  // namespace
 
 int main(int argc, char** argv) {
-  bench::bench_main<
-      bench::find_0_bench<unsq_find_unguarded_128_1, unsq_find_unguarded_256_1,
-                          unsq_find_unguarded_256_4>>(argc, argv);
+  bench::bench_main<bench::find_0_bench<unsq_eve_find_unguarded_128_1,
+                                        unsq_eve_find_unguarded_256_1,
+                                        unsq_eve_find_unguarded_256_4>>(argc,
+                                                                        argv);
 }

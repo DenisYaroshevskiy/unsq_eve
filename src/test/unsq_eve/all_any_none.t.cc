@@ -26,15 +26,9 @@
 namespace {
 
 template <typename T, std::size_t byte_width, std::size_t unroll>
-struct any_traits
-    : unsq_eve::iteration_traits<eve::fixed<byte_width / sizeof(T)>, unroll> {
-  static constexpr bool use_extra_any = true;
-};
-
-template <typename T, std::size_t byte_width, std::size_t unroll>
 struct variation {
   using type = T;
-  using traits = any_traits<T, byte_width, unroll>;
+  using traits = unsq_eve::iteration_traits<eve::fixed<byte_width / sizeof(T)>, unroll>;
   using wide = eve::wide<type, unsq_eve::width_t<traits>>;
 
   friend std::ostream& operator<<(std::ostream& out, variation) {
@@ -149,17 +143,10 @@ void common_any_test(Alg alg) {
   common_any_test_min_combinations<double>(alg);
 }
 
-struct dont_use_extra_any : unsq_eve::iteration_traits<eve::fixed<8>, 4> {
-  static constexpr bool use_extra_any = false;
-};
-
 TEST_CASE("unsq_eve.any", "[unsq_eve]") {
   common_any_test([](auto traits, auto f, auto l, auto v) {
     return unsq_eve::any_of_is<decltype(traits)>(f, l, v);
   });
-
-  std::vector<int> x{1, 2, 3, 4};
-  REQUIRE(unsq_eve::any_of_is<dont_use_extra_any>(x.begin(), x.end(), 3));
 }
 
 }  // namespace

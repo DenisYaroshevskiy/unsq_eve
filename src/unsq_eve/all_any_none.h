@@ -68,27 +68,13 @@ struct any_body {
   }
 
   bool complete_big_step() {
-    using logical = eve::logical<wide>;
-    using extra_fixed = eve::fixed<Traits::width() * Traits::unroll()>;
-    using extra_wide = eve::wide<T, extra_fixed>;
-    using extra_logical = eve::logical<extra_wide>;
-
-    using bool_t = typename extra_logical::value_type;
-    using aligned_ptr = eve::aligned_ptr<bool_t, alignof(extra_logical)>;
-
     // Compute predicate for each register
-    alignas(extra_logical) std::array<logical, Traits::unroll()> tests;
+    std::array<eve::logical<wide>, Traits::unroll()> tests;
     std::transform(regs.begin(), regs.end(), tests.begin(), p);
 
-    // Pretened this is 'eve::wide'
-    aligned_ptr tests_ptr{reinterpret_cast<bool_t*>(tests.data())};
-    const extra_logical as_extra_wide{tests_ptr};
-
-    // Do a smarter any
-    if constexpr (Traits::use_extra_any)
-      res = eve_extra::any(as_extra_wide, eve_extra::ignore_nothing{});
-    else
-      res = eve::any(as_extra_wide);
+    // Reduce the result
+    auto reduced = eve_extra::segment_reduction(tests, eve::logical_or);
+    res = eve_extra::any(reduced, eve_extra::ignore_nothing{});
     return res;
   }
 

@@ -25,7 +25,20 @@ namespace unsq_eve {
 namespace _iteration_guarded {
 
 template <typename Traits, typename Ptr, typename Delegate>
-StopReason main_loop(Ptr aligned_f, Ptr aligned_l, Delegate& delegate) {
+StopReason main_loop(Ptr aligned_f, Ptr aligned_l,
+                     Delegate& delegate) requires(Traits::unroll() == 1) {
+  while (aligned_f.get() != aligned_l.get()) {
+    if (delegate.small_step(aligned_f, indx_c<0>{},
+                            eve_extra::ignore_nothing{}))
+      return StopReason::Terminated;
+    aligned_f += Traits::width();
+  }
+  return StopReason::No;
+}
+
+template <typename Traits, typename Ptr, typename Delegate>
+StopReason main_loop(Ptr aligned_f, Ptr aligned_l,
+                     Delegate& delegate) /*requires(Traits::unroll() > 1)*/ {
   while (true) {  // To the beginning at most twice
     // initialize every register with small steps
     // (also can help for smaller range size)

@@ -28,9 +28,8 @@ target_compile_options(tests PRIVATE
                        -Wno-unused-parameter
                        -DEVE_DISABLE_ASSERTS
                         -fno-omit-frame-pointer
-                       --std=c++17
+                       --std=c++20
                        -stdlib=libc++
                        -fsanitize=address
                        -march=native)
 target_link_options(tests PRIVATE -fsanitize=address -stdlib=libc++)
-set_target_properties(tests PROPERTIES CXX_STANDARD 17)
