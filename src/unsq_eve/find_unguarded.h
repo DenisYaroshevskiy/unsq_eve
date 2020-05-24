@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 
-#ifndef UNSQ_EVE_FIND_H_
-#define UNSQ_EVE_FIND_H_
+#ifndef UNSQ_EVE_FIND_UNGUARDED_H_
+#define UNSQ_EVE_FIND_UNGUARDED_H_
 
 #include <array>
 
 #include "eve_extra/eve_extra.h"
 
 #include "unsq_eve/iteration_unguarded.h"
+#include "unsq_eve/predicate_helpers.h"
 
 namespace unsq_eve {
-namespace _find {
+namespace _find_unguarded {
 
 template <typename Traits, typename StrippedI, typename PV>
 // require ContigiousIterator<I> && VectorPredicate<PV, ValueType<I>>
@@ -50,22 +51,14 @@ struct find_if_body {
   }
 };
 
-template <typename Traits, typename I, typename U>
-auto equal_to(const U& y) {
-  using T = ValueType<I>;
-  using wide = eve::wide<T, width_t<Traits>>;
-  wide ys{static_cast<T>(y)};
-  return [ys](const wide& xs) { return xs == ys; };
-}
-
-}  // namespace _find
+}  // namespace _find_unguarded
 
 template <typename Traits, typename I, typename PV>
 // require ContigiousIterator<I> && VectorPredicate<PV, ValueType<I>>
 I find_if_unguarded(I _f, PV p) {
   auto* f = drill_down(_f);
 
-  _find::find_if_body<Traits, decltype(f), PV> body{p, f};
+  _find_unguarded::find_if_body<Traits, decltype(f), PV> body{p, f};
   auto* found = iteration_aligned_unguarded<Traits>(f, body).found;
 
   return undo_drill_down(_f, found);
@@ -74,9 +67,9 @@ I find_if_unguarded(I _f, PV p) {
 template <typename Traits, typename I, typename T>
 // require ContigiousIterator<I> && Convertible<T, ValueType<P>>
 I find_unguarded(I f, const T& x) {
-  return unsq_eve::find_if_unguarded<Traits>(f, _find::equal_to<Traits, I>(x));
+  return unsq_eve::find_if_unguarded<Traits>(f, equal_to<Traits, I>(x));
 }
 
 }  // namespace unsq_eve
 
-#endif   // UNSQ_EVE_FIND_H_
+#endif  // UNSQ_EVE_FIND_UNGUARDED_H_

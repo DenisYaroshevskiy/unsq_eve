@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef UNSQ_EVE_ALL_ANY_NONE_H_
-#define UNSQ_EVE_ALL_ANY_NONE_H_
+#ifndef UNSQ_EVE_FIND_H_
+#define UNSQ_EVE_FIND_H_
 
 #include <algorithm>
 #include <array>
@@ -23,24 +23,23 @@
 #include "eve_extra/eve_extra.h"
 
 #include "unsq_eve/iteration_guarded.h"
-#include "unsq_eve/predicate_helpers.h"
 
 namespace unsq_eve {
-namespace _all_any_none {
+namespace _find {
 
 template <typename Traits, typename StrippedI, typename PV>
 // require ContigiousIterator<I> && VectorPredicate<PV, ValueType<I>>
-struct any_body {
+struct body {
   using T = ValueType<StrippedI>;
   using wide = eve::wide<T, width_t<Traits>>;
 
   PV p;
-  bool res = false;
+  StrippedI found;
 
   // Intentionally unitilialized
   std::array<wide, Traits::unroll()> regs;
 
-  explicit any_body(PV p) : p(p) {}
+  body(PV p, StrippedI found) : p(p), found(found) {}
 
   template <typename Ptr, std::size_t idx, typename Ignore>
   bool small_step(Ptr ptr, indx_c<idx>, Ignore ignore) {
@@ -50,9 +49,11 @@ struct any_body {
       regs[idx] = eve_extra::load_unsafe(ptr, eve::as_<wide>{});
     }
 
-    res = eve_extra::any(p(regs[idx]), ignore);
+    const std::optional match = first_true(p(regs[idx]), ignore);
+    if (!match) return false;
 
-    return res;
+    found = &*from + *match;
+    return true;
   }
 
   // All registers are already intialized with small steps
@@ -73,31 +74,44 @@ struct any_body {
     std::array<eve::logical<wide>, Traits::unroll()> tests;
     std::transform(regs.begin(), regs.end(), tests.begin(), p);
 
-    res = eve_extra::any_array(tests);
+    const std::optional match = first_true(p(regs[idx]), ignore);
+
+    // Reduce the result
+    auto reduced = eve_extra::segment_reduction(tests, eve::logical_or);
+    res = eve_extra::any(reduced, eve_extra::ignore_nothing{});
     return res;
   }
 
   void after_big_steps() {}
 };
 
-}  // namespace _all_any_none
+template <typename Traits, typename I, typename U>
+auto equal_to(const U& y) {
+  using T = ValueType<I>;
+  using wide = eve::wide<T, width_t<Traits>>;
+  wide ys{static_cast<T>(y)};
+  return [ys](const wide& xs) { return xs == ys; };
+}
+
+}  // namespace _find
 
 template <typename Traits, typename I, typename PV>
 // require ContigiousIterator<I> && VectorPredicate<PV, ValueType<I>>
-bool any_of(I _f, I _l, PV p) {
+I find_if(I _f, I _l, PV p) {
   auto [f, l] = drill_down_range(_f, _l);
 
-  _all_any_none::any_body<Traits, decltype(f), PV> body{p};
+  _find::body<Traits, decltype(f), PV> body{p, l};
+  auto* found = iteration_aligned<Traits>(f, l, body).res;
 
-  return iteration_aligned<Traits>(f, l, body).res;
+  return undo_drill_down(_f, found);
 }
 
 template <typename Traits, typename I, typename T>
 // require ContigiousIterator<I> && VectorPredicate<PV, ValueType<I>>
-bool any_of_is(I f, I l, const T& x) {
-  return unsq_eve::any_of<Traits>(f, l, equal_to<Traits, I>(x));
+I find(I f, I l, const T& x) {
+  return unsq_eve::find_if<Traits>(f, l, equal_to<Traits, I>(x));
 }
 
 }  // namespace unsq_eve
 
-#endif  // UNSQ_EVE_ALL_ANY_NONE_H_
+#endif  // UNSQ_EVE_FIND_H_

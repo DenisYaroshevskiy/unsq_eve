@@ -50,11 +50,11 @@ namespace {
 TEST_CASE("previous_aligned_address", "[eve_extra]") {
   using wide = eve::wide<char, eve::fixed<16>>;
   const char str[] = "abc";
-  eve::aligned_ptr test = eve_extra::previous_aligned_address(eve::as_<wide>{}, str);
+  eve::aligned_ptr test =
+      eve_extra::previous_aligned_address(eve::as_<wide>{}, str);
   REQUIRE(test.get());
 };
 
-/*
 TEMPLATE_TEST_CASE("eve_extra.load_unsafe", "[eve_extra]", ALL_TEST_PACKS) {
   using wide = TestType;
   using scalar = typename wide::value_type;
@@ -185,22 +185,6 @@ TEST_CASE("eve_extra.load_const_aligned_ptr", "[eve_extra]") {
   REQUIRE(eve::all(loaded == wide{1}));
 }
 
-TEST_CASE("eve_extra.extra_wide_movemask", "[eve_extra]") {
-  using wide = eve::wide<char, eve::fixed<32 * 4>>;
-  wide x {char(0)}, y{char(1)};
-  x[0] = char(1);
-
-  using expected_res_type = eve::wide<std::uint32_t, eve::fixed<4>>;
-  expected_res_type expected{0};
-  expected[0] = 1;
-
-  expected_res_type actual = eve_extra::extra_wide_movemask(x == y);
-
-  const expected_res_type zeroes{0};
-
-  REQUIRE(eve::all(actual == expected));
-}
-
 TEMPLATE_TEST_CASE("eve_extra.any", "[eve_extra]", ALL_TEST_PACKS) {
   using wide = TestType;
 
@@ -231,23 +215,36 @@ TEMPLATE_TEST_CASE("eve_extra.any", "[eve_extra]", ALL_TEST_PACKS) {
     };
 
     run(eve::wide<T, eve::fixed<size>>{});
-    run(eve::wide<T, eve::fixed<2 * size>>{});
-    run(eve::wide<T, eve::fixed<4 * size>>{});
-    run(eve::wide<T, eve::fixed<8 * size>>{});
   }
 }
 
-TEST_CASE("load extra wide from real aligned ptr", "[eve_extra]") {
-  using wide = eve::wide<char, eve::fixed<32 * 2>>;
-  using real_wide = eve::wide<char, eve::fixed<32>>;
+TEMPLATE_TEST_CASE("eve_extra.first_true_array", "[eve_extra]",
+                   ALL_TEST_PACKS) {
+  using wide = TestType;
+  using logical = eve::logical<wide>;
 
-  alignas(real_wide) std::array<char, 32 * 2> data{};
+  auto run = [&](auto test) {
+    wide x{0}, y{1};
 
-  using aligned_ptr = eve::aligned_ptr<char, alignof(real_wide)>;
+    test.fill(x == y);
 
-  wide test{aligned_ptr(data.data())};
-  REQUIRE(eve::all(test == wide{0}));
+    using namespace eve_extra;
+    REQUIRE(!first_true_array(test));
+
+    x[1] = 1;
+
+    for (std::size_t i = 0; i != test.size(); ++i) {
+      test[i] = (x == y);
+      std::uint32_t expected = (wide::static_size * i) + 1;
+      REQUIRE(first_true_array(test));
+      REQUIRE(*first_true_array(test) == expected);
+      test[i] = (x != x);
+    }
+  };
+
+  run(std::array<logical, 1>{});
+  run(std::array<logical, 2>{});
+  run(std::array<logical, 4>{});
 }
-*/
 
 }  // namespace

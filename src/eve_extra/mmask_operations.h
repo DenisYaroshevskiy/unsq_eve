@@ -116,27 +116,6 @@ std::uint32_t movemask(Register reg) {
   }
 }
 
-template <typename T, typename N, typename ABI>
-auto extra_wide_movemask(eve::logical<eve::wide<T, N, ABI>> vbool) {
-  using storage_type =
-      typename eve::logical<eve::wide<T, N, ABI>>::storage_type;
-  static constexpr std::size_t replication = storage_type::replication;
-
-  static_assert(replication <= 8,
-                "Can't do one register operation for more than 8");
-
-  const auto& segments = vbool.storage().segments;
-
-  static constexpr std::size_t mmask_count = replication > 4 ? 8 : 4;
-
-  eve::wide<std::uint32_t, eve::fixed<mmask_count>> mmasks{0};
-  for (std::size_t i = 0; i != replication; ++i) {
-    mmasks[i] = movemask(segments[i].storage());
-  }
-
-  return mmasks;
-}
-
 }  // namespace eve_extra
 
 #endif  // EVE_EXTRA_MMASK_OPERATIONS_H_

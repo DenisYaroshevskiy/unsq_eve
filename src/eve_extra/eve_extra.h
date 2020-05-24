@@ -26,6 +26,7 @@
 #include <eve/function/logical_or.hpp>
 #include <eve/memory/align.hpp>
 
+#include "eve_extra/first_true.h"
 #include "eve_extra/mmask_operations.h"
 
 namespace eve_extra {
@@ -47,62 +48,10 @@ T* end_of_page(T* addr) {
 }
 
 template <typename U, typename N, typename T>
-auto previous_aligned_address(const eve::as_<eve::wide<U, N>>&, T* p) {
-  static_assert(std::is_same_v<std::decay_t<T>, U>);
-
+auto previous_aligned_address(const eve::as_<eve::wide<U, N>>&, T* p) requires(
+    std::is_same_v<std::decay_t<T>, U>) {
   static constexpr eve::under A{alignof(eve::wide<U, N>)};
   return eve::aligned_ptr<T, as_integer(A)>{eve::align(p, A)};
-}
-
-template <typename T, typename N, typename ABI, typename Ignore>
-std::optional<std::size_t> first_true(
-    eve::logical<eve::wide<T, N, ABI>> logical, Ignore ignore) {
-  using logical_t = eve::logical<eve::wide<T, N, ABI>>;
-  std::uint32_t mmask = eve_extra::movemask(logical.mask());
-  mmask = _eve_extra::clear_ingored<logical_t>(mmask, ignore);
-
-  if (!mmask) return {};
-  return __builtin_ctz(mmask) / sizeof(typename logical_t::value_type);
-}
-
-/*
-Compiler does not generate this properly, instead of doing things one
-after another if you ask it.
-*/
-
-template <typename Wide, typename Op>
-Wide segment_reduction(const std::array<Wide, 1>& arr, Op) {
-  return arr[0];
-}
-
-template <typename Wide, typename Op>
-Wide segment_reduction(const std::array<Wide, 2>& arr, Op op) {
-  return op(arr[0], arr[1]);
-}
-
-template <typename Wide, typename Op>
-Wide segment_reduction(const std::array<Wide, 4>& arr, Op op) {
-  Wide x = op(arr[0], arr[2]);
-  Wide y = op(arr[1], arr[3]);
-  return op(x, y);
-}
-
-template <typename Wide, typename Op>
-Wide segment_reduction(const std::array<Wide, 8>& arr, Op op) {
-  Wide x1 = op(arr[0], arr[4]);
-  Wide x2 = op(arr[1], arr[5]);
-  Wide x3 = op(arr[2], arr[6]);
-  Wide x4 = op(arr[3], arr[7]);
-  x1 = op(x1, x2);
-  x3 = op(x3, x4);
-  return op(x1, x3);
-}
-
-template <typename Logical, typename Ignore>
-bool any(const Logical& vbool, Ignore ignore) {
-  std::uint32_t mmask = eve_extra::movemask(vbool.mask());
-  mmask = _eve_extra::clear_ingored<Logical>(mmask, ignore);
-  return mmask;
 }
 
 }  // namespace eve_extra
