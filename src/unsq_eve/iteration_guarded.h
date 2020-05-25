@@ -65,7 +65,7 @@ StopReason main_loop(Ptr aligned_f, Ptr aligned_l,
     delegate.before_big_steps();
 
     do {
-      delegate.start_big_step();
+      delegate.start_big_step(aligned_f);
 
       res = unroll<Traits::unroll()>([&](auto idx) mutable {
         Ptr offset_ptr{aligned_f + Traits::width() * idx};
@@ -75,7 +75,7 @@ StopReason main_loop(Ptr aligned_f, Ptr aligned_l,
 
       if (res != StopReason::No) return res;
 
-      if (delegate.complete_big_step()) return StopReason::Terminated;
+      if (delegate.complete_big_step(aligned_f)) return StopReason::Terminated;
 
       aligned_f += big_step;
       --big_steps_count;
@@ -88,7 +88,7 @@ StopReason main_loop(Ptr aligned_f, Ptr aligned_l,
 }  //  namespace _iteration_guarded
 
 template <typename Traits, typename T, typename Delegate>
-// require ContigiousIterator<I> && IterationAlignedDelegate<P>
+// require IterationAlignedDelegate<P>
 Delegate iteration_aligned(T* f, T* l, Delegate delegate) {
   using wide = eve::wide<ValueType<T*>, eve::fixed<Traits::width()>>;
 

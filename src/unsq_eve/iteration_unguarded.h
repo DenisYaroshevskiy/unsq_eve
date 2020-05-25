@@ -23,10 +23,9 @@
 
 namespace unsq_eve {
 
-template <typename Traits, typename T, typename P>
-// require ContigiousIterator<I> &&
-//         Predictate<P, wide<ValueType<I, width>>, index_c, ignore>
-P iteration_aligned_unguarded(T* f, P p) {
+template <typename Traits, typename T, typename Delegate>
+// require IterationAlignedDelegate<P>
+Delegate iteration_aligned_unguarded(T* f, Delegate delegate) {
   using wide = eve::wide<ValueType<T*>, width_t<Traits>>;
 
   auto aligned_f = eve_extra::previous_aligned_address(eve::as_<wide>{}, f);
@@ -35,16 +34,16 @@ P iteration_aligned_unguarded(T* f, P p) {
   {
     std::size_t to_ignore = static_cast<std::size_t>(f - aligned_f.get());
     auto ignore = eve_extra::ignore_first_n{to_ignore};
-    if (p(aligned_f, indx_c<0>{}, ignore)) return p;
+    if (delegate.small_step(aligned_f, indx_c<0>{}, ignore)) return delegate;
   }
   aligned_f += Traits::width();
 
   // Everything else is on the caller.
   unroll_iteration<Traits>(aligned_f, [&](auto cur, auto reg_idx) mutable {
-    return p(cur, reg_idx, eve_extra::ignore_nothing{});
+    return delegate.small_step(cur, reg_idx, eve_extra::ignore_nothing{});
   });
 
-  return p;
+  return delegate;
 }
 
 }  // namespace unsq_eve

@@ -21,7 +21,6 @@
 
 #include "eve_extra/eve_extra.h"
 
-#include "unsq_eve/iteration_unguarded.h"
 #include "unsq_eve/predicate_helpers.h"
 
 namespace unsq_eve {
@@ -52,23 +51,6 @@ struct find_if_body {
 };
 
 }  // namespace _find_unguarded
-
-template <typename Traits, typename I, typename PV>
-// require ContigiousIterator<I> && VectorPredicate<PV, ValueType<I>>
-I find_if_unguarded(I _f, PV p) {
-  auto* f = drill_down(_f);
-
-  _find_unguarded::find_if_body<Traits, decltype(f), PV> body{p, f};
-  auto* found = iteration_aligned_unguarded<Traits>(f, body).found;
-
-  return undo_drill_down(_f, found);
-}
-
-template <typename Traits, typename I, typename T>
-// require ContigiousIterator<I> && Convertible<T, ValueType<P>>
-I find_unguarded(I f, const T& x) {
-  return unsq_eve::find_if_unguarded<Traits>(f, equal_to<Traits, I>(x));
-}
 
 }  // namespace unsq_eve
 

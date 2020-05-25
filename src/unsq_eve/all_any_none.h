@@ -60,7 +60,9 @@ struct any_body {
   // Big step will be invoked for each register, in order, once each step.
 
   void before_big_steps() {}
-  void start_big_step() {}
+
+  template <typename Ptr>
+  void start_big_step(Ptr) {}
 
   template <typename Ptr, std::size_t idx>
   bool big_step(Ptr ptr, indx_c<idx>) {
@@ -68,7 +70,8 @@ struct any_body {
     return false;
   }
 
-  bool complete_big_step() {
+  template <typename Ptr>
+  bool complete_big_step(Ptr) {
     // Compute predicate for each register
     std::array<eve::logical<wide>, Traits::unroll()> tests;
     std::transform(regs.begin(), regs.end(), tests.begin(), p);

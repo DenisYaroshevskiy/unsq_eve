@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "unsq_eve/find_unguarded.h"
+#include "unsq_eve/find.h"
 
 #include <ostream>
 #include <string>
@@ -70,30 +70,37 @@ void common_find_test_impl(Alg alg) {
   using T = typename Variation::type;
   std::vector<T, eve::aligned_allocator<T, 4096>> page(4096 / sizeof(T), T{0});
 
-  // 16 from the beginning
+  // 50 from the beginning
   auto* f = page.data();
-  auto* before_l = f + 16;
+  auto* l = f + 50;
 
   auto run = [&]() {
     typename Variation::traits traits{};
-    auto actual = alg(traits, f, before_l + 1, 1);
-    REQUIRE(actual - f == before_l - f);
+
+    for (auto* it = f; it < l; ++it) {
+      INFO("length: " << (l - f) << " from the beginning: " << it - f);
+      *it = 1;
+      REQUIRE(alg(traits, f, l, 1) == it);
+      *it = 0;
+    }
   };
 
-  while (f != before_l + 1) {
-    *before_l = 1;
+  while (f < l) {
     run();
-    --before_l;
+    *l = 1;
+    --l;
+    *f = 1;
+    ++f;
   }
 
-  // 16 from the end
-  f = page.data() + page.size() - 16;
-  before_l = page.data() + page.size() - 1;
-  *before_l = 1;
-  auto* l = before_l + 1;
+  // 50 from the end
+  f = page.data() + page.size() - 50;
+  l = page.data() + page.size() - 1;
 
-  while (f != l) {
+  while (f < l) {
     run();
+    *l = 1;
+    --l;
     *f = 1;
     ++f;
   }
@@ -112,13 +119,9 @@ void common_find_test_traits_combinations(Alg alg) {
 template <typename Alg>
 void common_find_test(Alg alg) {
   common_find_test_traits_combinations<std::int8_t>(alg);
-  common_find_test_traits_combinations<std::uint8_t>(alg);
   common_find_test_traits_combinations<std::int16_t>(alg);
-  common_find_test_traits_combinations<std::uint16_t>(alg);
   common_find_test_traits_combinations<std::int32_t>(alg);
-  common_find_test_traits_combinations<std::uint32_t>(alg);
   common_find_test_traits_combinations<std::int64_t>(alg);
-  common_find_test_traits_combinations<std::uint64_t>(alg);
   common_find_test_traits_combinations<float>(alg);
   common_find_test_traits_combinations<double>(alg);
 }
@@ -126,6 +129,12 @@ void common_find_test(Alg alg) {
 TEST_CASE("unsq_eve.find_unguarded", "[unsq_eve]") {
   common_find_test([](auto traits, auto f, auto /*l*/, auto v) {
     return unsq_eve::find_unguarded<decltype(traits)>(f, v);
+  });
+}
+
+TEST_CASE("unsq_eve.find_found", "[unsq_eve]") {
+  common_find_test([](auto traits, auto f, auto l, auto v) {
+    return unsq_eve::find<decltype(traits)>(f, l, v);
   });
 }
 

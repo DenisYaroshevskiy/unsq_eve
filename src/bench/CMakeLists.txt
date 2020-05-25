@@ -26,5 +26,6 @@ function(add_benchmark name source)
 endfunction()
 
 add_benchmark(std_find std_find.cc)
+add_benchmark(unsq_eve_find unsq_eve_find.cc)
 add_benchmark(unsq_eve_find_unguarded unsq_eve_find_unguarded.cc)
 add_benchmark(unsq_eve_any_of unsq_eve_any_of.cc)

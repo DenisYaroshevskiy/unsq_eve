@@ -15,6 +15,7 @@
  */
 
 #include "unsq_eve/all_any_none.h"
+#include "unsq_eve/find.h"
 
 #include <ostream>
 #include <string>
@@ -146,6 +147,12 @@ void common_any_test(Alg alg) {
 TEST_CASE("unsq_eve.any", "[unsq_eve]") {
   common_any_test([](auto traits, auto f, auto l, auto v) {
     return unsq_eve::any_of_is<decltype(traits)>(f, l, v);
+  });
+}
+
+TEST_CASE("unsq_eve.find_not_found", "[unsq_eve]") {
+  common_any_test([](auto traits, auto f, auto l, auto v) {
+    return unsq_eve::find<decltype(traits)>(f, l, v) != l;
   });
 }
 

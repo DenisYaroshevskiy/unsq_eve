@@ -24,38 +24,37 @@ template <typename I, std::size_t width, std::size_t unroll>
 using make_traits =
     unsq_eve::iteration_traits<width / sizeof(unsq_eve::ValueType<I>), unroll>;
 
-struct unsq_eve_find_unguarded_128_1 {
-  const char* name() const { return "unsq_eve::find_unguarded<128, 1>"; }
+struct unsq_eve_find_128_1 {
+  const char* name() const { return "unsq_eve::find<128, 1>"; }
 
   template <typename I, typename T>
-  I operator()(I f, I, const T& x) {
-    return unsq_eve::find_unguarded<make_traits<I, 16, 1>>(f, x);
+  I operator()(I f, I l, const T& x) {
+    return unsq_eve::find<make_traits<I, 16, 1>>(f, l, x);
   }
 };
 
-struct unsq_eve_find_unguarded_256_1 {
-  const char* name() const { return "unsq_eve::find_unguarded<256, 1>"; }
+struct unsq_eve_find_256_1 {
+  const char* name() const { return "unsq_eve::find<256, 1>"; }
 
   template <typename I, typename T>
-  I operator()(I f, I, const T& x) {
-    return unsq_eve::find_unguarded<make_traits<I, 32, 1>>(f, x);
+  I operator()(I f, I l, const T& x) {
+    return unsq_eve::find<make_traits<I, 32, 1>>(f, l, x);
   }
 };
 
-struct unsq_eve_find_unguarded_256_4 {
-  const char* name() const { return "unsq_eve::find_unguarded<256, 4>"; }
+struct unsq_eve_find_256_4 {
+  const char* name() const { return "unsq_eve::find<256, 4>"; }
 
   template <typename I, typename T>
-  I operator()(I f, I, const T& x) {
-    return unsq_eve::find_unguarded<make_traits<I, 32, 4>>(f, x);
+  I operator()(I f, I l, const T& x) {
+    return unsq_eve::find<make_traits<I, 32, 4>>(f, l, x);
   }
 };
 
 }  // namespace
 
 int main(int argc, char** argv) {
-  bench::bench_main<bench::find_0_bench<unsq_eve_find_unguarded_128_1,
-                                        unsq_eve_find_unguarded_256_1,
-                                        unsq_eve_find_unguarded_256_4>>(argc,
-                                                                        argv);
+  bench::bench_main<bench::find_0_bench<
+      unsq_eve_find_128_1, unsq_eve_find_256_1, unsq_eve_find_256_4>>(argc,
+                                                                      argv);
 }
