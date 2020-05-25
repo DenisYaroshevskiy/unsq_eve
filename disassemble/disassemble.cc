@@ -1,6 +1,7 @@
-#include "eve_extra/eve_extra.h"
-#include "unsq_eve/all_any_none.h"
+#include "unsq_eve/find.h"
 
-using traits = unsq_eve::iteration_traits<32, 1>;
+using traits = unsq_eve::iteration_traits<32, 4>;
 
-bool any_zeroes(const char* f, const char* l) { return unsq_eve::any_of_is<traits>(f, l, 0); }
+const char* find_zeroe(const char* f, const char* l) {
+  return unsq_eve::find<traits>(f, l, 0);
+}
