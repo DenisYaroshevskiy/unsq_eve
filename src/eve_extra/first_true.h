@@ -22,6 +22,7 @@
 #include <bit>
 
 #include <eve/eve.hpp>
+#include <eve/function/any.hpp>
 #include <eve/function/logical_or.hpp>
 
 #include "eve_extra/mmask_operations.h"

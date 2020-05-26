@@ -21,13 +21,13 @@
 #include <type_traits>
 
 #include <eve/eve.hpp>
-#include <eve/function/any.hpp>
 #include <eve/function/load.hpp>
-#include <eve/function/logical_or.hpp>
 #include <eve/memory/align.hpp>
 
+#include "eve_extra/constants.h"
 #include "eve_extra/first_true.h"
 #include "eve_extra/mmask_operations.h"
+#include "eve_extra/replace_ignored.h"
 
 namespace eve_extra {
 
