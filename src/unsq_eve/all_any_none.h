@@ -86,8 +86,8 @@ struct any_body {
 
 }  // namespace _all_any_none
 
-template <typename Traits, typename I, wide_predicate_for<Traits, I> PV>
-// require ContigiousIterator<I>
+template <typename Traits, contigious_iterator I,
+          wide_predicate_for<Traits, I> PV>
 bool any_of(I _f, I _l, PV p) {
   auto [f, l] = drill_down_range(_f, _l);
 
@@ -96,8 +96,8 @@ bool any_of(I _f, I _l, PV p) {
   return iteration_aligned<Traits>(f, l, body).res;
 }
 
-template <typename Traits, typename I, typename T>
-// require ContigiousIterator<I>
+template <typename Traits, contigious_iterator I,
+          std::convertible_to<value_type<I>> T>
 bool any_of_is(I f, I l, const T& x) {
   return unsq_eve::any_of<Traits>(f, l, equal_to<Traits, I>(x));
 }

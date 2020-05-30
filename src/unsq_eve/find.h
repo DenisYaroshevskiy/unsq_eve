@@ -91,8 +91,8 @@ struct body {
 
 }  // namespace _find
 
-template <typename Traits, typename I, wide_predicate_for<Traits, I> PV>
-// require ContigiousIterator<I>
+template <typename Traits, contigious_iterator I,
+          wide_predicate_for<Traits, I> PV>
 I find_if(I _f, I _l, PV p) {
   auto [f, l] = drill_down_range(_f, _l);
 
@@ -102,13 +102,14 @@ I find_if(I _f, I _l, PV p) {
   return undo_drill_down(_f, found);
 }
 
-template <typename Traits, typename I, typename T>
+template <typename Traits, contigious_iterator I,
+          std::convertible_to<value_type<I>> T>
 I find(I f, I l, const T& x) {
   return unsq_eve::find_if<Traits>(f, l, equal_to<Traits, I>(x));
 }
 
-template <typename Traits, typename I, wide_predicate_for<Traits, I> PV>
-// require ContigiousIterator<I> && VectorPredicate<PV, ValueType<I>>
+template <typename Traits, contigious_iterator I,
+          wide_predicate_for<Traits, I> PV>
 I find_if_unguarded(I _f, PV p) {
   auto* f = drill_down(_f);
 
@@ -118,8 +119,8 @@ I find_if_unguarded(I _f, PV p) {
   return undo_drill_down(_f, found);
 }
 
-template <typename Traits, typename I, typename T>
-// require ContigiousIterator<I> && Convertible<T, ValueType<P>>
+template <typename Traits, contigious_iterator I,
+          std::convertible_to<value_type<I>> T>
 I find_unguarded(I f, const T& x) {
   return unsq_eve::find_if_unguarded<Traits>(f, equal_to<Traits, I>(x));
 }

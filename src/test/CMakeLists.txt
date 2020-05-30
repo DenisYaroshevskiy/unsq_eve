@@ -28,6 +28,7 @@ target_sources(tests PRIVATE
                unsq_eve/all_any_none.t.cc
                unsq_eve/concepts.t.cc
                unsq_eve/find_common.t.cc
+               unsq_eve/transform_reduce.types.t.cc
                unsq_eve/unroll.t.cc
                catch_main.cc)
 
