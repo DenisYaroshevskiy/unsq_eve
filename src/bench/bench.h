@@ -125,19 +125,19 @@ void register_benchmark(BenchDescription description) {
         description.types(), description.algorithms(), _bench::all_paddings(),
         [&](auto type, auto algorithm_wrapped, auto padding_wrapped) {
           for (auto percentage : description.percentage_points()) {
-            constexpr auto algorighm =
+            constexpr auto algorithm =
                 typename decltype(algorithm_wrapped)::type{};
             constexpr auto padding = typename decltype(padding_wrapped)::type{};
 
             auto name = _bench::benchmark_name(description, size, type,
-                                               algorighm, percentage, padding);
+                                               algorithm, percentage, padding);
 
             auto driver = description.driver();
             auto input = description.input(type, size, percentage);
 
             benchmark::RegisterBenchmark(
                 name.c_str(), [=](benchmark::State& state) mutable {
-                  driver(padding, state, algorighm, input);
+                  driver(padding, state, algorithm, input);
                 });
           }
         });

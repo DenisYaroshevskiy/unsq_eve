@@ -28,8 +28,8 @@
 namespace unsq_eve {
 namespace _transform_reduce {
 
-template <typename Traits, typename I, typename ZeroT, typename Map,
-          typename Reduce>
+template <typename Traits, typename I, typename ZeroT, typename Reduce,
+          typename Map>
 struct unary_body {
   using T = value_type<I>;
 
@@ -78,7 +78,9 @@ struct unary_body {
   }
 
   template <typename Ptr>
-  bool complete_big_step(Ptr) { return false; }
+  bool complete_big_step(Ptr) {
+    return false;
+  }
 
   void after_big_steps() {}
 
@@ -92,9 +94,9 @@ struct unary_body {
 }  // namespace _transform_reduce
 
 template <typename Traits, contigious_iterator I, typename T,
-          wide_map_unary_for<Traits, I> Map, typename Reduction>
-auto transform_reduce(I _f, I _l, const T& zero, Map map, Reduction reduce) {
-  _transform_reduce::unary_body<Traits, I, T, Map, Reduction> body(map, reduce,
+          typename Reduction, wide_map_unary_for<Traits, I> Map>
+auto transform_reduce(I _f, I _l, const T& zero, Reduction reduce, Map map) {
+  _transform_reduce::unary_body<Traits, I, T, Reduction, Map> body(map, reduce,
                                                                    zero);
   auto [f, l] = drill_down_range(_f, _l);
 

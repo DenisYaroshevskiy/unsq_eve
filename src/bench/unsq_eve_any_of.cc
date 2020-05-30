@@ -22,7 +22,7 @@ namespace {
 
 template <typename I, std::size_t width, std::size_t unroll>
 struct make_traits
-    : unsq_eve::iteration_traits<width / sizeof(unsq_eve::ValueType<I>),
+    : unsq_eve::iteration_traits<width / sizeof(unsq_eve::value_type<I>),
                                  unroll> {
   static constexpr bool use_extra_any = true;
 };

@@ -22,7 +22,7 @@ namespace {
 
 template <typename I, std::size_t width, std::size_t unroll>
 using make_traits =
-    unsq_eve::iteration_traits<width / sizeof(unsq_eve::ValueType<I>), unroll>;
+    unsq_eve::iteration_traits<width / sizeof(unsq_eve::value_type<I>), unroll>;
 
 struct unsq_eve_find_unguarded_128_1 {
   const char* name() const { return "unsq_eve::find_unguarded<128, 1>"; }
