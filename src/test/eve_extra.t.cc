@@ -324,4 +324,39 @@ TEMPLATE_TEST_CASE("eve_extra.replace_ignored", "[eve_extra]", ALL_TEST_PACKS) {
   }
 }
 
+template <std::size_t x>
+using indx_c = std::integral_constant<std::size_t, x>;
+
+TEMPLATE_TEST_CASE("eve_extra.swap_adjacent_groups", "[eve_extra]", ALL_TEST_PACKS) {
+  using wide = TestType;
+
+  using T = typename wide::value_type;
+  constexpr std::ptrdiff_t size = wide::static_size;
+
+  using extra_wide = eve::wide<T, eve::fixed<size * 4>>;
+
+  const extra_wide x = eve_extra::iota(eve::as_<extra_wide>{});
+
+  auto run = [&]<std::size_t group_size>(indx_c<group_size>) {
+    if constexpr (group_size < extra_wide::static_size) {
+      const extra_wide actual = eve_extra::swap_adjacent_groups<group_size>(x);
+      extra_wide expected = x;
+
+      for (auto f = expected.begin(); f != expected.end();
+           f += 2 * group_size) {
+        std::swap_ranges(f, f + group_size, f + group_size);
+      }
+      REQUIRE(eve::all(expected == actual));
+    }
+  };
+
+  run(indx_c<1>{});
+  run(indx_c<2>{});
+  run(indx_c<4>{});
+  run(indx_c<8>{});
+  run(indx_c<16>{});
+  run(indx_c<32>{});
+  run(indx_c<64>{});
+}
+
 }  // namespace
