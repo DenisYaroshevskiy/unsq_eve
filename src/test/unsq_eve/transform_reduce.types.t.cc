@@ -36,8 +36,10 @@ TEST_CASE("unsq_eve.transform_reduce.type_increase", "[unsq_eve]") {
   };
   auto reduce = [](widest x, widest y) -> widest { return x + y; };
   std::vector<char> data{1, 2, 3};
-  unsq_eve::transform_reduce<traits>(data.begin(), data.end(), int(0), map,
-                                     reduce);
+  auto res = unsq_eve::transform_reduce<traits>(data.begin(), data.end(),
+                                                int(0), map, reduce);
+  STATIC_REQUIRE(std::is_same_v<decltype(res), int>);
+  REQUIRE(1 * 2 + 2 * 2 + 3 * 2 == res);
 }
 
 }  // namespace

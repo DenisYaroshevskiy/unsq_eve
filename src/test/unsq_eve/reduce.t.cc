@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-#include "unsq_eve/all_any_none.h"
-#include "unsq_eve/find.h"
+#include "unsq_eve/reduce.h"
 
 #include <ostream>
 #include <string>
+#include <iostream>
 
 #include <eve/memory/aligned_allocator.hpp>
 
@@ -47,21 +47,17 @@ void specific_tests(Alg alg) {
   // const T*
   {
     std::vector<T> v(13u, T(1));
-    v.back() = T(2);
 
     const T* f = v.data();
     const T* l = f + v.size();
 
-    REQUIRE(alg(traits{}, f, l, 2));
-    REQUIRE(!alg(traits{}, f, l, 5));
+    REQUIRE(alg(traits{}, f, l) == 13);
   }
 
   // const iterator
   {
     std::vector<T> v(27u, T(1));
-    v.back() = T(2);
-
-    REQUIRE(alg(traits{}, v.cbegin(), v.cend(), v.back()));
+    REQUIRE(alg(traits{}, v.cbegin(), v.cend()) == 27);
   }
 }
 
@@ -84,20 +80,18 @@ void common_any_test_impl(Alg alg) {
 
   auto run = [&]() {
     typename Variation::traits traits{};
-
     for (auto* it = f; it < l; ++it) {
       INFO("length: " << (l - f) << " from the beginning: " << it - f);
       INFO("previous aligned f: " << (std::uint64_t)aligned_address(f)
                                   << " previous aligned l: "
                                   << (std::uint64_t)aligned_address(l));
-      REQUIRE(!alg(traits, f, l, 1));
-
-      *it = 1;
-      REQUIRE(alg(traits, f, l, 1));
-      *it = 0;
+      int n = l - it;
+      int expected = *it * n + n * (n - 1) / 2;
+      REQUIRE(expected == alg(traits, it, l));
     }
   };
 
+  std::iota(f, l, 0);
   while (f < l) {
     run();
     *l = 1;
@@ -109,6 +103,7 @@ void common_any_test_impl(Alg alg) {
   // 50 from the end
   f = page.data() + page.size() - 50;
   l = page.data() + page.size() - 1;
+  std::iota(f, l, 0);
 
   while (f < l) {
     run();
@@ -144,15 +139,13 @@ void common_any_test(Alg alg) {
   common_any_test_min_combinations<double>(alg);
 }
 
-TEST_CASE("unsq_eve.any", "[unsq_eve]") {
-  common_any_test([](auto traits, auto f, auto l, auto v) {
-    return unsq_eve::any_of_is<decltype(traits)>(f, l, v);
-  });
-}
-
-TEST_CASE("unsq_eve.find_not_found", "[unsq_eve]") {
-  common_any_test([](auto traits, auto f, auto l, auto v) {
-    return unsq_eve::find<decltype(traits)>(f, l, v) != l;
+TEST_CASE("unsq_eve.reduce_basic", "[unsq_eve]") {
+  common_any_test([](auto traits, auto f, auto l) {
+    if constexpr (sizeof(unsq_eve::value_type<decltype(f)>) == 1) {
+      return unsq_eve::reduce<decltype(traits)>(f, l, short(0));
+    } else {
+      return unsq_eve::reduce<decltype(traits)>(f, l);
+    }
   });
 }
 
