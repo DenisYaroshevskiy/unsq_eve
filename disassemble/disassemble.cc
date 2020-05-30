@@ -1,7 +1,9 @@
-#include "unsq_eve/find.h"
+#include "eve_extra/eve_extra.h"
 
-using traits = unsq_eve::iteration_traits<32, 4>;
+#include <eve/function/add.hpp>
 
-const char* find_zeroe(const char* f, const char* l) {
-  return unsq_eve::find<traits>(f, l, 0);
+using wide = eve::wide<int, eve::fixed<32>>;
+
+wide reduce(wide x) {
+  return eve_extra::reduce_wide(x, eve::add);
 }
