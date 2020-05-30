@@ -24,7 +24,7 @@
 
 template <typename Traits, typename I, typename U>
 auto equal_to(const U& y) {
-  using T = ValueType<I>;
+  using T = value_type<I>;
   using wide = eve::wide<T, width_t<Traits>>;
   wide ys{static_cast<T>(y)};
   return [ys](const wide& xs) { return xs == ys; };

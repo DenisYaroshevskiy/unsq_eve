@@ -18,6 +18,7 @@ add_executable(tests)
 
 target_sources(tests PRIVATE
                eve_extra/any.t.cc
+               eve_extra/concepts.t.cc
                eve_extra/eve_extra.t.cc
                eve_extra/first_true_array.t.cc
                eve_extra/first_true.t.cc
@@ -25,6 +26,7 @@ target_sources(tests PRIVATE
                eve_extra/replace_ignored.t.cc
                eve_extra/swap_adjacent_groups.t.cc
                unsq_eve/all_any_none.t.cc
+               unsq_eve/concepts.t.cc
                unsq_eve/find_common.t.cc
                unsq_eve/unroll.t.cc
                catch_main.cc)

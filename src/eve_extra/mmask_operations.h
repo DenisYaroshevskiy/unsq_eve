@@ -19,6 +19,8 @@
 
 #include <eve/eve.hpp>
 
+#include "eve_extra/concepts.h"
+
 namespace eve_extra {
 
 struct ignore_nothing {
@@ -70,7 +72,7 @@ constexpr ignore_first_last combine(ignore_last_n x, ignore_first_n y) {
 
 namespace _eve_extra {
 
-template <typename Logical>
+template <native_logical Logical>
 std::uint32_t clear_ingored(std::uint32_t mmask, ignore_nothing) {
   return mmask;
 }
@@ -82,7 +84,7 @@ constexpr std::uint32_t set_lower_n_bits(std::uint32_t n) {
   return static_cast<std::uint32_t>(res);
 }
 
-template <typename Logical>
+template <native_logical Logical>
 std::uint32_t clear_ingored(std::uint32_t mmask, ignore_first_n ignore) {
   using scalar = typename Logical::value_type;
 
@@ -90,7 +92,7 @@ std::uint32_t clear_ingored(std::uint32_t mmask, ignore_first_n ignore) {
   return ignore_mask & mmask;
 }
 
-template <typename Logical>
+template <native_logical Logical>
 std::uint32_t clear_ingored(std::uint32_t mmask, ignore_last_n ignore) {
   using scalar = typename Logical::value_type;
 
@@ -99,7 +101,7 @@ std::uint32_t clear_ingored(std::uint32_t mmask, ignore_last_n ignore) {
   return ignore_mask & mmask;
 }
 
-template <typename Logical>
+template <native_logical Logical>
 std::uint32_t clear_ingored(std::uint32_t mmask, ignore_first_last ignore) {
   mmask = clear_ingored<Logical>(mmask, ignore_first_n{ignore.first_n});
   return clear_ingored<Logical>(mmask, ignore_last_n{ignore.last_n});

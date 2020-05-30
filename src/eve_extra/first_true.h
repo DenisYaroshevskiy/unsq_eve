@@ -25,6 +25,7 @@
 #include <eve/function/any.hpp>
 #include <eve/function/logical_or.hpp>
 
+#include "eve_extra/concepts.h"
 #include "eve_extra/mmask_operations.h"
 
 namespace eve_extra {
@@ -34,42 +35,42 @@ Compiler does not generate this properly, instead of doing things one
 after another if you ask it.
 */
 
-template <typename Wide, typename Op>
-Wide segment_reduction(const std::array<Wide, 1>& arr, Op) {
+template <typename T, typename Op>
+T segment_reduction(const std::array<T, 1>& arr, Op) {
   return arr[0];
 }
 
-template <typename Wide, typename Op>
-Wide segment_reduction(const std::array<Wide, 2>& arr, Op op) {
+template <typename T, typename Op>
+T segment_reduction(const std::array<T, 2>& arr, Op op) {
   return op(arr[0], arr[1]);
 }
 
-template <typename Wide, typename Op>
-Wide segment_reduction(const std::array<Wide, 4>& arr, Op op) {
-  Wide x = op(arr[0], arr[2]);
-  Wide y = op(arr[1], arr[3]);
+template <typename T, typename Op>
+T segment_reduction(const std::array<T, 4>& arr, Op op) {
+  T x = op(arr[0], arr[2]);
+  T y = op(arr[1], arr[3]);
   return op(x, y);
 }
 
-template <typename Wide, typename Op>
-Wide segment_reduction(const std::array<Wide, 8>& arr, Op op) {
-  Wide x1 = op(arr[0], arr[4]);
-  Wide x2 = op(arr[1], arr[5]);
-  Wide x3 = op(arr[2], arr[6]);
-  Wide x4 = op(arr[3], arr[7]);
+template <typename T, typename Op>
+T segment_reduction(const std::array<T, 8>& arr, Op op) {
+  T x1 = op(arr[0], arr[4]);
+  T x2 = op(arr[1], arr[5]);
+  T x3 = op(arr[2], arr[6]);
+  T x4 = op(arr[3], arr[7]);
   x1 = op(x1, x2);
   x3 = op(x3, x4);
   return op(x1, x3);
 }
 
-template <typename Logical, std::size_t N>
+template <eve_logical Logical, std::size_t N>
 bool any_array(const std::array<Logical, N>& xs) {
   return eve::any(segment_reduction(xs, eve::logical_or));
 }
 
 namespace _first_true {
 
-template <typename Logical, std::size_t N>
+template <eve_logical Logical, std::size_t N>
 std::array<std::uint32_t, N> move_masks(const std::array<Logical, N>& regs) {
   std::array<std::uint32_t, N> mmasks;
 
@@ -79,7 +80,7 @@ std::array<std::uint32_t, N> move_masks(const std::array<Logical, N>& regs) {
   return mmasks;
 }
 
-template <typename Logical>
+template <eve_logical Logical>
 std::uint32_t first_true_pos(std::uint32_t offset, std::uint32_t mmask) {
   using T = typename Logical::value_type;
   offset = Logical::static_size * offset;
@@ -88,14 +89,14 @@ std::uint32_t first_true_pos(std::uint32_t offset, std::uint32_t mmask) {
 
 }  // namespace _first_true
 
-template <typename Logical, typename Ignore>
+template <eve_logical Logical, typename Ignore>
 bool any(const Logical& vbool, Ignore ignore) {
   std::uint32_t mmask = eve_extra::movemask(vbool.bits());
   mmask = _eve_extra::clear_ingored<Logical>(mmask, ignore);
   return mmask;
 }
 
-template <typename Logical, typename Ignore>
+template <eve_logical Logical, typename Ignore>
 std::optional<std::size_t> first_true(Logical logical, Ignore ignore) {
   std::uint32_t mmask = eve_extra::movemask(logical.bits());
   mmask = _eve_extra::clear_ingored<Logical>(mmask, ignore);
@@ -104,13 +105,13 @@ std::optional<std::size_t> first_true(Logical logical, Ignore ignore) {
   return _first_true::first_true_pos<Logical>(0, mmask);
 }
 
-template <typename Logical>
+template <eve_logical Logical>
 std::optional<std::uint32_t> first_true_array(
     const std::array<Logical, 1>& xs) {
   return first_true(xs[0], ignore_nothing{});
 }
 
-template <typename Logical, std::size_t N>
+template <eve_logical Logical, std::size_t N>
 std::optional<std::uint32_t> first_true_array(
     const std::array<Logical, N>& xs) {
   if (!any_array(xs)) return {};

@@ -22,6 +22,7 @@
 
 #include "eve_extra/eve_extra.h"
 
+#include "unsq_eve/concepts.h"
 #include "unsq_eve/iteration_guarded.h"
 #include "unsq_eve/predicate_helpers.h"
 
@@ -31,7 +32,7 @@ namespace _all_any_none {
 template <typename Traits, typename StrippedI, typename PV>
 // require ContigiousIterator<I> && VectorPredicate<PV, ValueType<I>>
 struct any_body {
-  using T = ValueType<StrippedI>;
+  using T = value_type<StrippedI>;
   using wide = eve::wide<T, width_t<Traits>>;
 
   PV p;
@@ -85,8 +86,8 @@ struct any_body {
 
 }  // namespace _all_any_none
 
-template <typename Traits, typename I, typename PV>
-// require ContigiousIterator<I> && VectorPredicate<PV, ValueType<I>>
+template <typename Traits, typename I, wide_predicate_for<Traits, I> PV>
+// require ContigiousIterator<I>
 bool any_of(I _f, I _l, PV p) {
   auto [f, l] = drill_down_range(_f, _l);
 
@@ -96,7 +97,7 @@ bool any_of(I _f, I _l, PV p) {
 }
 
 template <typename Traits, typename I, typename T>
-// require ContigiousIterator<I> && VectorPredicate<PV, ValueType<I>>
+// require ContigiousIterator<I>
 bool any_of_is(I f, I l, const T& x) {
   return unsq_eve::any_of<Traits>(f, l, equal_to<Traits, I>(x));
 }

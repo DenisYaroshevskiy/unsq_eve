@@ -17,6 +17,7 @@
 #ifndef EVE_EXTRA_REDUCE_WIDE_H_
 #define EVE_EXTRA_REDUCE_WIDE_H_
 
+#include "eve_extra/concepts.h"
 #include "eve_extra/swap_adjacent_groups.h"
 
 namespace eve_extra {
@@ -35,7 +36,7 @@ Wide do_reduce_wide(Wide x, Op op) {
 
 }  // namespace _reduce_wide
 
-template <typename Wide, typename Op>
+template <eve_wide Wide, typename Op>
 Wide reduce_wide(Wide x, Op op) {
   return _reduce_wide::do_reduce_wide<Wide::static_size / 2>(x, op);
 }

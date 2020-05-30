@@ -20,6 +20,7 @@
 #include <eve/eve.hpp>
 
 #include <algorithm>
+#include "eve_extra/concepts.h"
 #include "eve_extra/map_array.h"
 
 namespace eve_extra {
@@ -70,17 +71,6 @@ Register swap_adjacent_register(Register x) {
 }
 
 }  // namespace _swap_adjacent_groups
-
-template <typename Wide>
-concept composite_wide = requires(const Wide& x) {
-  {x.storage().segments};
-};
-
-template <typename Wide>
-concept native_wide = !composite_wide<Wide>;
-
-template <composite_wide Wide>
-constexpr std::size_t small_size = Wide::storage_type::small_size;
 
 template <std::size_t group_size, native_wide Wide>
 Wide swap_adjacent_groups(const Wide& x) {

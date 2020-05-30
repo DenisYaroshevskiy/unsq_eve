@@ -14,31 +14,20 @@
  * limitations under the License.
  */
 
-#ifndef EVE_EXTRA_CONSTANTS_H_
-#define EVE_EXTRA_CONSTANTS_H_
+#include "unsq_eve/concepts.h"
 
-#include <eve/eve.hpp>
+#include "test/catch.h"
 
-namespace eve_extra {
-namespace _constants {
+namespace {
 
-template <typename T, std::size_t N>
-constexpr auto iota = [] {
-  std::array<T, N> res = {};
-  for (T i = 0; i < static_cast<T>(N); ++i) {
-    res[i] = i;
-  }
-  return res;
-}();
+TEST_CASE("unsq_eve.concepts", "[unsq_eve]") {
+  using wide = eve::wide<char, eve::fixed<32>>;
 
-}  // namespace _constants
+  auto equal_zero = [](const wide& x) mutable {
+    return x == wide{0};
+  };
 
-// Should dissapear
-template <typename T, typename N, typename ABI>
-auto iota(const eve::as_<eve::wide<T, N, ABI>>&) {
-  return eve::wide<T, N, ABI>{_constants::iota<T, N{}()>.begin()};
+  STATIC_REQUIRE(unsq_eve::wide_predicate<decltype(equal_zero), wide>);
 }
 
-}  // namespace eve_extra
-
-#endif  // EVE_EXTRA_CONSTANTS_H_
+}  // namespace

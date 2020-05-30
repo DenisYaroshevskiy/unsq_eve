@@ -22,6 +22,7 @@
 
 #include "eve_extra/eve_extra.h"
 
+#include "unsq_eve/concepts.h"
 #include "unsq_eve/iteration_guarded.h"
 #include "unsq_eve/iteration_unguarded.h"
 #include "unsq_eve/predicate_helpers.h"
@@ -32,7 +33,7 @@ namespace _find {
 template <typename Traits, typename StrippedI, typename PV>
 // require ContigiousIterator<I> && VectorPredicate<PV, ValueType<I>>
 struct body {
-  using T = ValueType<StrippedI>;
+  using T = value_type<StrippedI>;
   using wide = eve::wide<T, width_t<Traits>>;
 
   PV p;
@@ -77,7 +78,6 @@ struct body {
     std::array<eve::logical<wide>, Traits::unroll()> tests;
     std::transform(regs.begin(), regs.end(), tests.begin(), p);
 
-
     const std::optional match = eve_extra::first_true_array(tests);
     if (!match) return false;
 
@@ -91,8 +91,8 @@ struct body {
 
 }  // namespace _find
 
-template <typename Traits, typename I, typename PV>
-// require ContigiousIterator<I> && VectorPredicate<PV, ValueType<I>>
+template <typename Traits, typename I, wide_predicate_for<Traits, I> PV>
+// require ContigiousIterator<I>
 I find_if(I _f, I _l, PV p) {
   auto [f, l] = drill_down_range(_f, _l);
 
@@ -103,12 +103,11 @@ I find_if(I _f, I _l, PV p) {
 }
 
 template <typename Traits, typename I, typename T>
-// require ContigiousIterator<I> && VectorPredicate<PV, ValueType<I>>
 I find(I f, I l, const T& x) {
   return unsq_eve::find_if<Traits>(f, l, equal_to<Traits, I>(x));
 }
 
-template <typename Traits, typename I, typename PV>
+template <typename Traits, typename I, wide_predicate_for<Traits, I> PV>
 // require ContigiousIterator<I> && VectorPredicate<PV, ValueType<I>>
 I find_if_unguarded(I _f, PV p) {
   auto* f = drill_down(_f);

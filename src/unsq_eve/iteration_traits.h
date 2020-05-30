@@ -21,11 +21,9 @@
 #include <utility>
 
 #include "eve_extra/eve_extra.h"
+#include "unsq_eve/concepts.h"
 
 namespace unsq_eve {
-
-template <std::size_t i>
-using indx_c = std::integral_constant<std::size_t, i>;
 
 template <std::size_t _width, std::size_t _unroll>
 struct iteration_traits {
@@ -35,13 +33,7 @@ struct iteration_traits {
 };
 
 template <typename Traits>
-using width_t = typename Traits::width_type;
-
-template <typename Traits>
 using extra_width_t = eve::fixed<Traits::width() * Traits::unroll()>;
-
-template <typename I>
-using ValueType = typename std::iterator_traits<I>::value_type;
 
 template <typename I>
 using Pointer = typename std::iterator_traits<I>::pointer;

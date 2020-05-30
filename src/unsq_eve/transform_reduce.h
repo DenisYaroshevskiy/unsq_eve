@@ -14,31 +14,9 @@
  * limitations under the License.
  */
 
-#ifndef EVE_EXTRA_CONSTANTS_H_
-#define EVE_EXTRA_CONSTANTS_H_
+#ifndef UNSQ_EVE_TRANSFORM_REDUCE_H_
+#define UNSQ_EVE_TRANSFORM_REDUCE_H_
 
-#include <eve/eve.hpp>
 
-namespace eve_extra {
-namespace _constants {
 
-template <typename T, std::size_t N>
-constexpr auto iota = [] {
-  std::array<T, N> res = {};
-  for (T i = 0; i < static_cast<T>(N); ++i) {
-    res[i] = i;
-  }
-  return res;
-}();
-
-}  // namespace _constants
-
-// Should dissapear
-template <typename T, typename N, typename ABI>
-auto iota(const eve::as_<eve::wide<T, N, ABI>>&) {
-  return eve::wide<T, N, ABI>{_constants::iota<T, N{}()>.begin()};
-}
-
-}  // namespace eve_extra
-
-#endif  // EVE_EXTRA_CONSTANTS_H_
+#endif  // UNSQ_EVE_TRANSFORM_REDUCE_H_

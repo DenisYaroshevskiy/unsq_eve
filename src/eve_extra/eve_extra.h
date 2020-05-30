@@ -49,10 +49,10 @@ T* end_of_page(T* addr) {
                               upage_size);
 }
 
-template <typename U, typename N, typename T>
-auto previous_aligned_address(const eve::as_<eve::wide<U, N>>&, T* p) requires(
-    std::is_same_v<std::decay_t<T>, U>) {
-  static constexpr eve::under A{alignof(eve::wide<U, N>)};
+template <eve_wide Wide, typename T>
+auto previous_aligned_address(const eve::as_<Wide>&, T* p) requires(
+    std::is_same_v<std::decay_t<T>, typename Wide::value_type>) {
+  static constexpr eve::under A{Wide::static_alignment};
   return eve::aligned_ptr<T, as_integer(A)>{eve::align(p, A)};
 }
 

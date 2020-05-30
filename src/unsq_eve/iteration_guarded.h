@@ -90,7 +90,7 @@ StopReason main_loop(Ptr aligned_f, Ptr aligned_l,
 template <typename Traits, typename T, typename Delegate>
 // require IterationAlignedDelegate<P>
 Delegate iteration_aligned(T* f, T* l, Delegate delegate) {
-  using wide = eve::wide<ValueType<T*>, eve::fixed<Traits::width()>>;
+  using wide = eve::wide<value_type<T*>, eve::fixed<Traits::width()>>;
 
   auto aligned_f = eve_extra::previous_aligned_address(eve::as_<wide>{}, f);
   auto aligned_l = eve_extra::previous_aligned_address(eve::as_<wide>{}, l);

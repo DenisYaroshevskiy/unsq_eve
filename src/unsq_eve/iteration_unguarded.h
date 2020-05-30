@@ -26,7 +26,7 @@ namespace unsq_eve {
 template <typename Traits, typename T, typename Delegate>
 // require IterationAlignedDelegate<P>
 Delegate iteration_aligned_unguarded(T* f, Delegate delegate) {
-  using wide = eve::wide<ValueType<T*>, width_t<Traits>>;
+  using wide = eve::wide<value_type<T*>, width_t<Traits>>;
 
   auto aligned_f = eve_extra::previous_aligned_address(eve::as_<wide>{}, f);
 
