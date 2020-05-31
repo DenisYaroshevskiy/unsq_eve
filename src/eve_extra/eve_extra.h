@@ -17,7 +17,6 @@
 #ifndef EVE_EXTRA_LOAD_UNSAFE_H_
 #define EVE_EXTRA_LOAD_UNSAFE_H_
 
-#include <optional>
 #include <type_traits>
 
 #include <eve/eve.hpp>

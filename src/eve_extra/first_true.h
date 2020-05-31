@@ -20,6 +20,7 @@
 #include <algorithm>
 #include <array>
 #include <bit>
+#include <optional>
 
 #include <eve/eve.hpp>
 #include <eve/function/any.hpp>

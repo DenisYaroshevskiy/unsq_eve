@@ -17,7 +17,6 @@
 #ifndef UNSQ_EVE_REDUCE_H_
 #define UNSQ_EVE_REDUCE_H_
 
-#include <eve/eve.hpp>
 #include <eve/function/add.hpp>
 
 #include "unsq_eve/concepts.h"
