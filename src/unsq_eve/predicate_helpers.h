@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
- #ifndef UNSQ_EVE_PREDICATE_HELPERS_H_
- #define UNSQ_EVE_PREDICATE_HELPERS_H_
+#ifndef UNSQ_EVE_PREDICATE_HELPERS_H_
+#define UNSQ_EVE_PREDICATE_HELPERS_H_
 
- #include <eve/eve.hpp>
- #include "unsq_eve/iteration_unguarded.h"
+#include <eve/eve.hpp>
+#include "unsq_eve/iteration_unguarded.h"
 
- namespace unsq_eve {
+namespace unsq_eve {
 
 template <typename Traits, typename I, typename U>
 auto equal_to(const U& y) {
@@ -30,6 +30,6 @@ auto equal_to(const U& y) {
   return [ys](const wide& xs) { return xs == ys; };
 }
 
- }  // namespace unsq_eve
+}  // namespace unsq_eve
 
- #endif  // UNSQ_EVE_PREDICATE_HELPERS_H_
+#endif  // UNSQ_EVE_PREDICATE_HELPERS_H_

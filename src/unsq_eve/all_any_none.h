@@ -93,7 +93,7 @@ bool any_of(I _f, I _l, PV p) {
 
   _all_any_none::any_body<Traits, decltype(f), PV> body{p};
 
-  return iteration_aligned<Traits>(f, l, body).res;
+  return iteration_aligned<iteration_traits_t<Traits>>(f, l, body).res;
 }
 
 template <typename Traits, contigious_iterator I,

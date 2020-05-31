@@ -27,92 +27,6 @@ namespace unsq_eve {
 
 namespace _unroll {
 
-template <std::size_t, std::ptrdiff_t width>
-struct duffs_device;
-
-template <std::ptrdiff_t width>
-struct duffs_device<1u, width> {
-  template <typename Ptr, typename Op>
-  void operator()(Ptr f, Ptr l, Op op) const {
-    while (f != l) {
-      if (op(f, indx_c<0>{})) return;
-      f += width;
-    }
-  }
-};
-
-template <std::ptrdiff_t width>
-struct duffs_device<2u, width> {
-  template <typename Ptr, typename Op>
-  void operator()(Ptr f, Ptr l, Op op) const {
-    while (true) {
-      switch (l - f) {
-        case 0: return;
-        default:
-          if (op(f, indx_c<0>{})) return;
-          f += width;
-          [[fallthrough]];
-        case width:
-          if (op(f, indx_c<1>{})) return;
-          f += width;
-          [[fallthrough]];
-      }
-    }
-  }
-};
-
-template <std::ptrdiff_t width>
-struct duffs_device<3u, width> {
-  template <typename Ptr, typename Op>
-  void operator()(Ptr f, Ptr l, Op op) const {
-    while (true) {
-      switch (l - f) {
-        case 0: return;
-        default:
-          if (op(f, indx_c<0>{})) return;
-          f += width;
-          [[fallthrough]];
-        case 2 * width:
-          if (op(f, indx_c<1>{})) return;
-          f += width;
-          [[fallthrough]];
-        case width:
-          if (op(f, indx_c<2>{})) return;
-          f += width;
-          [[fallthrough]];
-      }
-    }
-  }
-};
-
-template <std::ptrdiff_t width>
-struct duffs_device<4u, width> {
-  template <typename Ptr, typename Op>
-  void operator()(Ptr f, Ptr l, Op op) const {
-    while (true) {
-      switch (l - f) {
-        case 0: return;
-        default:
-          if (op(f, indx_c<0>{})) return;
-          f += width;
-          [[fallthrough]];
-        case 3 * width:
-          if (op(f, indx_c<1>{})) return;
-          f += width;
-          [[fallthrough]];
-        case 2 * width:
-          if (op(f, indx_c<2>{})) return;
-          f += width;
-          [[fallthrough]];
-        case width:
-          if (op(f, indx_c<3>{})) return;
-          f += width;
-          [[fallthrough]];
-      }
-    }
-  }
-};
-
 template <typename Op, std::size_t... unroll_idxs>
 StopReason do_unroll(Op op, std::index_sequence<unroll_idxs...>) {
   StopReason res = StopReason::No;
@@ -126,13 +40,6 @@ StopReason do_unroll(Op op, std::index_sequence<unroll_idxs...>) {
 
 }  // namespace _unroll
 
-template <typename Traits, typename Ptr, typename Op>
-void duffs_device_iteration(Ptr f, Ptr l, Op op) {
-  // assert(l - f) % width == 0
-  _unroll::duffs_device<Traits::unroll(), Traits::width()> device;
-  device(f, l, op);
-}
-
 template <std::size_t how_much, typename Op>
 auto unroll(Op op) {
   return _unroll::do_unroll(op, std::make_index_sequence<how_much>{});
@@ -141,12 +48,12 @@ auto unroll(Op op) {
 template <typename Traits, typename Ptr, typename Op>
 void unroll_iteration(Ptr f, Op op) {
   auto tranformed_op = [&](auto idx) mutable {
-    Ptr offset_ptr = f + Traits::width() * idx;
+    Ptr offset_ptr = f + Traits::chunk_size() * idx;
     return op(offset_ptr, idx) ? StopReason::Terminated : StopReason::No;
   };
 
   while (unroll<Traits::unroll()>(tranformed_op) == StopReason::No) {
-    f += Traits::width() * Traits::unroll();
+    f += Traits::chunk_size() * Traits::unroll();
   }
 }  // namespace unsq_eve
 

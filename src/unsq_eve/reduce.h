@@ -28,8 +28,8 @@ namespace unsq_eve {
 template <typename Traits, contigious_iterator I,
           std::convertible_to<value_type<I>> T, typename F>
 std::common_type_t<T, value_type<I>> reduce(I f, I l, const T& zero, F op) {
-  return unsq_eve::transform_reduce<Traits>(
-      f, l, zero, op, [](const auto& xs) { return xs; });
+  return unsq_eve::transform_reduce<Traits>(f, l, zero, op,
+                                            [](const auto& xs) { return xs; });
 }
 
 template <typename Traits, contigious_iterator I,

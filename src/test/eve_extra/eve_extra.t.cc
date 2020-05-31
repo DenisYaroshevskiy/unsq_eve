@@ -32,7 +32,8 @@ TEST_CASE("previous_aligned_address", "[eve_extra]") {
   using wide = eve::wide<char, eve::fixed<16>>;
   const char str[] = "abc";
   eve::aligned_ptr test =
-      eve_extra::previous_aligned_address(eve::as_<wide>{}, str);
+      eve_extra::previous_aligned_address<wide::static_size * sizeof(char)>(
+          str);
   REQUIRE(test.get());
 };
 
@@ -57,7 +58,8 @@ TEMPLATE_TEST_CASE("eve_extra.load_unsafe", "[eve_extra]", ALL_TEST_PACKS) {
   REQUIRE(eve::any(expected == actual));
 
   actual = eve_extra::load_unsafe(
-      eve_extra::previous_aligned_address(eve::as_<wide>{}, &s),
+      eve_extra::previous_aligned_address<wide::static_size * sizeof(scalar)>(
+          &s),
       eve::as_<wide>{});
   REQUIRE(eve::any(expected == actual));
 }

@@ -31,7 +31,7 @@ StopReason main_loop(Ptr aligned_f, Ptr aligned_l,
     if (delegate.small_step(aligned_f, indx_c<0>{},
                             eve_extra::ignore_nothing{}))
       return StopReason::Terminated;
-    aligned_f += Traits::width();
+    aligned_f += Traits::chunk_size();
   }
   return StopReason::No;
 }
@@ -49,14 +49,14 @@ StopReason main_loop(Ptr aligned_f, Ptr aligned_l,
       if (delegate.small_step(aligned_f, idx, eve_extra::ignore_nothing{}))
         return StopReason::Terminated;
 
-      aligned_f += Traits::width();
+      aligned_f += Traits::chunk_size();
       return StopReason::No;
     });
 
     if (res != StopReason::No) return res;
 
     static constexpr std::ptrdiff_t big_step =
-        Traits::width() * Traits::unroll();
+        Traits::chunk_size() * Traits::unroll();
 
     std::ptrdiff_t big_steps_count =
         (aligned_l.get() - aligned_f.get()) / big_step;
@@ -68,7 +68,7 @@ StopReason main_loop(Ptr aligned_f, Ptr aligned_l,
       delegate.start_big_step(aligned_f);
 
       res = unroll<Traits::unroll()>([&](auto idx) mutable {
-        Ptr offset_ptr{aligned_f + Traits::width() * idx};
+        Ptr offset_ptr{aligned_f + Traits::chunk_size() * idx};
         if (delegate.big_step(offset_ptr, idx)) return StopReason::Terminated;
         return StopReason::No;
       });
@@ -90,10 +90,8 @@ StopReason main_loop(Ptr aligned_f, Ptr aligned_l,
 template <typename Traits, typename T, typename Delegate>
 // require IterationAlignedDelegate<P>
 Delegate iteration_aligned(T* f, T* l, Delegate delegate) {
-  using wide = eve::wide<value_type<T*>, eve::fixed<Traits::width()>>;
-
-  auto aligned_f = eve_extra::previous_aligned_address(eve::as_<wide>{}, f);
-  auto aligned_l = eve_extra::previous_aligned_address(eve::as_<wide>{}, l);
+  auto aligned_f = Traits::previous_aligned_address(f);
+  auto aligned_l = Traits::previous_aligned_address(l);
 
   eve_extra::ignore_first_n ignore_first{
       static_cast<std::size_t>(f - aligned_f.get())};
@@ -103,7 +101,7 @@ Delegate iteration_aligned(T* f, T* l, Delegate delegate) {
     if (delegate.small_step(aligned_f, indx_c<0>{}, ignore_first))
       return delegate;
     ignore_first = eve_extra::ignore_first_n{0};
-    aligned_f += Traits::width();
+    aligned_f += Traits::chunk_size();
 
     StopReason stop =
         _iteration_guarded::main_loop<Traits>(aligned_f, aligned_l, delegate);
@@ -111,7 +109,7 @@ Delegate iteration_aligned(T* f, T* l, Delegate delegate) {
     if (stop == StopReason::Terminated || aligned_l.get() == l) return delegate;
   }
 
-  const std::ptrdiff_t last_offset = aligned_l.get() + Traits::width() - l;
+  const std::ptrdiff_t last_offset = aligned_l.get() + Traits::chunk_size() - l;
 
   eve_extra::ignore_last_n ignore_last{static_cast<std::size_t>(last_offset)};
   delegate.small_step(aligned_l, indx_c<0>{},

@@ -100,7 +100,8 @@ auto transform_reduce(I _f, I _l, const T& zero, Reduction reduce, Map map) {
                                                                    zero);
   auto [f, l] = drill_down_range(_f, _l);
 
-  return iteration_aligned<Traits>(f, l, body).final_reduction();
+  return iteration_aligned<iteration_traits_t<Traits>>(f, l, body)
+      .final_reduction();
 }
 
 }  // namespace unsq_eve

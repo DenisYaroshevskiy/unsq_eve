@@ -25,40 +25,50 @@
 
 namespace unsq_eve {
 
-template <std::size_t _width, std::size_t _unroll>
+template <std::size_t _chunk_size, std::size_t _unroll>
 struct iteration_traits {
-  using width_type = eve::fixed<_width>;
-  static constexpr width_type width{};
+  static constexpr indx_c<_chunk_size> chunk_size{};
   static constexpr indx_c<_unroll> unroll{};
+
+  template <typename T>
+  static auto previous_aligned_address(T* addr) {
+    return eve_extra::previous_aligned_address<sizeof(T) * chunk_size()>(addr);
+  }
 };
 
-template <typename Traits>
-using extra_width_t = eve::fixed<Traits::width() * Traits::unroll()>;
+template <typename T, std::size_t register_bit_width, std::size_t _unroll>
+struct algorithm_traits {
+  using width_type = eve::fixed<register_bit_width / sizeof(T) / 8>;
+  static constexpr width_type width{};
+  static constexpr indx_c<_unroll> unroll{};
+
+  using wide = eve::wide<T, width_type>;
+  using iteration_traits =
+      unsq_eve::iteration_traits<wide::static_size, unroll()>;
+};
+
+template <typename ATraits>
+using iteration_traits_t = typename ATraits::iteration_traits;
 
 template <typename I>
 using Pointer = typename std::iterator_traits<I>::pointer;
 
-template <typename I>
-// require ContigiousIterator<I>
+template <contigious_iterator I>
 Pointer<I> drill_down(I f) {
   return &*f;
 }
 
-template <typename I>
-// require ContigiousIterator<I>
+template <contigious_iterator I>
 std::pair<Pointer<I>, Pointer<I>> drill_down_range(I f, I l) {
   auto _f = drill_down(f);
   return {_f, _f + (l - f)};
 }
 
-template <typename I, typename T>
+template <contigious_iterator I, typename T>
 // require ContigiousIterator<I>
 I undo_drill_down(I f, T* ptr) {
   return f + (ptr - drill_down(f));
 }
-
-template <typename I>
-using DrillDownI = Pointer<I>;
 
 enum class StopReason {
   No,

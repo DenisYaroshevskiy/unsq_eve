@@ -29,7 +29,7 @@ namespace {
 template <typename T, std::size_t byte_width, std::size_t unroll>
 struct variation {
   using type = T;
-  using traits = unsq_eve::iteration_traits<byte_width / sizeof(T), unroll>;
+  using traits = unsq_eve::algorithm_traits<T, byte_width * 8, unroll>;
   using wide = eve::wide<type, unsq_eve::width_t<traits>>;
 
   friend std::ostream& operator<<(std::ostream& out, variation) {
@@ -73,11 +73,6 @@ void common_any_test_impl(Alg alg) {
   using T = typename Variation::type;
   std::vector<T, eve::aligned_allocator<T, 4096>> page(4096 / sizeof(T), T{0});
 
-  auto aligned_address = [](T* ptr) {
-    using wide = typename Variation::wide;
-    return eve_extra::previous_aligned_address(eve::as_<wide>{}, ptr).get();
-  };
-
   // 50 from the beginning
   auto* f = page.data();
   auto* l = f + 50;
@@ -87,9 +82,7 @@ void common_any_test_impl(Alg alg) {
 
     for (auto* it = f; it < l; ++it) {
       INFO("length: " << (l - f) << " from the beginning: " << it - f);
-      INFO("previous aligned f: " << (std::uint64_t)aligned_address(f)
-                                  << " previous aligned l: "
-                                  << (std::uint64_t)aligned_address(l));
+
       REQUIRE(!alg(traits, f, l, 1));
 
       *it = 1;

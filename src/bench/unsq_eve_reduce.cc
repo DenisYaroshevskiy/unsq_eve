@@ -31,8 +31,8 @@ struct unsq_eve_reduce {
 
   template <typename I>
   SumType operator()(I f, I l) {
-    using traits = unsq_eve::iteration_traits<
-        width / (8 * sizeof(unsq_eve::value_type<I>)), unroll>;
+    using traits =
+        unsq_eve::algorithm_traits<unsq_eve::value_type<I>, width, unroll>;
 
     return unsq_eve::reduce<traits>(f, l, SumType{0});
   }

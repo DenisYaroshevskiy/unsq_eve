@@ -35,6 +35,8 @@ template <typename Traits, typename StrippedI, typename PV>
 struct body {
   using T = value_type<StrippedI>;
   using wide = eve::wide<T, width_t<Traits>>;
+  using iteration_traits =
+      unsq_eve::iteration_traits<wide::static_size, Traits::unroll()>;
 
   PV p;
   StrippedI found;
@@ -97,7 +99,7 @@ I find_if(I _f, I _l, PV p) {
   auto [f, l] = drill_down_range(_f, _l);
 
   _find::body<Traits, decltype(f), PV> body{p, l};
-  auto* found = iteration_aligned<Traits>(f, l, body).found;
+  auto* found = iteration_aligned<iteration_traits_t<Traits>>(f, l, body).found;
 
   return undo_drill_down(_f, found);
 }
@@ -114,7 +116,8 @@ I find_if_unguarded(I _f, PV p) {
   auto* f = drill_down(_f);
 
   _find::body<Traits, decltype(f), PV> body{p, f};
-  auto* found = iteration_aligned_unguarded<Traits>(f, body).found;
+  auto* found =
+      iteration_aligned_unguarded<iteration_traits_t<Traits>>(f, body).found;
 
   return undo_drill_down(_f, found);
 }

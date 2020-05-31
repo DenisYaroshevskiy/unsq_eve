@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-#include "eve_extra/eve_extra.h"
-#include "unsq_eve/unroll.h"
 #include "unsq_eve/iteration_traits.h"
+#include "unsq_eve/unroll.h"
 
 #ifndef UNSQ_EVE_ITERATION_UNGUARDED_H_
 #define UNSQ_EVE_ITERATION_UNGUARDED_H_
@@ -26,9 +25,7 @@ namespace unsq_eve {
 template <typename Traits, typename T, typename Delegate>
 // require IterationAlignedDelegate<P>
 Delegate iteration_aligned_unguarded(T* f, Delegate delegate) {
-  using wide = eve::wide<value_type<T*>, width_t<Traits>>;
-
-  auto aligned_f = eve_extra::previous_aligned_address(eve::as_<wide>{}, f);
+  auto aligned_f = Traits::previous_aligned_address(f);
 
   // Deal with first bit, maybe not fully in the data
   {
@@ -36,7 +33,7 @@ Delegate iteration_aligned_unguarded(T* f, Delegate delegate) {
     auto ignore = eve_extra::ignore_first_n{to_ignore};
     if (delegate.small_step(aligned_f, indx_c<0>{}, ignore)) return delegate;
   }
-  aligned_f += Traits::width();
+  aligned_f += Traits::chunk_size();
 
   // Everything else is on the caller.
   unroll_iteration<Traits>(aligned_f, [&](auto cur, auto reg_idx) mutable {

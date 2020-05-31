@@ -24,7 +24,7 @@
 namespace {
 
 TEST_CASE("unsq_eve.transform_reduce.type_increase", "[unsq_eve]") {
-  using traits = unsq_eve::iteration_traits<32, 4>;
+  using traits = unsq_eve::algorithm_traits<char, 256, 4>;
   using wide = eve::wide<char, eve::fixed<32>>;
   using wider = eve::wide<short, eve::fixed<32>>;
   using widest = eve::wide<int, eve::fixed<32>>;

@@ -22,14 +22,14 @@ namespace {
 
 template <typename I, std::size_t width, std::size_t unroll>
 using make_traits =
-    unsq_eve::iteration_traits<width / sizeof(unsq_eve::value_type<I>), unroll>;
+    unsq_eve::algorithm_traits<unsq_eve::value_type<I>, width, unroll>;
 
 struct unsq_eve_find_128_1 {
   const char* name() const { return "unsq_eve::find<128, 1>"; }
 
   template <typename I, typename T>
   I operator()(I f, I l, const T& x) {
-    return unsq_eve::find<make_traits<I, 16, 1>>(f, l, x);
+    return unsq_eve::find<make_traits<I, 128, 1>>(f, l, x);
   }
 };
 
@@ -38,7 +38,7 @@ struct unsq_eve_find_256_1 {
 
   template <typename I, typename T>
   I operator()(I f, I l, const T& x) {
-    return unsq_eve::find<make_traits<I, 32, 1>>(f, l, x);
+    return unsq_eve::find<make_traits<I, 256, 1>>(f, l, x);
   }
 };
 
@@ -47,7 +47,7 @@ struct unsq_eve_find_256_4 {
 
   template <typename I, typename T>
   I operator()(I f, I l, const T& x) {
-    return unsq_eve::find<make_traits<I, 32, 4>>(f, l, x);
+    return unsq_eve::find<make_traits<I, 256, 4>>(f, l, x);
   }
 };
 

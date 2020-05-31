@@ -27,7 +27,7 @@ namespace {
 #define ALL_UNROLLS \
   (unsq_eve::indx_c<1>), (unsq_eve::indx_c<2>), (unsq_eve::indx_c<4>)
 
-TEMPLATE_TEST_CASE("iteration_main_loop_unrolled", "[unsq_eve]", ALL_UNROLLS) {
+TEMPLATE_TEST_CASE("unroll", "[unsq_eve]", ALL_UNROLLS) {
   using traits = unsq_eve::iteration_traits<8, TestType{}()>;
 
   std::vector<int> v(1024, 15);
@@ -44,34 +44,17 @@ TEMPLATE_TEST_CASE("iteration_main_loop_unrolled", "[unsq_eve]", ALL_UNROLLS) {
     return false;
   };
 
-  SECTION("guarded") {
-    unsq_eve::duffs_device_iteration<traits>(v.data(), v.data() + v.size(), op);
-    for (int i = 0, j = 0; i < 1024; i += 8) {
-      if (i >= stop_at) {
-        REQUIRE(v[i] == 15);
-        continue;
-      }
-
-      // guarded doesn't guarantee register order
-      REQUIRE(v[i] != 15);
-      REQUIRE(v[i + 1] == 15);
-      if (++j == traits::unroll) j = 0;
+  unsq_eve::unroll_iteration<traits>(v.data(), op);
+  for (int i = 0, j = 0; i < 1024; i += 8) {
+    if (i >= stop_at) {
+      REQUIRE(v[i] == 15);
+      continue;
     }
-  }
 
-  SECTION("unguarded") {
-    unsq_eve::unroll_iteration<traits>(v.data(), op);
-    for (int i = 0, j = 0; i < 1024; i += 8) {
-      if (i >= stop_at) {
-        REQUIRE(v[i] == 15);
-        continue;
-      }
-
-      // unguarded does guarantee register order
-      REQUIRE(v[i] == j);
-      REQUIRE(v[i + 1] == 15);
-      if (++j == traits::unroll) j = 0;
-    }
+    // unguarded does guarantee register order
+    REQUIRE(v[i] == j);
+    REQUIRE(v[i + 1] == 15);
+    if (++j == traits::unroll()) j = 0;
   }
 }
 

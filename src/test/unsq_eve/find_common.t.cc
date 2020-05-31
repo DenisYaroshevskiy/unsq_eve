@@ -28,7 +28,7 @@ namespace {
 template <typename T, std::size_t byte_width, std::size_t unroll>
 struct variation {
   using type = T;
-  using traits = unsq_eve::iteration_traits<byte_width / sizeof(T), unroll>;
+  using traits = unsq_eve::algorithm_traits<T, byte_width * 8, unroll>;
 
   friend std::ostream& operator<<(std::ostream& out, variation) {
     out << "{sizeof(T): " << sizeof(T) << " byte_width: " << byte_width

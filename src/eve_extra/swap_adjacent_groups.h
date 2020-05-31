@@ -89,7 +89,7 @@ Wide swap_adjacent_groups(const Wide& x) requires(group_size <
 
   using storage_type = typename Wide::storage_type;
 
-  storage_type converted {map_array(x.storage().segments, for_segment)};
+  storage_type converted{map_array(x.storage().segments, for_segment)};
 
   return Wide{converted};
 }

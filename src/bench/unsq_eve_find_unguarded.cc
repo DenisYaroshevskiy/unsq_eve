@@ -22,14 +22,14 @@ namespace {
 
 template <typename I, std::size_t width, std::size_t unroll>
 using make_traits =
-    unsq_eve::iteration_traits<width / sizeof(unsq_eve::value_type<I>), unroll>;
+    unsq_eve::algorithm_traits<unsq_eve::value_type<I>, width, unroll>;
 
 struct unsq_eve_find_unguarded_128_1 {
   const char* name() const { return "unsq_eve::find_unguarded<128, 1>"; }
 
   template <typename I, typename T>
   I operator()(I f, I, const T& x) {
-    return unsq_eve::find_unguarded<make_traits<I, 16, 1>>(f, x);
+    return unsq_eve::find_unguarded<make_traits<I, 128, 1>>(f, x);
   }
 };
 
@@ -38,7 +38,7 @@ struct unsq_eve_find_unguarded_256_1 {
 
   template <typename I, typename T>
   I operator()(I f, I, const T& x) {
-    return unsq_eve::find_unguarded<make_traits<I, 32, 1>>(f, x);
+    return unsq_eve::find_unguarded<make_traits<I, 256, 1>>(f, x);
   }
 };
 
@@ -47,7 +47,7 @@ struct unsq_eve_find_unguarded_256_4 {
 
   template <typename I, typename T>
   I operator()(I f, I, const T& x) {
-    return unsq_eve::find_unguarded<make_traits<I, 32, 4>>(f, x);
+    return unsq_eve::find_unguarded<make_traits<I, 256, 4>>(f, x);
   }
 };
 
