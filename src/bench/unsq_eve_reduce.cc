@@ -26,7 +26,7 @@ struct unsq_eve_reduce {
   std::string name() const {
     return "unsq_eve::reduce<" + std::to_string(width) + ", " +
            std::to_string(unroll) +
-           "/sum_type:" + bench::type_name<SumType>{}();
+           ">/sum_type:" + bench::type_name<SumType>{}();
   }
 
   template <typename I>
