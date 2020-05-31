@@ -39,7 +39,7 @@ function valuesByKeys(measurements) {
 
 async function loadMeasurements() {
   if (!loadMeasurements.cache) {
-    const loaded = await fetch("/data/all.json").then(async (raw) => raw.json());
+    const loaded = await fetch("data/all.json").then(async (raw) => raw.json());
     loadMeasurements.cache = loaded.map(replaceStringValuesWithNumbers);
   }
   return loadMeasurements.cache;
