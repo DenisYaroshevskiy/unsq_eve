@@ -25,6 +25,7 @@
 #include <eve/function/store.hpp>
 
 #include "eve_extra/concepts.h"
+#include "eve_extra/mm.h"
 #include "eve_extra/mmask_operations.h"
 
 namespace eve_extra {
@@ -63,13 +64,8 @@ void maskstore(T* to, Mask mask,
 
 template <typename T, typename Register>
 void maskmove(T* to, __m128i mask, Register reg) {
-  __m128i _reg;
-  if constexpr (std::floating_point<T>) {
-    _reg = _mm_castpd_si128(reg);
-  } else {
-    _reg = reg;
-  }
-  _mm_maskmoveu_si128(reg, mask, reinterpret_cast<char*>(to));
+  _mm_maskmoveu_si128(mm::cast_to_integral(reg), mask,
+                      reinterpret_cast<char*>(to));
 }
 
 template <typename T, std::size_t A>

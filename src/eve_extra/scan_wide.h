@@ -14,28 +14,24 @@
  * limitations under the License.
  */
 
-#ifndef EVE_EXTRA_MAP_ARRAY_H_
-#define EVE_EXTRA_MAP_ARRAY_H_
+#ifndef EVE_EXTRA_SCAN_H_
+#define EVE_EXTRA_SCAN_H_
 
-#include <array>
-#include <type_traits>
+#include "eve_extra/concepts.h"
 
 namespace eve_extra {
-namespace _map_array {
 
-template <typename T, std::size_t N, typename Op, std::size_t... idxs>
-auto do_map_array(const std::array<T, N>& in, Op op,
-                  std::index_sequence<idxs...>) {
-  return std::array{op(in[idxs])...};
-}
+// [a b c d]
+// + [0 a b c]
+// [a (a + b) (b + c) (c + d)]
+// >> 2 [0 0 a (a + b)]
+// [a (a + b) (a + b + c) (a + b + c + d)]
 
-}  // namespace _map_array
-
-template <typename T, std::size_t N, typename Op>
-auto map_array(const std::array<T, N>& in, Op op) {
-  return _map_array::do_map_array(in, op, std::make_index_sequence<N>{});
+template <native_wide Wide, typename Op>
+Wide scan_wide(Wide x, Op op) {
+  return x;
 }
 
 }  // namespace eve_extra
 
-#endif  // EVE_EXTRA_MAP_ARRAY_H_
+#endif  // EVE_EXTRA_SCAN_H_

@@ -24,6 +24,7 @@ target_sources(tests PRIVATE
                eve_extra/first_true.t.cc
                eve_extra/reduce_wide.t.cc
                eve_extra/replace_ignored.t.cc
+               eve_extra/shift_with.cpp
                eve_extra/store.t.cc
                eve_extra/swap_adjacent_groups.t.cc
                unsq_eve/all_any_none.t.cc
