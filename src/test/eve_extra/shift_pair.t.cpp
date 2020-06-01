@@ -36,15 +36,15 @@ void unroll(Op op) {
   (std::make_index_sequence<n>{});
 }
 
-TEMPLATE_TEST_CASE("eve_extra.shift_pair_right", "[eve_extra]",
-                   ALL_TEST_PACKS) {
+template <typename TestType, typename Op>
+void shift_pair_right_test(Op op) {
   using wide = TestType;
 
   const wide lhs = eve_extra::iota(eve::as_<wide>{});
   const wide rhs = eve_extra::iota(eve::as_<wide>{}) + wide{20};
 
-  auto run = [&]<std::size_t shift>(indx_c<shift>) {
-    const wide actual = eve_extra::shift_pair_right<shift>(lhs, rhs);
+  auto run = [&]<std::size_t shift>(indx_c<shift> wrapped_shift) {
+    const wide actual = op(wrapped_shift, lhs, rhs);
 
     wide expected;
     std::copy(lhs.end() - shift, lhs.end(), expected.begin());
@@ -57,6 +57,14 @@ TEMPLATE_TEST_CASE("eve_extra.shift_pair_right", "[eve_extra]",
   };
 
   unroll<wide::static_size>(run);
+}
+
+TEMPLATE_TEST_CASE("eve_extra.shift_pair_right", "[eve_extra]",
+                   ALL_TEST_PACKS) {
+  shift_pair_right_test<TestType>(
+      []<std::size_t shift>(indx_c<shift>, auto lhs, auto rhs) {
+        return eve_extra::shift_pair_right<shift>(lhs, rhs);
+      });
 }
 
 TEST_CASE("trying shifts (left for reference)", "[eve_extra]") {
@@ -103,6 +111,45 @@ TEST_CASE("trying shifts (left for reference)", "[eve_extra]") {
     INFO("expected: " << expected << " actual: " << actual);
     REQUIRE(eve::all(expected == actual));
   }
+}
+
+TEST_CASE("eve_extra.shift_pair_right_in_groups", "[eve_extra]") {
+  using wide = eve::wide<std::int64_t, eve::fixed<4>>;
+  using TestType = wide;
+
+  if constexpr (eve_extra::wide_16_bytes<wide>) {
+    shift_pair_right_test<TestType>(
+        []<std::size_t shift>(indx_c<shift>, auto lhs, auto rhs) {
+          return eve_extra::shift_pair_right_in_groups<shift>(lhs, rhs);
+        });
+    return;
+  }
+
+  const wide lhs = eve_extra::iota(eve::as_<wide>{});
+  const wide rhs = eve_extra::iota(eve::as_<wide>{}) + wide{20};
+  static constexpr std::ptrdiff_t half_size = wide::static_size / 2;
+
+  auto run = [&]<std::size_t shift>(indx_c<shift>) {
+    const wide actual = eve_extra::shift_pair_right_in_groups<shift>(lhs, rhs);
+
+    wide expected;
+
+    auto lhs_m = lhs.begin() + half_size;
+    auto rhs_m = rhs.begin() + half_size;
+    auto expected_m = expected.begin() + half_size;
+
+    std::copy(lhs_m - shift, lhs_m, expected.begin());
+    std::copy(rhs.begin(), rhs_m - shift, expected.begin() + shift);
+    std::copy(lhs.end() - shift, lhs.end(), expected_m);
+    std::copy(rhs_m, rhs.end() - shift, expected_m + shift);
+
+    INFO("lhs: " << lhs << " rhs: " << rhs);
+    INFO("shift " << shift);
+    INFO("expected: " << expected << " actual: " << actual);
+    REQUIRE(eve::all(expected == actual));
+  };
+
+  unroll<half_size>(run);
 }
 
 }  // namespace

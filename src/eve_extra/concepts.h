@@ -60,6 +60,12 @@ template <typename Wide>
 concept native_wide = eve_wide<Wide> && ((static_byte_size_v<Wide> == 16) ||
                                          (static_byte_size_v<Wide> == 32));
 
+template <typename Wide>
+concept wide_16_bytes = eve_wide<Wide>&& static_byte_size_v<Wide> == 16;
+
+template <typename Wide>
+concept wide_32_bytes = eve_wide<Wide>&& static_byte_size_v<Wide> == 32;
+
 template <typename Logical>
 concept native_logical =
     eve_logical<Logical>&& native_wide<typename Logical::bits_type>;

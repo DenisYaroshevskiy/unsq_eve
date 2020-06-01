@@ -1,13 +1,8 @@
-#include <eve/function/add.hpp>
-#include "eve_extra/eve_extra.h"
+#include "unsq_eve/inclusive_scan.h"
 
-#include <utility>
+using T = int;
+using traits = unsq_eve::algorithm_traits<T, 128, 4>;
 
-using wide = eve::wide<int, eve::fixed<8>>;
-
-auto test(wide x, wide y) {
-  x = eve_extra::inclusive_scan_wide(x, eve::add, wide{0});
-  y = eve_extra::inclusive_scan_wide(y, eve::add, wide{0});
-  y += wide{x.back()};
-  return std::pair{x, y};
+void inclusive_scan_inplace(int* f, int* l) {
+  unsq_eve::inclusive_scan_inplace_aligned<traits>(f, l);
 }

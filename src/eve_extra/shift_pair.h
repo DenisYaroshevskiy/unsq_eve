@@ -58,6 +58,26 @@ Wide shift_pair_right(Wide lhs, Wide rhs) {
   return Wide{mm::cast<raw_t>(res)};
 }
 
+template <std::size_t shift, wide_16_bytes Wide>
+Wide shift_pair_right_in_groups(Wide lhs, Wide rhs) {
+  return shift_pair_right<shift>(lhs, rhs);
+}
+
+template <std::size_t shift, wide_32_bytes Wide>
+Wide shift_pair_right_in_groups(Wide lhs, Wide rhs) {
+  using T = typename Wide::value_type;
+
+  mm::reg auto lhs_raw = lhs.storage();
+  mm::reg auto rhs_raw = rhs.storage();
+  using raw_t = decltype(lhs_raw);
+
+  __m256i lhs_reg = mm::cast_to_integral(lhs_raw);
+  __m256i rhs_reg = mm::cast_to_integral(rhs_raw);
+  __m256i res = _mm256_alignr_epi8(rhs_reg, lhs_reg, 16 - sizeof(T) * shift);
+
+  return Wide{mm::cast<raw_t>(res)};
+}
+
 }  // namespace eve_extra
 
 #endif  // EVE_EXTRA_SHIFT_WITH_H_
