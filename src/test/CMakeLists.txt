@@ -24,12 +24,13 @@ target_sources(tests PRIVATE
                eve_extra/first_true.t.cc
                eve_extra/reduce_wide.t.cc
                eve_extra/replace_ignored.t.cc
+               eve_extra/store.t.cc
                eve_extra/swap_adjacent_groups.t.cc
                unsq_eve/all_any_none.t.cc
                unsq_eve/concepts.t.cc
                unsq_eve/find_common.t.cc
-               unsq_eve/transform_reduce.types.t.cc
                unsq_eve/reduce.t.cc
+               unsq_eve/transform_reduce.types.t.cc
                unsq_eve/unroll.t.cc
                catch_main.cc)
 
