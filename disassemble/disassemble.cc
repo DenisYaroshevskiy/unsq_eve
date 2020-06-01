@@ -1,6 +1,13 @@
-#include "unsq_eve/reduce.h"
+#include <eve/function/add.hpp>
+#include "eve_extra/eve_extra.h"
 
-int reduce(const char* f, const char* l) {
-  using traits = unsq_eve::algorithm_traits<char, 256, 1>;
-  return unsq_eve::reduce<traits>(f, l, int(0));
+#include <utility>
+
+using wide = eve::wide<int, eve::fixed<8>>;
+
+auto test(wide x, wide y) {
+  x = eve_extra::inclusive_scan_wide(x, eve::add, wide{0});
+  y = eve_extra::inclusive_scan_wide(y, eve::add, wide{0});
+  y += wide{x.back()};
+  return std::pair{x, y};
 }

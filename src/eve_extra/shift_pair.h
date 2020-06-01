@@ -20,8 +20,6 @@
 #include "eve_extra/concepts.h"
 #include "eve_extra/mm.h"
 
-#include <iostream>
-
 namespace eve_extra {
 namespace _shift_with {
 
@@ -39,22 +37,22 @@ __m256i alignr256_emulated(__m256i a, __m256i b) {
 }  // namespace _shift_with
 
 template <std::size_t shift, native_wide Wide>
-Wide shift_right(Wide x, Wide in) {
+Wide shift_pair_right(Wide lhs, Wide rhs) {
   using T = typename Wide::value_type;
 
-  mm::reg auto x_raw = x.storage();
-  mm::reg auto in_raw = in.storage();
-  using raw_t = decltype(x_raw);
+  mm::reg auto lhs_raw = lhs.storage();
+  mm::reg auto rhs_raw = rhs.storage();
+  using raw_t = decltype(lhs_raw);
 
-  mm::integral_reg auto x_reg = mm::cast_to_integral(x_raw);
-  mm::integral_reg auto in_reg = mm::cast_to_integral(in_raw);
+  mm::integral_reg auto lhs_reg = mm::cast_to_integral(lhs_raw);
+  mm::integral_reg auto rhs_reg = mm::cast_to_integral(rhs_raw);
 
   mm::integral_reg auto res = [&] {
-    if constexpr (sizeof(x_reg) == 16)
-      return _mm_alignr_epi8(x_reg, in_reg, 16 - sizeof(T) * shift);
+    if constexpr (sizeof(lhs_reg) == 16)
+      return _mm_alignr_epi8(rhs_reg, lhs_reg, 16 - sizeof(T) * shift);
     else
-      return _shift_with::alignr256_emulated<32 - sizeof(T) * shift>(x_reg,
-                                                                     in_reg);
+      return _shift_with::alignr256_emulated<32 - sizeof(T) * shift>(rhs_reg,
+                                                                     lhs_reg);
   }();
 
   return Wide{mm::cast<raw_t>(res)};

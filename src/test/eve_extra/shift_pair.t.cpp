@@ -36,19 +36,21 @@ void unroll(Op op) {
   (std::make_index_sequence<n>{});
 }
 
-TEMPLATE_TEST_CASE("eve_extra.shift_with", "[eve_extra]", ALL_TEST_PACKS) {
+TEMPLATE_TEST_CASE("eve_extra.shift_pair_right", "[eve_extra]",
+                   ALL_TEST_PACKS) {
   using wide = TestType;
 
-  const wide x = eve_extra::iota(eve::as_<wide>{}) + wide{20};
-  const wide in = eve_extra::iota(eve::as_<wide>{});
+  const wide lhs = eve_extra::iota(eve::as_<wide>{});
+  const wide rhs = eve_extra::iota(eve::as_<wide>{}) + wide{20};
 
   auto run = [&]<std::size_t shift>(indx_c<shift>) {
-    const wide actual = eve_extra::shift_right<shift>(x, in);
+    const wide actual = eve_extra::shift_pair_right<shift>(lhs, rhs);
 
     wide expected;
-    std::copy(in.end() - shift, in.end(), expected.begin());
-    std::copy(x.begin(), x.end() - shift, expected.begin() + shift);
-    INFO("x: " << x);
+    std::copy(lhs.end() - shift, lhs.end(), expected.begin());
+    std::copy(rhs.begin(), rhs.end() - shift, expected.begin() + shift);
+
+    INFO("lhs: " << lhs << " rhs: " << rhs);
     INFO("shift " << shift);
     INFO("expected: " << expected << " actual: " << actual);
     REQUIRE(eve::all(expected == actual));
