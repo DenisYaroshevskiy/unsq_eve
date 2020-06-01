@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "unsq_eve/reduce.h"
+#include "unsq_eve/inclusive_scan.h"
 
 #include <ostream>
 
@@ -42,20 +42,15 @@ void specific_tests(Alg alg) {
   using T = typename Variation::type;
   using traits = typename Variation::traits;
 
-  // const T*
+  // vector
   {
     std::vector<T> v(13u, T(1));
 
-    const T* f = v.data();
-    const T* l = f + v.size();
+    alg(traits{}, v.begin(), v.end());
 
-    REQUIRE(alg(traits{}, f, l) == 13);
-  }
-
-  // const iterator
-  {
-    std::vector<T> v(27u, T(1));
-    REQUIRE(alg(traits{}, v.cbegin(), v.cend()) == 27);
+    for (T i = 0; i != static_cast<T>(v.size()); ++i) {
+      REQUIRE(v[i] == i + 1);
+    }
   }
 }
 
@@ -73,11 +68,20 @@ void common_any_test_impl(Alg alg) {
 
   auto run = [&]() {
     typename Variation::traits traits{};
+
+    std::vector<T> copy{f, l};
+
     for (auto* it = f; it < l; ++it) {
       INFO("length: " << (l - f) << " from the beginning: " << it - f);
-      int n = l - it;
-      int expected = *it * n + n * (n - 1) / 2;
-      REQUIRE(expected == alg(traits, it, l));
+
+      std::vector<T> expected(l - it);
+      std::inclusive_scan(it, l, expected.begin());
+
+      alg(traits, it, l);
+      std::vector<T> actual{it, l};
+      REQUIRE(expected == actual);
+
+      std::copy(copy.begin(), copy.end(), f);
     }
   };
 
@@ -129,13 +133,9 @@ void common_any_test(Alg alg) {
   common_any_test_min_combinations<double>(alg);
 }
 
-TEST_CASE("unsq_eve.reduce_basic", "[unsq_eve]") {
+TEST_CASE("unsq_eve.inclusive_scan_inplace_aligned.basic", "[unsq_eve]") {
   common_any_test([](auto traits, auto f, auto l) {
-    if constexpr (sizeof(unsq_eve::value_type<decltype(f)>) == 1) {
-      return unsq_eve::reduce<decltype(traits)>(f, l, short(0));
-    } else {
-      return unsq_eve::reduce<decltype(traits)>(f, l);
-    }
+    unsq_eve::inclusive_scan_inplace_aligned<decltype(traits)>(f, l);
   });
 }
 

@@ -35,8 +35,6 @@ template <typename Traits, typename StrippedI, typename PV>
 struct body {
   using T = value_type<StrippedI>;
   using wide = eve::wide<T, width_t<Traits>>;
-  using iteration_traits =
-      unsq_eve::iteration_traits<wide::static_size, Traits::unroll()>;
 
   PV p;
   StrippedI found;
