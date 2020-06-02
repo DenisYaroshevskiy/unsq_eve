@@ -1,0 +1,131 @@
+<!doctype html>
+<html>
+<meta charset='utf-8'>
+
+<title>inclusive scan results</title>
+<script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
+<script type='text/javascript' src='scripts/bench.js'></script>
+
+</html>
+
+<body>
+  <h1> inclusive_scan </h1>
+
+  My implementation is based on <a
+    href="https://stackoverflow.com/a/19496697/5021064">StackOverflow answer by
+    Z boson.</a> <br />
+
+  So far only have an inplace version - replace elements with running sum -
+  didn't support writing to a different array. <br />
+  Only tried aligned loads and stores <br />
+  The best unrolling seems to be `2`. <br />
+  The main routine that does the work is <a
+    href="https://github.com/DenisYaroshevskiy/unsq_eve/blob/6f1acf7dd2d0b609c08f5f54966d6f7dd644da51/src/eve_extra/scan_wide.h#L50">`eve_extra::inclusive_scan_wide`</a>
+  that computes (as the name suggests)
+  `inclusive_scan` for one wide register. <br />
+
+
+  <h2> 40 bytes summary </h2>
+
+  For 40 bytes extremly poor performance for chars/shorts I blame `maskmoveu`.
+  <br />
+  I do 2 of them for each masked store (4 in total on 4 bytes). <br />
+  For integeres I do 2 `_mm_maskstore_epi32` and we can see that integers are
+  only 2 times slower,<br />
+  as oppose to 20. (I don't have hard proof yet though). <br />
+  This leads me to believe that I should try: <br />
+  a) branch over 2 `maskmoveu`. I think I can get it faster with a branch.
+  <br />
+  b) I really need to try unaligned iteration. The case like I test here: <br />
+  we modify the same range as we read is not as common as writing a different
+  range <br />
+  and in that case I cannot use aligned writes anyways. <br />
+  Also - the operation here is quite expensive, probably unaligned read/write
+  won't be <br />
+  much of an issue.
+
+  <h3> 40 bytes, data</h3>
+
+  <div id='40_bytes_data'></div>
+  <script>dynamicEntryPoint('40_bytes_data', {
+      name: 'sum',
+      size: 40,
+      algorithm: 'selection',
+      type: 'x',
+      time: 'y',
+      padding: 'min',
+      group: 'intel_9700K',
+      percentage: 100,
+    }, ['inclusive_scan_inplace_aligned<256, 2>', 'std::inclusive_scan']);
+  </script>
+
+  <h2> 1000 bytes summary </h2>
+
+  Seems like `maskmove` still dominates. I judge by total time still being small
+  and <br />
+  I also have a 40 bytes as a baseline. <br />
+  Nevertheless, we get a 2 times speed up for chars and ints. <br />
+
+  <h3> 1000 bytes, data</h3>
+
+  <div id='1000_bytes_data'></div>
+  <script>dynamicEntryPoint('1000_bytes_data', {
+      name: 'sum',
+      size: 1000,
+      algorithm: 'selection',
+      type: 'x',
+      time: 'y',
+      padding: 'min',
+      group: 'intel_9700K',
+      percentage: 100,
+    }, ['inclusive_scan_inplace_aligned<256, 2>', 'std::inclusive_scan']);
+  </script>
+
+  <h2> 10'000 bytes summary </h2>
+
+  Our theoretical win comes from us doing log additions from our size. <br />
+  So for:<br />
+  * 32 chars - we do 5 additions instead of 31 => cound be a 6 times speed up.
+  <br />
+  * 16 shorts we do 4 additions intead of 15 => could be a 4 times speed up.
+  <br>
+  * 8 ints we do 3 additions as oppose to 7 of scalar => could be a 2 times
+  speed up.<br /> <br />
+  We actully got 4,25 times for chars, 2,5 times for shorts and 2 times for
+  ints.
+  <br />
+  Pretty close to what we were hoping for, though I'm not wild about shorts,
+  could be better. <br />
+  Maybe some of the planned improvements will help. <br />
+
+  <h3> 10'000 bytes, data</h3>
+
+  <div id='10000_bytes_data'></div>
+  <script>dynamicEntryPoint('10000_bytes_data', {
+      name: 'sum',
+      size: 10000,
+      algorithm: 'selection',
+      type: 'x',
+      time: 'y',
+      padding: 'min',
+      group: 'intel_9700K',
+      percentage: 100,
+    }, ['inclusive_scan_inplace_aligned<256, 2>', 'std::inclusive_scan']);
+  </script>
+
+  <h2> Total benchmark </h2>
+  <div id='total_benchmark'></div>
+  <script>dynamicEntryPoint('total_benchmark', {
+      name: 'sum',
+      size: 'x',
+      algorithm: 'selection',
+      type: 'selection',
+      sum_type: 'selection',
+      time: 'y',
+      padding: 'min',
+      group: 'intel_9700K',
+      percentage: 100,
+    }, ['inclusive_scan']);
+  </script>
+
+</body>

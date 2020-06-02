@@ -51,14 +51,14 @@ int main(int argc, char** argv) {
 
   using short_2_short_benchmars =
       bench::sum_bench<short,
-                       unsq_eve_inclusive_scan_inplace_aligned<char, 256, 1>,
+                       unsq_eve_inclusive_scan_inplace_aligned<short, 256, 1>,
                        unsq_eve_inclusive_scan_inplace_aligned<short, 256, 2>,
                        unsq_eve_inclusive_scan_inplace_aligned<short, 256, 4>>;
 
   using int_2_int_benchmarks =
       bench::sum_bench<int,
-                       unsq_eve_inclusive_scan_inplace_aligned<char, 256, 1>,
-                       unsq_eve_inclusive_scan_inplace_aligned<short, 256, 2>,
+                       unsq_eve_inclusive_scan_inplace_aligned<int, 256, 1>,
+                       unsq_eve_inclusive_scan_inplace_aligned<int, 256, 2>,
                        unsq_eve_inclusive_scan_inplace_aligned<int, 256, 4>>;
 
   bench::bench_main<char_2_char_benchmarks, short_2_short_benchmars,
