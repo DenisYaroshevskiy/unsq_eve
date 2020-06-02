@@ -30,7 +30,7 @@ TEMPLATE_TEST_CASE("eve_extra.reduce_wide", "[eve_extra]", ALL_TEST_PACKS) {
   constexpr std::ptrdiff_t size = wide::static_size;
   using extra_wide = eve::wide<T, eve::fixed<size * 4>>;
 
-  auto run = []<typename Wide>(Wide input_dummy) {
+  auto run = []<typename Wide>(Wide) {
     const auto input = eve_extra::iota(eve::as_<Wide>{});
 
     // I'm hardcoding types in the predicates to make sure that we are

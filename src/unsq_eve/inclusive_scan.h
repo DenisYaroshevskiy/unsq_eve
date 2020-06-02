@@ -67,7 +67,7 @@ struct inplace_body {
   }
 
   template <typename Ptr>
-  bool complete_big_step(Ptr ptr) {
+  bool complete_big_step(Ptr) {
     return false;
   }
 

@@ -39,7 +39,6 @@ target_sources(tests PRIVATE
 
 target_compile_options(tests PRIVATE
                        -Werror -Wall -Wextra -Wpedantic -Og -g
-                       -Wno-unused-parameter
                        -DEVE_DISABLE_ASSERTS
                         -fno-omit-frame-pointer
                        --std=c++20
