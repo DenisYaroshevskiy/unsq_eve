@@ -136,7 +136,7 @@ TEST_CASE("unsq_eve.reduce_basic", "[unsq_eve]") {
   common_any_test([](auto variation, auto f, auto l) {
     if constexpr (sizeof(unsq_eve::value_type<decltype(f)>) == 1) {
       using traits = traits_for<short, decltype(variation)>;
-      return unsq_eve::reduce<traits>(f, l, 0);
+      return unsq_eve::reduce<traits>(f, l, short(0));
     } else {
       using traits =
           traits_for<unsq_eve::value_type<decltype(f)>, decltype(variation)>;

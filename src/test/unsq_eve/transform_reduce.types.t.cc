@@ -38,8 +38,8 @@ TEMPLATE_TEST_CASE("unsq_eve.transform_reduce.type_increase", "[unsq_eve]",
   auto reduce = [](wide x, wide y) -> wide { return x + y; };
 
   std::vector<ArrayType> data{1, 2, 3};
-  auto res = unsq_eve::transform_reduce<traits>(data.begin(), data.end(), 0,
-                                                reduce, map);
+  auto res = unsq_eve::transform_reduce<traits>(data.begin(), data.end(),
+                                                IterateAs(0), reduce, map);
   STATIC_REQUIRE(std::is_same_v<decltype(res), IterateAs>);
   REQUIRE(1 * 2 + 2 * 2 + 3 * 2 == res);
 }

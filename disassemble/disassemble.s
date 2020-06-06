@@ -4,14 +4,22 @@
 	.section	.rodata.cst32,"aM",@progbits,32
 	.p2align	5               # -- Begin function _Z6reducePKcS0_
 .LCPI0_0:
-	.long	0                       # 0x0
-	.long	1                       # 0x1
-	.long	2                       # 0x2
-	.long	3                       # 0x3
-	.long	4                       # 0x4
-	.long	5                       # 0x5
-	.long	6                       # 0x6
-	.long	7                       # 0x7
+	.short	0                       # 0x0
+	.short	1                       # 0x1
+	.short	2                       # 0x2
+	.short	3                       # 0x3
+	.short	4                       # 0x4
+	.short	5                       # 0x5
+	.short	6                       # 0x6
+	.short	7                       # 0x7
+	.short	8                       # 0x8
+	.short	9                       # 0x9
+	.short	10                      # 0xa
+	.short	11                      # 0xb
+	.short	12                      # 0xc
+	.short	13                      # 0xd
+	.short	14                      # 0xe
+	.short	15                      # 0xf
 	.text
 	.globl	_Z6reducePKcS0_
 	.p2align	4, 0x90
@@ -21,28 +29,28 @@ _Z6reducePKcS0_:                        # @_Z6reducePKcS0_
 	.cfi_startproc
 # %bb.0:
 	mov	rcx, rdi
-	and	rcx, -8
+	and	rcx, -16
 	mov	r8, rsi
-	and	r8, -8
-	and	edi, 7
+	and	r8, -16
+	and	edi, 15
 	cmp	rcx, r8
 	je	.LBB0_1
 # %bb.2:
-	vpmovsxbd	ymm0, qword ptr [rcx]
+	vpmovsxbw	ymm0, xmmword ptr [rcx]
 	dec	edi
 	vmovd	xmm1, edi
-	vpbroadcastd	ymm1, xmm1
-	vmovdqa	ymm2, ymmword ptr [rip + .LCPI0_0] # ymm2 = [0,1,2,3,4,5,6,7]
-	vpcmpgtd	ymm1, ymm2, ymm1
+	vpbroadcastw	ymm1, xmm1
+	vmovdqa	ymm2, ymmword ptr [rip + .LCPI0_0] # ymm2 = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
+	vpcmpgtw	ymm1, ymm2, ymm1
 	vpand	ymm0, ymm1, ymm0
-	add	rcx, 8
+	add	rcx, 16
 	vpxor	xmm1, xmm1, xmm1
 	vpxor	xmm2, xmm2, xmm2
 	vpxor	xmm3, xmm3, xmm3
 	cmp	rcx, r8
 	jne	.LBB0_3
 .LBB0_14:
-	mov	edi, -1
+	mov	di, -1
 	cmp	r8, rsi
 	jne	.LBB0_15
 	jmp	.LBB0_16
@@ -55,82 +63,82 @@ _Z6reducePKcS0_:                        # @_Z6reducePKcS0_
 	je	.LBB0_14
 .LBB0_3:                                # =>This Loop Header: Depth=1
                                         #     Child Loop BB0_11 Depth 2
-	vpmovsxbd	ymm4, qword ptr [rcx]
-	vpaddd	ymm0, ymm0, ymm4
-	lea	rax, [rcx + 8]
-	cmp	rax, r8
-	je	.LBB0_14
-# %bb.4:                                #   in Loop: Header=BB0_3 Depth=1
-	vpmovsxbd	ymm4, qword ptr [rcx + 8]
-	vpaddd	ymm1, ymm1, ymm4
+	vpmovsxbw	ymm4, xmmword ptr [rcx]
+	vpaddw	ymm0, ymm0, ymm4
 	lea	rax, [rcx + 16]
 	cmp	rax, r8
 	je	.LBB0_14
+# %bb.4:                                #   in Loop: Header=BB0_3 Depth=1
+	vpmovsxbw	ymm4, xmmword ptr [rcx + 16]
+	vpaddw	ymm1, ymm1, ymm4
+	lea	rax, [rcx + 32]
+	cmp	rax, r8
+	je	.LBB0_14
 # %bb.5:                                #   in Loop: Header=BB0_3 Depth=1
-	vpmovsxbd	ymm4, qword ptr [rcx + 16]
-	vpaddd	ymm2, ymm2, ymm4
-	lea	rax, [rcx + 24]
+	vpmovsxbw	ymm4, xmmword ptr [rcx + 32]
+	vpaddw	ymm2, ymm2, ymm4
+	lea	rax, [rcx + 48]
 	cmp	rax, r8
 	je	.LBB0_14
 # %bb.6:                                #   in Loop: Header=BB0_3 Depth=1
-	vpmovsxbd	ymm4, qword ptr [rcx + 24]
-	vpaddd	ymm3, ymm3, ymm4
-	lea	r9, [rcx + 32]
+	vpmovsxbw	ymm4, xmmword ptr [rcx + 48]
+	vpaddw	ymm3, ymm3, ymm4
+	lea	r9, [rcx + 64]
 	mov	rdx, r8
 	sub	rdx, r9
-	lea	rax, [rdx + 31]
-	cmp	rax, 63
+	lea	rax, [rdx + 63]
+	cmp	rax, 127
 	jb	.LBB0_13
 # %bb.7:                                #   in Loop: Header=BB0_3 Depth=1
 	test	rdx, rdx
 	cmovns	rax, rdx
 	mov	rdi, rax
-	sar	rdi, 5
+	sar	rdi, 6
 	test	dil, 1
 	jne	.LBB0_9
 # %bb.8:                                #   in Loop: Header=BB0_3 Depth=1
 	mov	rcx, r9
-	and	rax, -32
-	and	rdx, -32
-	cmp	rdx, 32
+	and	rax, -64
+	and	rdx, -64
+	cmp	rdx, 64
 	jne	.LBB0_11
 	jmp	.LBB0_12
 	.p2align	4, 0x90
 .LBB0_9:                                #   in Loop: Header=BB0_3 Depth=1
-	vpmovsxbd	ymm4, qword ptr [rcx + 32]
-	vpaddd	ymm0, ymm0, ymm4
-	vpmovsxbd	ymm4, qword ptr [rcx + 40]
-	vpaddd	ymm1, ymm1, ymm4
-	vpmovsxbd	ymm4, qword ptr [rcx + 48]
-	vpaddd	ymm2, ymm2, ymm4
-	vpmovsxbd	ymm4, qword ptr [rcx + 56]
-	vpaddd	ymm3, ymm3, ymm4
-	add	rcx, 64
+	vpmovsxbw	ymm4, xmmword ptr [rcx + 64]
+	vpaddw	ymm0, ymm0, ymm4
+	vpmovsxbw	ymm4, xmmword ptr [rcx + 80]
+	vpaddw	ymm1, ymm1, ymm4
+	vpmovsxbw	ymm4, xmmword ptr [rcx + 96]
+	vpaddw	ymm2, ymm2, ymm4
+	vpmovsxbw	ymm4, xmmword ptr [rcx + 112]
+	vpaddw	ymm3, ymm3, ymm4
+	sub	rcx, -128
 	dec	rdi
-	and	rax, -32
-	and	rdx, -32
-	cmp	rdx, 32
+	and	rax, -64
+	and	rdx, -64
+	cmp	rdx, 64
 	je	.LBB0_12
 	.p2align	4, 0x90
 .LBB0_11:                               #   Parent Loop BB0_3 Depth=1
                                         # =>  This Inner Loop Header: Depth=2
-	vpmovsxbd	ymm4, qword ptr [rcx]
-	vpaddd	ymm0, ymm0, ymm4
-	vpmovsxbd	ymm4, qword ptr [rcx + 8]
-	vpaddd	ymm1, ymm1, ymm4
-	vpmovsxbd	ymm4, qword ptr [rcx + 16]
-	vpaddd	ymm2, ymm2, ymm4
-	vpmovsxbd	ymm4, qword ptr [rcx + 24]
-	vpaddd	ymm3, ymm3, ymm4
-	vpmovsxbd	ymm4, qword ptr [rcx + 32]
-	vpaddd	ymm0, ymm0, ymm4
-	vpmovsxbd	ymm4, qword ptr [rcx + 40]
-	vpaddd	ymm1, ymm1, ymm4
-	vpmovsxbd	ymm4, qword ptr [rcx + 48]
-	vpaddd	ymm2, ymm2, ymm4
-	vpmovsxbd	ymm4, qword ptr [rcx + 56]
-	vpaddd	ymm3, ymm3, ymm4
-	add	rcx, 64
+	vpmovsxbw	ymm4, xmmword ptr [rcx]
+	vpaddw	ymm0, ymm0, ymm4
+	vpmovsxbw	ymm4, xmmword ptr [rcx + 16]
+	vpaddw	ymm1, ymm1, ymm4
+	vpmovsxbw	ymm4, xmmword ptr [rcx + 32]
+	vpaddw	ymm2, ymm2, ymm4
+	vpmovsxbw	ymm4, xmmword ptr [rcx + 48]
+	vpaddw	ymm3, ymm3, ymm4
+	vpmovsxbw	ymm4, xmmword ptr [rcx + 64]
+	vpaddw	ymm0, ymm0, ymm4
+	vpmovsxbw	ymm4, xmmword ptr [rcx + 80]
+	vpaddw	ymm1, ymm1, ymm4
+	vpmovsxbw	ymm4, xmmword ptr [rcx + 96]
+	vpaddw	ymm2, ymm2, ymm4
+	vpmovsxbw	ymm4, xmmword ptr [rcx + 112]
+	vpaddw	ymm3, ymm3, ymm4
+	sub	rcx, -128
 	add	rdi, -2
 	jne	.LBB0_11
 	jmp	.LBB0_12
@@ -142,29 +150,32 @@ _Z6reducePKcS0_:                        # @_Z6reducePKcS0_
 	vpxor	xmm0, xmm0, xmm0
 .LBB0_15:
 	sub	esi, r8d
-	vpmovsxbd	ymm4, qword ptr [r8]
+	vpmovsxbw	ymm4, xmmword ptr [r8]
 	vmovd	xmm5, edi
-	vpbroadcastd	ymm5, xmm5
+	vpbroadcastw	ymm5, xmm5
 	vmovd	xmm6, esi
-	vpbroadcastd	ymm6, xmm6
-	vmovdqa	ymm7, ymmword ptr [rip + .LCPI0_0] # ymm7 = [0,1,2,3,4,5,6,7]
-	vpcmpgtd	ymm5, ymm7, ymm5
-	vpcmpgtd	ymm6, ymm6, ymm7
+	vpbroadcastw	ymm6, xmm6
+	vmovdqa	ymm7, ymmword ptr [rip + .LCPI0_0] # ymm7 = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
+	vpcmpgtw	ymm5, ymm7, ymm5
+	vpcmpgtw	ymm6, ymm6, ymm7
 	vpand	ymm5, ymm5, ymm6
 	vpand	ymm4, ymm5, ymm4
-	vpaddd	ymm0, ymm4, ymm0
+	vpaddw	ymm0, ymm4, ymm0
 .LBB0_16:
-	vpaddd	ymm0, ymm1, ymm0
-	vpaddd	ymm1, ymm2, ymm3
-	vpaddd	ymm0, ymm1, ymm0
+	vpaddw	ymm0, ymm1, ymm0
+	vpaddw	ymm1, ymm2, ymm3
+	vpaddw	ymm0, ymm1, ymm0
 	vpermq	ymm1, ymm0, 78          # ymm1 = ymm0[2,3,0,1]
-	vpaddd	ymm0, ymm0, ymm1
+	vpaddw	ymm0, ymm0, ymm1
 	vpshufd	ymm1, ymm0, 78          # ymm1 = ymm0[2,3,0,1,6,7,4,5]
-	vpaddd	xmm0, xmm0, xmm1
-	vpshufd	xmm1, xmm0, 229         # xmm1 = xmm0[1,1,2,3]
-	vpaddd	xmm0, xmm1, xmm0
+	vpaddw	ymm0, ymm0, ymm1
+	vpshufd	ymm1, ymm0, 177         # ymm1 = ymm0[1,0,3,2,5,4,7,6]
+	vpaddw	xmm0, xmm0, xmm1
+	vpsrld	xmm1, xmm0, 16
+	vpaddw	xmm0, xmm1, xmm0
 	vmovd	eax, xmm0
 	movsx	eax, al
+                                        # kill: def $ax killed $ax killed $eax
 	vzeroupper
 	ret
 .Lfunc_end0:
