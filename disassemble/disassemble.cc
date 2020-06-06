@@ -1,6 +1,6 @@
 #include "unsq_eve/inclusive_scan.h"
 
-using T = char;
+using T = short;
 using traits = unsq_eve::algorithm_traits<T, 256, 1>;
 
 void inclusive_scan_inplace(T* f, T* l) {
