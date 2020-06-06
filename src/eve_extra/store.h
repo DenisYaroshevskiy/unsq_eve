@@ -18,6 +18,7 @@
 #define EVE_EXTRA_STORE_H_
 
 #include <cstdint>
+#include <cstring>
 #include <type_traits>
 
 #include <immintrin.h>
@@ -62,12 +63,6 @@ void maskstore(T* to, Mask mask,
     _mm256_maskstore_pd(to, mask, reg);
 }
 
-template <typename T, typename Register>
-void maskmove(T* to, __m128i mask, Register reg) {
-  _mm_maskmoveu_si128(mm::cast_to_integral(reg), mask,
-                      reinterpret_cast<char*>(to));
-}
-
 template <typename T, std::size_t A>
 T* raw_pointer(eve::aligned_ptr<T, A> ptr) {
   return ptr.get();
@@ -89,27 +84,29 @@ template <native_wide Wide, typename Ptr, typename Ignore>
 void store(const Wide& wide, Ptr ptr, Ignore ignore) {
   using T = typename Wide::value_type;
   static_assert(std::is_same_v<T, std::decay_t<decltype(*ptr)>>);
-
-  const auto mask = ignore_broadcast<eve::logical<Wide>>(ignore).storage();
-  const auto reg = wide.storage();
+  T* raw_ptr = _store::raw_pointer(ptr);
 
   if constexpr (sizeof(T) >= 4) {
-    _store::maskstore(_store::raw_pointer(ptr), mask, reg);
-  } else if constexpr (sizeof(reg) == 16) {
-    _store::maskmove(_store::raw_pointer(ptr), mask, reg);
-  } else {
-    __m256i _reg = reg;
+    const auto mask = ignore_broadcast<eve::logical<Wide>>(ignore).storage();
+    const auto reg = wide.storage();
 
-    const __m128i low = _mm256_extracti128_si256(_reg, 0);
-    const __m128i high = _mm256_extracti128_si256(_reg, 1);
-    const __m128i low_mask = _mm256_extracti128_si256(mask, 0);
-    const __m128i high_mask = _mm256_extracti128_si256(mask, 1);
-
-    T* to = _store::raw_pointer(ptr);
-    _store::maskmove(to, low_mask, low);
-    to += 16 / sizeof(T);
-    _store::maskmove(to, high_mask, high);
+    _store::maskstore(raw_ptr, mask, reg);
+    return;
   }
+
+  std::size_t start = 0, n = Wide::static_size;
+  if constexpr (std::is_same_v<Ignore, ignore_first_n>) {
+    start += ignore.n;
+    n -= ignore.n;
+  } else if constexpr (std::is_same_v<Ignore, ignore_last_n>) {
+    n -= ignore.n;
+  } else {
+    static_assert(std::is_same_v<Ignore, ignore_first_last>);
+    start += ignore.first_n;
+    n -= ignore.first_n + ignore.last_n;
+  }
+
+  std::memcpy(raw_ptr + start, &wide[start], n * sizeof(T));
 }
 
 }  // namespace eve_extra
