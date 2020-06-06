@@ -42,6 +42,7 @@ struct algorithm_traits {
   static constexpr width_type width{};
   static constexpr indx_c<_unroll> unroll{};
 
+  using type = T;
   using wide = eve::wide<T, width_type>;
   using iteration_traits =
       unsq_eve::iteration_traits<wide::static_size, unroll()>;

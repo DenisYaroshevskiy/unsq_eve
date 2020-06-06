@@ -46,14 +46,14 @@ int main(int argc, char** argv) {
                        unsq_eve_reduce<char, 256, 4>>;
   using char_2_short_benchmarks =
       bench::sum_bench<char, unsq_eve_reduce<short, 256, 1>,
-                       unsq_eve_reduce<short, 256, 2>,
                        unsq_eve_reduce<short, 256, 4>>;
   using char_2_int_benchmarks =
       bench::sum_bench<char, unsq_eve_reduce<int, 256, 1>,
-                       unsq_eve_reduce<int, 256, 2>>;
+                       unsq_eve_reduce<int, 256, 4>>;
 
   using short_2_short_benchmars =
-      bench::sum_bench<short, unsq_eve_reduce<short, 256, 4>>;
+      bench::sum_bench<short, unsq_eve_reduce<short, 256, 4>,
+                       unsq_eve_reduce<int, 256, 4>>;
 
   using int_2_int_benchmarks =
       bench::sum_bench<int, unsq_eve_reduce<int, 256, 4>>;

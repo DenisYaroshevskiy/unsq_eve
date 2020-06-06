@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+#include <utility>
+
 #include "unsq_eve/iteration_traits.h"
 #include "unsq_eve/transform_reduce.h"
 
@@ -23,22 +25,22 @@
 
 namespace {
 
-TEST_CASE("unsq_eve.transform_reduce.type_increase", "[unsq_eve]") {
-  using traits = unsq_eve::algorithm_traits<char, 256, 4>;
-  using wide = eve::wide<char, eve::fixed<32>>;
-  using wider = eve::wide<short, eve::fixed<32>>;
-  using widest = eve::wide<int, eve::fixed<32>>;
+TEMPLATE_TEST_CASE("unsq_eve.transform_reduce.type_increase", "[unsq_eve]",
+                   (std::pair<char, char>), (std::pair<char, short>),
+                   (std::pair<char, int>)/*, (std::pair<int, char>),
+                   (std::pair<int, short>), (std::pair<int, int>)*/) {
+  using ArrayType = typename TestType::first_type;
+  using IterateAs = typename TestType::second_type;
+  using traits = unsq_eve::algorithm_traits<IterateAs, 256, 4>;
+  using wide = eve::wide<IterateAs, eve::fixed<32 / sizeof(IterateAs)>>;
 
-  auto map = [](wide x) -> wider {
-    auto wider_x = eve::convert(x, eve::as_<short>{});
-    wider_x += wider_x;
-    return wider_x;
-  };
-  auto reduce = [](widest x, widest y) -> widest { return x + y; };
-  std::vector<char> data{1, 2, 3};
-  auto res = unsq_eve::transform_reduce<traits>(data.begin(), data.end(),
-                                                int(0), reduce, map);
-  STATIC_REQUIRE(std::is_same_v<decltype(res), int>);
+  auto map = [](wide x) -> wide { return x + x; };
+  auto reduce = [](wide x, wide y) -> wide { return x + y; };
+
+  std::vector<ArrayType> data{1, 2, 3};
+  auto res = unsq_eve::transform_reduce<traits>(data.begin(), data.end(), 0,
+                                                reduce, map);
+  STATIC_REQUIRE(std::is_same_v<decltype(res), IterateAs>);
   REQUIRE(1 * 2 + 2 * 2 + 3 * 2 == res);
 }
 

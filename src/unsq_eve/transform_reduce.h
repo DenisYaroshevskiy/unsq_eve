@@ -28,42 +28,36 @@
 namespace unsq_eve {
 namespace _transform_reduce {
 
-template <typename Traits, typename I, typename ZeroT, typename Reduce,
-          typename Map>
+template <typename Traits, typename I, typename Reduce, typename Map>
 struct unary_body {
-  using T = value_type<I>;
-
-  using wide_read = wide_for<Traits, I>;
-  using wide_mapped = std::decay_t<decltype(std::declval<Map>()(wide_read{}))>;
-
-  using U = std::common_type_t<typename wide_mapped::value_type, ZeroT>;
-  using wide_reduced = eve::wide<U, width_t<Traits>>;
+  using T = typename Traits::type;
+  using wide_read = eve::wide<value_type<I>, width_t<Traits>>;
+  using wide = typename Traits::wide;
 
   Map map;
   Reduce reduce;
-  wide_read small_zeroes;
-  std::array<wide_reduced, Traits::unroll()> regs;
+  wide zeroes;
+  std::array<wide, Traits::unroll()> regs;
 
-  unary_body(Map map, Reduce reduce, ZeroT zero)
-      : map{map}, reduce{reduce}, small_zeroes{static_cast<T>(zero)} {
-    regs.fill(wide_reduced{zero});
+  unary_body(Map map, Reduce reduce, T zero)
+      : map{map}, reduce{reduce}, zeroes{static_cast<T>(zero)} {
+    regs.fill(zeroes);
   }
 
   template <typename Ptr, std::size_t idx, typename Ignore>
   bool small_step(Ptr from, indx_c<idx>, Ignore ignore) {
     wide_read read;
+
     if constexpr (std::is_same_v<Ignore, eve_extra::ignore_nothing>) {
       read = wide_read{from};
     } else {
       read = eve_extra::load_unsafe(from, eve::as_<wide_read>{});
     }
+    wide xs = eve::convert(read, eve::as_<T>{});
 
-    read = eve_extra::replace_ignored(read, ignore, small_zeroes);
+    xs = eve_extra::replace_ignored(xs, ignore, zeroes);
 
-    const auto mapped = map(read);
-    const auto to_reduce = eve::convert(mapped, eve::as_<U>{});
-
-    regs[idx] = reduce(regs[idx], to_reduce);
+    regs[idx] = reduce(regs[idx], map(xs));
     return false;
   }
 
@@ -84,7 +78,7 @@ struct unary_body {
 
   void after_big_steps() {}
 
-  U final_reduction() const {
+  T final_reduction() const {
     auto combined = eve_extra::segment_reduction(regs, reduce);
     combined = eve_extra::reduce_wide(combined, reduce);
     return combined[0];
@@ -93,11 +87,12 @@ struct unary_body {
 
 }  // namespace _transform_reduce
 
-template <typename Traits, contigious_iterator I, typename T,
-          typename Reduction, wide_map_unary_for<Traits, I> Map>
-auto transform_reduce(I _f, I _l, const T& zero, Reduction reduce, Map map) {
-  _transform_reduce::unary_body<Traits, I, T, Reduction, Map> body(map, reduce,
-                                                                   zero);
+template <typename Traits, contigious_iterator I, typename Reduction,
+          wide_map_unary<typename Traits::wide> Map>
+auto transform_reduce(I _f, I _l, const typename Traits::type& zero,
+                      Reduction reduce, Map map) {
+  _transform_reduce::unary_body<Traits, I, Reduction, Map> body(map, reduce,
+                                                                zero);
   auto [f, l] = drill_down_range(_f, _l);
 
   return iteration_aligned<iteration_traits_t<Traits>>(f, l, body)

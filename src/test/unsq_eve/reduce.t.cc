@@ -24,11 +24,12 @@
 
 namespace {
 
-template <typename T, std::size_t byte_width, std::size_t unroll>
+template <typename T, std::size_t byte_width, std::size_t _unroll>
 struct variation {
   using type = T;
-  using traits = unsq_eve::algorithm_traits<T, byte_width * 8, unroll>;
-  using wide = eve::wide<type, unsq_eve::width_t<traits>>;
+
+  static constexpr std::size_t bit_witdh = byte_width * 8;
+  static constexpr std::size_t unroll = _unroll;
 
   friend std::ostream& operator<<(std::ostream& out, variation) {
     out << "{sizeof(T): " << sizeof(T) << " byte_width: " << byte_width
@@ -37,10 +38,13 @@ struct variation {
   }
 };
 
+template <typename T, typename Variation>
+using traits_for =
+    unsq_eve::algorithm_traits<T, Variation::bit_witdh, Variation::unroll>;
+
 template <typename Variation, typename Alg>
 void specific_tests(Alg alg) {
   using T = typename Variation::type;
-  using traits = typename Variation::traits;
 
   // const T*
   {
@@ -49,13 +53,13 @@ void specific_tests(Alg alg) {
     const T* f = v.data();
     const T* l = f + v.size();
 
-    REQUIRE(alg(traits{}, f, l) == 13);
+    REQUIRE(alg(Variation{}, f, l) == 13);
   }
 
   // const iterator
   {
     std::vector<T> v(27u, T(1));
-    REQUIRE(alg(traits{}, v.cbegin(), v.cend()) == 27);
+    REQUIRE(alg(Variation{}, v.cbegin(), v.cend()) == 27);
   }
 }
 
@@ -72,12 +76,11 @@ void common_any_test_impl(Alg alg) {
   auto* l = f + 50;
 
   auto run = [&]() {
-    typename Variation::traits traits{};
     for (auto* it = f; it < l; ++it) {
       INFO("length: " << (l - f) << " from the beginning: " << it - f);
       int n = l - it;
       int expected = *it * n + n * (n - 1) / 2;
-      REQUIRE(expected == alg(traits, it, l));
+      REQUIRE(expected == alg(Variation{}, it, l));
     }
   };
 
@@ -130,11 +133,14 @@ void common_any_test(Alg alg) {
 }
 
 TEST_CASE("unsq_eve.reduce_basic", "[unsq_eve]") {
-  common_any_test([](auto traits, auto f, auto l) {
+  common_any_test([](auto variation, auto f, auto l) {
     if constexpr (sizeof(unsq_eve::value_type<decltype(f)>) == 1) {
-      return unsq_eve::reduce<decltype(traits)>(f, l, short(0));
+      using traits = traits_for<short, decltype(variation)>;
+      return unsq_eve::reduce<traits>(f, l, 0);
     } else {
-      return unsq_eve::reduce<decltype(traits)>(f, l);
+      using traits =
+          traits_for<unsq_eve::value_type<decltype(f)>, decltype(variation)>;
+      return unsq_eve::reduce<traits>(f, l);
     }
   });
 }
