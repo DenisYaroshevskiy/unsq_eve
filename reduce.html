@@ -26,8 +26,8 @@
 
   This is relatively straight forward.<br />
   The best results is achived when unrolling 4 times. <br />
-  In this case we are consistenlty massively winning - at most 7 times for 1000
-  bytes of chars. <br />
+  In this case we are consistenlty massively winning - at most 5.6 times for
+  1000 bytes of chars. <br />
   I don't know why the big difference in behaviour of `std::reduce` - the
   assembly looks <a href="https://godbolt.org/z/tskjMs">identical</a> <br />
   and I'm controlling for code alignment. <br />
@@ -40,7 +40,7 @@
   `std::reduce` - not so lucky - at 10k swings up to 44% and this does not seem
   to be the scalar code's code fault. <br />
 
-  <h3> reducing to the same type, data </h3>
+  <h4> reducing to the same type, data </h4>
   <div id='reduce_same_type'></div>
   <script>dynamicEntryPoint('reduce_same_type', {
       name: 'sum',
@@ -56,7 +56,7 @@
       'std::reduce/char/char', 'std::reduce/short/short', 'std::reduce/int/int']);
   </script>
 
-  <h3> reducing to the same type, code alignment, unsq_eve </h3>
+  <h4> reducing to the same type, code alignment, unsq_eve </h4>
   <div id='reduce_same_type_code_alignment_unsq_eve'></div>
   <script>dynamicEntryPoint('reduce_same_type_code_alignment_unsq_eve', {
       name: 'sum',
@@ -71,7 +71,7 @@
     }, ['reduce<256, 4>/char/char', 'reduce<256, 4>/short/short', 'reduce<256, 4>/int/int']);
   </script>
 
-  <h3> reducing to the same type, code alignment, `std::reduce` </h3>
+  <h4> reducing to the same type, code alignment, `std::reduce` </h4>
   <div id='reduce_same_type_code_alignment_std_reduce'></div>
   <script>dynamicEntryPoint('reduce_same_type_code_alignment_std_reduce', {
       name: 'sum',
@@ -88,9 +88,8 @@
 
   <h2> Reducing to a different type </h2>
 
-  When reducing to a different type, we need to somehow convert from the array
-  type, to <br />
-  they type we want to do our operations in. <br />
+  When reducing to a different type, we need to somehow convert from the <br />
+  array type, to the type we want to do our operations in. <br />
   `std::reduce` for this generates a really nice <a
     href="https://godbolt.org/z/fXLh8T">assembly</a> <br />
   (chars reducing to shorts).
@@ -106,33 +105,125 @@
   <br /><br />
 
   This is essentially: `_mm_cvtepi8_epi16 ` called directly on the address -
-  <br />
-  There is no intrinsic to do this, but I'll to try to make the compiler
-  generate it for me. <br />
+  <br /><br />
 
-  What I do instead is load the whole register and then do `eve::convert` to an
-  emulated register. <br />
-  This is not free. (I only measured for chars to shorts/ints). <br />
-  For char/short we loose everywhere except for 40 bytes, because `unsq_eve`
-  doesn't peel loops. <br />
-  For chars/int every option is roughly the same, but we could've been getting a
-  nicer assembly <br />
-  All of the attempts to unroll on top are useless <br />
+  I do the same trick in eve by loading a smaller `eve::wide` and <br />
+  then calling `eve::convert` on it.
 
-  <h3> reducing chars to shorts/ints </h3>
+  We end up winning primarally because of not peeling the loops. <br />
 
-  <div id='reduce_chars_to_shorts/ints'></div>
-  <script>dynamicEntryPoint('reduce_chars_to_shorts/ints', {
+  <h3> reducing 40 bytes </h3>
+
+  On 40 bytes not peeling loops gives the most effect.<br />
+  adding chars to `short` is 4 times faster and adding to `int` ~30%. <br />
+  adding shorts to `int` is 1.75 times faster. <br />
+
+  <h4> reducing chars 40 bytes data </h4>
+
+  <div id='reduce_chars_40_bytes'></div>
+  <script>dynamicEntryPoint('reduce_chars_40_bytes', {
       name: 'sum',
-      size: 'x',
+      size: 40,
       algorithm: 'selection',
       type: 'selection',
-      sum_type: 'selection',
+      sum_type: 'x',
       time: 'y',
       padding: 'min',
       group: 'intel_9700K',
       percentage: 100,
-    }, ['std::reduce/char/short', 'std::reduce/char/int', 'reduce<256, 1>/char/short', 'reduce<256, 1>/char/int']);
+    }, ['std::reduce/char', 'reduce<256, 4>/char']);
+  </script>
+
+  <h4> reducing shorts 40 bytes data </h4>
+
+  <div id='reduce_shorts_40_bytes'></div>
+  <script>dynamicEntryPoint('reduce_shorts_40_bytes', {
+      name: 'sum',
+      size: 40,
+      algorithm: 'selection',
+      type: 'selection',
+      sum_type: 'x',
+      time: 'y',
+      padding: 'min',
+      group: 'intel_9700K',
+      percentage: 100,
+    }, ['std::reduce/short', 'reduce<256, 4>/short']);
+  </script>
+
+  <h3> reducing 1000 bytes </h3>
+
+  On 1000 bytes not peeling loops still has an effect, though not that big.
+  <br />
+  adding chars to `short` is 1.5 times faster and adding to `int` is roughly the
+  same.
+  <br />
+  adding shorts to `int` is 1.13 times faster.
+  <br /> <br />
+
+  <h4> reducing chars 1000 bytes data </h4>
+
+  <div id='reduce_chars_1000_bytes'></div>
+  <script>dynamicEntryPoint('reduce_chars_1000_bytes', {
+      name: 'sum',
+      size: 1000,
+      algorithm: 'selection',
+      type: 'selection',
+      sum_type: 'x',
+      time: 'y',
+      padding: 'min',
+      group: 'intel_9700K',
+      percentage: 100,
+    }, ['std::reduce/char', 'reduce<256, 4>/char']);
+  </script>
+
+  <h4> reducing shorts 1000 bytes data </h4>
+
+  <div id='reduce_shorts_1000_bytes'></div>
+  <script>dynamicEntryPoint('reduce_shorts_1000_bytes', {
+      name: 'sum',
+      size: 1000,
+      algorithm: 'selection',
+      type: 'selection',
+      sum_type: 'x',
+      time: 'y',
+      padding: 'min',
+      group: 'intel_9700K',
+      percentage: 100,
+    }, ['std::reduce/short', 'reduce<256, 4>/short']);
+  </script>
+
+  <h3> reducing 10000 bytes </h3>
+
+  On 10'000 bytes loop peeling stops being important.<br /> <br />
+
+  <h4> reducing chars 1000 bytes data </h4>
+
+  <div id='reduce_chars_10000_bytes'></div>
+  <script>dynamicEntryPoint('reduce_chars_10000_bytes', {
+      name: 'sum',
+      size: 10000,
+      algorithm: 'selection',
+      type: 'selection',
+      sum_type: 'x',
+      time: 'y',
+      padding: 'min',
+      group: 'intel_9700K',
+      percentage: 100,
+    }, ['std::reduce/char', 'reduce<256, 4>/char']);
+  </script>
+
+  <div id='reduce_shorts_10000_bytes'></div>
+  <script>dynamicEntryPoint('reduce_shorts_10000_bytes', {
+      name: 'sum',
+      size: 10000,
+      algorithm: 'selection',
+      type: 'selection',
+      sum_type: 'x',
+      time: 'y',
+      padding: 'min',
+      group: 'intel_9700K',
+      percentage: 100,
+    }, ['std::reduce/short', 'reduce<256, 4>/short']);
   </script>
 
   <h2> Total benchmark </h2>
