@@ -38,6 +38,6 @@ struct std_reduce {
 int main(int argc, char** argv) {
   bench::bench_main<bench::sum_bench<char, std_reduce<char>, std_reduce<short>,
                                      std_reduce<int>>,
-                    bench::sum_bench<short, std_reduce<short>>,
+                    bench::sum_bench<short, std_reduce<short>, std_reduce<int>>,
                     bench::sum_bench<int, std_reduce<int>>>(argc, argv);
 }
