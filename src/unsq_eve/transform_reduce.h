@@ -89,7 +89,8 @@ struct unary_body {
 
 template <typename Traits, contigious_iterator I, typename T,
           typename Reduction, wide_map_unary<typename Traits::wide> Map>
-auto transform_reduce(I _f, I _l, const T& zero, Reduction reduce, Map map) {
+typename Traits::type transform_reduce(I _f, I _l, const T& zero,
+                                       Reduction reduce, Map map) {
   static_assert(sizeof(typename Traits::type) >= sizeof(T));
 
   _transform_reduce::unary_body<Traits, I, Reduction, Map> body(map, reduce,

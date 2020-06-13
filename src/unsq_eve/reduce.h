@@ -24,16 +24,14 @@
 
 namespace unsq_eve {
 
-template <typename Traits, contigious_iterator I,
-          std::convertible_to<value_type<I>> T, typename F>
-std::common_type_t<T, value_type<I>> reduce(I f, I l, const T& zero, F op) {
+template <typename Traits, contigious_iterator I, typename T, typename F>
+typename Traits::type reduce(I f, I l, const T& zero, F op) {
   return unsq_eve::transform_reduce<Traits>(f, l, zero, op,
                                             [](const auto& xs) { return xs; });
 }
 
-template <typename Traits, contigious_iterator I,
-          std::convertible_to<value_type<I>> T>
-std::common_type_t<T, value_type<I>> reduce(I f, I l, const T& zero) {
+template <typename Traits, contigious_iterator I, typename T>
+typename Traits::type reduce(I f, I l, const T& zero) {
   return unsq_eve::reduce<Traits>(f, l, zero, eve::add);
 }
 

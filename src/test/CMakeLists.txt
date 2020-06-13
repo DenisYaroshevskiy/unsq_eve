@@ -33,6 +33,7 @@ target_sources(tests PRIVATE
                unsq_eve/find_common.t.cc
                unsq_eve/inclusive_scan_inplace.t.cc
                unsq_eve/reduce.t.cc
+               unsq_eve/transform_inplace.t.cc
                unsq_eve/transform_reduce.types.t.cc
                unsq_eve/unroll.t.cc
                catch_main.cc)
