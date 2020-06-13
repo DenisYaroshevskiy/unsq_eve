@@ -38,7 +38,8 @@ struct inplace_body {
   wide zeroes;
   wide running_sum;
 
-  inplace_body(Op op, T zero) : op(op), zeroes(zero), running_sum(zeroes) {}
+  EVE_FORCEINLINE inplace_body(Op op, T zero)
+      : op(op), zeroes(zero), running_sum(zeroes) {}
 
   template <typename Ptr, std::size_t idx, typename Ignore>
   void under_chunk_size_step(Ptr ptr, indx_c<idx>, const wide_read& read,
@@ -86,8 +87,8 @@ struct inplace_body {
 }  // namespace _inclusive_scan
 
 template <typename Traits, contigious_iterator I, typename Op>
-void inclusive_scan_inplace_aligned(I _f, I _l, Op op,
-                                    const value_type<I>& zero) {
+EVE_FORCEINLINE void inclusive_scan_inplace_aligned(I _f, I _l, Op op,
+                                                    const value_type<I>& zero) {
   _inclusive_scan::inplace_body<Traits, I, Op> body{op, zero};
 
   auto [f, l] = drill_down_range(_f, _l);
@@ -96,12 +97,12 @@ void inclusive_scan_inplace_aligned(I _f, I _l, Op op,
 }
 
 template <typename Traits, contigious_iterator I, typename Op>
-void inclusive_scan_inplace_aligned(I f, I l, Op op) {
+EVE_FORCEINLINE void inclusive_scan_inplace_aligned(I f, I l, Op op) {
   unsq_eve::inclusive_scan_inplace_aligned<Traits>(f, l, op, value_type<I>{});
 }
 
 template <typename Traits, contigious_iterator I>
-void inclusive_scan_inplace_aligned(I f, I l) {
+EVE_FORCEINLINE void inclusive_scan_inplace_aligned(I f, I l) {
   unsq_eve::inclusive_scan_inplace_aligned<Traits>(f, l, eve::add);
 }
 

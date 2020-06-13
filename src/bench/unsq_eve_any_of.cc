@@ -30,7 +30,7 @@ struct unsq_eve_any_of_128_1 {
   const char* name() const { return "unsq_eve::any_of<128, 1>"; }
 
   template <typename I, typename T>
-  bool operator()(I f, I l, const T& x) {
+  BENCH_ALWAYS_INLINE bool operator()(I f, I l, const T& x) {
     return unsq_eve::any_of_is<make_traits<I, 128, 1>>(f, l, x);
   }
 };
@@ -39,7 +39,7 @@ struct unsq_eve_any_of_256_1 {
   const char* name() const { return "unsq_eve::any_of<256, 1>"; }
 
   template <typename I, typename T>
-  bool operator()(I f, I l, const T& x) {
+  BENCH_ALWAYS_INLINE bool operator()(I f, I l, const T& x) {
     return unsq_eve::any_of_is<make_traits<I, 256, 1>>(f, l, x);
   }
 };
@@ -48,7 +48,7 @@ struct unsq_eve_any_of_256_4 {
   const char* name() const { return "unsq_eve::any_of<256, 4>"; }
 
   template <typename I, typename T>
-  bool operator()(I f, I l, const T& x) {
+  BENCH_ALWAYS_INLINE bool operator()(I f, I l, const T& x) {
     return unsq_eve::any_of_is<make_traits<I, 256, 4>>(f, l, x);
   }
 };

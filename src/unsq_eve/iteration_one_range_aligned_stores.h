@@ -28,7 +28,7 @@ namespace _iteration_one_range_aligned_stores {
 // [|f  l] => Ok from f, Not Ok from l - width
 // [f, l|] => Not ok from f, Ok from l - width
 template <typename Traits, typename T, typename Delegate>
-Delegate under_chunk_size(T* f, T* l, Delegate delegate) {
+EVE_FORCEINLINE Delegate under_chunk_size(T* f, T* l, Delegate delegate) {
   using wide = eve::wide<T, eve::fixed<Traits::chunk_size()>>;
 
   T* page_boundary = eve_extra::end_of_page(f);
@@ -52,8 +52,9 @@ Delegate under_chunk_size(T* f, T* l, Delegate delegate) {
 }
 
 template <typename Traits, typename Ptr, typename Wide, typename Delegate>
-StopReason main_loop(Ptr aligned_f, Ptr aligned_l, Wide& cur,
-                     Delegate& delegate) requires(Traits::unroll() == 1) {
+EVE_FORCEINLINE StopReason
+main_loop(Ptr aligned_f, Ptr aligned_l, Wide& cur,
+          Delegate& delegate) requires(Traits::unroll() == 1) {
   using wide = Wide;
 
   while (aligned_f != aligned_l) {
@@ -69,8 +70,9 @@ StopReason main_loop(Ptr aligned_f, Ptr aligned_l, Wide& cur,
 }
 
 template <typename Traits, typename Ptr, typename Wide, typename Delegate>
-StopReason big_steps(Ptr& aligned_f, std::ptrdiff_t big_steps_count, Wide& cur,
-                     Delegate& delegate) {
+EVE_FORCEINLINE StopReason big_steps(Ptr& aligned_f,
+                                     std::ptrdiff_t big_steps_count, Wide& cur,
+                                     Delegate& delegate) {
   using wide = Wide;
   static constexpr std::ptrdiff_t big_step =
       Traits::chunk_size() * Traits::unroll();
@@ -102,8 +104,8 @@ StopReason big_steps(Ptr& aligned_f, std::ptrdiff_t big_steps_count, Wide& cur,
 }
 
 template <typename Traits, typename Ptr, typename Wide, typename Delegate>
-StopReason main_loop(Ptr aligned_f, Ptr aligned_l, Wide& cur,
-                     Delegate& delegate) {
+EVE_FORCEINLINE StopReason main_loop(Ptr aligned_f, Ptr aligned_l, Wide& cur,
+                                     Delegate& delegate) {
   using wide = Wide;
 
   while (true) {  // To the beginning at most twice
@@ -150,7 +152,8 @@ StopReason main_loop(Ptr aligned_f, Ptr aligned_l, Wide& cur,
 }  // namespace _iteration_one_range_aligned_stores
 
 template <typename Traits, typename T, typename Delegate>
-Delegate iteration_one_range_aligned_stores(T* f, T* l, Delegate delegate) {
+EVE_FORCEINLINE Delegate iteration_one_range_aligned_stores(T* f, T* l,
+                                                            Delegate delegate) {
   using wide = eve::wide<T, eve::fixed<Traits::chunk_size()>>;
 
   if (l - f < static_cast<std::ptrdiff_t>(Traits::chunk_size())) {

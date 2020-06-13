@@ -24,7 +24,7 @@ namespace unsq_eve {
 
 template <typename Traits, typename T, typename Delegate>
 // require IterationAlignedDelegate<P>
-Delegate iteration_aligned_unguarded(T* f, Delegate delegate) {
+EVE_FORCEINLINE Delegate iteration_aligned_unguarded(T* f, Delegate delegate) {
   auto aligned_f = Traits::previous_aligned_address(f);
 
   // Deal with first bit, maybe not fully in the data

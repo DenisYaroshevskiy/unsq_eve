@@ -29,7 +29,7 @@ struct std_inclusive_scan {
   }
 
   template <typename I>
-  SumType operator()(I f, I l) {
+  BENCH_ALWAYS_INLINE SumType operator()(I f, I l) {
     std::inclusive_scan(f, l, f);
     return 0;
   }

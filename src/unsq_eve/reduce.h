@@ -25,18 +25,18 @@
 namespace unsq_eve {
 
 template <typename Traits, contigious_iterator I, typename T, typename F>
-typename Traits::type reduce(I f, I l, const T& zero, F op) {
+EVE_FORCEINLINE typename Traits::type reduce(I f, I l, const T& zero, F op) {
   return unsq_eve::transform_reduce<Traits>(f, l, zero, op,
                                             [](const auto& xs) { return xs; });
 }
 
 template <typename Traits, contigious_iterator I, typename T>
-typename Traits::type reduce(I f, I l, const T& zero) {
+EVE_FORCEINLINE typename Traits::type reduce(I f, I l, const T& zero) {
   return unsq_eve::reduce<Traits>(f, l, zero, eve::add);
 }
 
 template <typename Traits, contigious_iterator I>
-value_type<I> reduce(I f, I l) {
+EVE_FORCEINLINE value_type<I> reduce(I f, I l) {
   return unsq_eve::reduce<Traits>(f, l, value_type<I>{});
 }
 

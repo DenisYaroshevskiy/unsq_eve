@@ -93,7 +93,7 @@ struct body {
 
 template <typename Traits, contigious_iterator I,
           wide_predicate_for<Traits, I> PV>
-I find_if(I _f, I _l, PV p) {
+EVE_FORCEINLINE I find_if(I _f, I _l, PV p) {
   auto [f, l] = drill_down_range(_f, _l);
 
   _find::body<Traits, decltype(f), PV> body{p, l};
@@ -104,13 +104,13 @@ I find_if(I _f, I _l, PV p) {
 
 template <typename Traits, contigious_iterator I,
           std::convertible_to<value_type<I>> T>
-I find(I f, I l, const T& x) {
+EVE_FORCEINLINE I find(I f, I l, const T& x) {
   return unsq_eve::find_if<Traits>(f, l, equal_to<Traits, I>(x));
 }
 
 template <typename Traits, contigious_iterator I,
           wide_predicate_for<Traits, I> PV>
-I find_if_unguarded(I _f, PV p) {
+EVE_FORCEINLINE I find_if_unguarded(I _f, PV p) {
   auto* f = drill_down(_f);
 
   _find::body<Traits, decltype(f), PV> body{p, f};
@@ -122,7 +122,7 @@ I find_if_unguarded(I _f, PV p) {
 
 template <typename Traits, contigious_iterator I,
           std::convertible_to<value_type<I>> T>
-I find_unguarded(I f, const T& x) {
+EVE_FORCEINLINE I find_unguarded(I f, const T& x) {
   return unsq_eve::find_if_unguarded<Traits>(f, equal_to<Traits, I>(x));
 }
 

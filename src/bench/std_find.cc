@@ -26,7 +26,7 @@ struct std_strlen {
   const char* name() const { return "std::strlen"; }
 
   template <typename I, typename T>
-  I operator()(I f, I, const T&) {
+  BENCH_ALWAYS_INLINE I operator()(I f, I, const T&) {
     return f + std::strlen(&*f);
   }
 };
@@ -35,7 +35,7 @@ struct std_find {
   const char* name() const { return "std::find"; }
 
   template <typename I, typename T>
-  I operator()(I f, I l, const T& x) {
+  BENCH_ALWAYS_INLINE I operator()(I f, I l, const T& x) {
     return std::find(f, l, x);
   }
 };
@@ -44,7 +44,7 @@ struct find_unguarded {
   const char* name() const { return "find_unguarded"; }
 
   template <typename I, typename T>
-  I operator()(I f, I, const T& x) {
+  BENCH_ALWAYS_INLINE I operator()(I f, I, const T& x) {
     while (true) {
       if (*f == x) return f;
       ++f;

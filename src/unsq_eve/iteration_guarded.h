@@ -25,8 +25,9 @@ namespace unsq_eve {
 namespace _iteration_guarded {
 
 template <typename Traits, typename Ptr, typename Delegate>
-StopReason main_loop(Ptr aligned_f, Ptr aligned_l,
-                     Delegate& delegate) requires(Traits::unroll() == 1) {
+EVE_FORCEINLINE StopReason
+main_loop(Ptr aligned_f, Ptr aligned_l,
+          Delegate& delegate) requires(Traits::unroll() == 1) {
   while (aligned_f.get() != aligned_l.get()) {
     if (delegate.small_step(aligned_f, indx_c<0>{},
                             eve_extra::ignore_nothing{}))
@@ -37,7 +38,8 @@ StopReason main_loop(Ptr aligned_f, Ptr aligned_l,
 }
 
 template <typename Traits, typename Ptr, typename Delegate>
-StopReason main_loop(Ptr aligned_f, Ptr aligned_l, Delegate& delegate) {
+EVE_FORCEINLINE StopReason main_loop(Ptr aligned_f, Ptr aligned_l,
+                                     Delegate& delegate) {
   while (true) {  // To the beginning at most twice
     // initialize every register with small steps
     // (also can help for smaller range size)
@@ -88,7 +90,7 @@ StopReason main_loop(Ptr aligned_f, Ptr aligned_l, Delegate& delegate) {
 
 template <typename Traits, typename T, typename Delegate>
 // require IterationAlignedDelegate<P>
-Delegate iteration_aligned(T* f, T* l, Delegate delegate) {
+EVE_FORCEINLINE Delegate iteration_aligned(T* f, T* l, Delegate delegate) {
   auto aligned_f = Traits::previous_aligned_address(f);
   auto aligned_l = Traits::previous_aligned_address(l);
 

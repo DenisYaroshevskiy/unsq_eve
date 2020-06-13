@@ -88,7 +88,7 @@ struct any_body {
 
 template <typename Traits, contigious_iterator I,
           wide_predicate_for<Traits, I> PV>
-bool any_of(I _f, I _l, PV p) {
+EVE_FORCEINLINE bool any_of(I _f, I _l, PV p) {
   auto [f, l] = drill_down_range(_f, _l);
 
   _all_any_none::any_body<Traits, decltype(f), PV> body{p};
@@ -98,7 +98,7 @@ bool any_of(I _f, I _l, PV p) {
 
 template <typename Traits, contigious_iterator I,
           std::convertible_to<value_type<I>> T>
-bool any_of_is(I f, I l, const T& x) {
+EVE_FORCEINLINE bool any_of_is(I f, I l, const T& x) {
   return unsq_eve::any_of<Traits>(f, l, equal_to<Traits, I>(x));
 }
 

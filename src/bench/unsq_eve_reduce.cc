@@ -30,7 +30,7 @@ struct unsq_eve_reduce {
   }
 
   template <typename I>
-  SumType operator()(I f, I l) {
+  BENCH_ALWAYS_INLINE SumType operator()(I f, I l) {
     using traits = unsq_eve::algorithm_traits<SumType, width, unroll>;
 
     return unsq_eve::reduce<traits>(f, l, SumType{0});

@@ -30,7 +30,7 @@ struct unsq_eve_inclusive_scan_inplace_aligned {
   }
 
   template <typename I>
-  SumType operator()(I f, I l) {
+  BENCH_ALWAYS_INLINE SumType operator()(I f, I l) {
     using traits =
         unsq_eve::algorithm_traits<unsq_eve::value_type<I>, width, unroll>;
 

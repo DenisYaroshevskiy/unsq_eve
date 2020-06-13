@@ -76,7 +76,7 @@ struct inplace_body {
 
 template <typename Traits, contigious_iterator I,
           wide_map_unary<typename Traits::wide> Op>
-void transform(I _f, I _l, Op op) {
+EVE_FORCEINLINE void transform(I _f, I _l, Op op) {
   _transform::inplace_body<Traits, I, Op> body{op};
   auto [f, l] = drill_down_range(_f, _l);
   iteration_one_range_aligned_stores<iteration_traits_t<Traits>>(f, l, body);
