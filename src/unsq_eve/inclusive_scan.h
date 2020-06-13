@@ -18,10 +18,11 @@
 #define UNSQ_EVE_INCLUSIVE_SCAN_H
 
 #include <eve/function/add.hpp>
+#include <eve/function/convert.hpp>
 
 #include "eve_extra/eve_extra.h"
 #include "unsq_eve/concepts.h"
-#include "unsq_eve/iteration_guarded.h"
+#include "unsq_eve/iteration_one_range_aligned_stores.h"
 
 namespace unsq_eve {
 
@@ -29,8 +30,9 @@ namespace _inclusive_scan {
 
 template <typename Traits, typename I, typename Op>
 struct inplace_body {
+  using T = typename Traits::type;
+  using wide_read = eve::wide<value_type<I>, width_t<Traits>>;
   using wide = typename Traits::wide;
-  using T = value_type<I>;
 
   Op op;
   wide zeroes;
@@ -39,20 +41,27 @@ struct inplace_body {
   inplace_body(Op op, T zero) : op(op), zeroes(zero), running_sum(zeroes) {}
 
   template <typename Ptr, std::size_t idx, typename Ignore>
-  bool small_step(Ptr ptr, indx_c<idx>, Ignore ignore) {
-    wide cur;
-    if constexpr (std::is_same_v<Ignore, eve_extra::ignore_nothing>) {
-      cur = wide{ptr};
-    } else {
-      cur = eve_extra::load_unsafe(ptr, eve::as_<wide>{});
-    }
+  void under_chunk_size_step(Ptr ptr, indx_c<idx>, const wide_read& read,
+                             Ignore ignore) {
+    wide xs = eve::convert(read, eve::as_<T>{});
+    xs = eve_extra::replace_ignored(xs, ignore, zeroes);
+    xs = eve_extra::inclusive_scan_wide(xs, op, zeroes);
+    // Running sum is zeroes.
+    wide_read ys = eve::convert(xs, eve::as_<value_type<I>>{});
+    eve_extra::store(ys, ptr, ignore);
+  }
 
-    cur = eve_extra::replace_ignored(cur, ignore, zeroes);
-    cur = eve_extra::inclusive_scan_wide(cur, op, zeroes);
-    cur = op(running_sum, cur);
-    eve_extra::store(cur, ptr, ignore);
+  template <typename Ptr, std::size_t idx, typename Ignore>
+  bool small_step(Ptr ptr, const wide_read& read, indx_c<idx>, Ignore ignore) {
+    wide xs = eve::convert(read, eve::as_<T>{});
+    xs = eve_extra::replace_ignored(xs, ignore, zeroes);
+    xs = eve_extra::inclusive_scan_wide(xs, op, zeroes);
+    xs = op(running_sum, xs);
+    running_sum = wide(xs.back());
 
-    running_sum = wide(cur.back());
+    wide_read ys = eve::convert(xs, eve::as_<value_type<I>>{});
+    eve::store(ys, ptr);
+
     return false;
   }
 
@@ -62,8 +71,8 @@ struct inplace_body {
   void start_big_step(Ptr) {}
 
   template <typename Ptr, std::size_t idx_>
-  bool big_step(Ptr ptr, indx_c<idx_> idx) {
-    return small_step(ptr, idx, eve_extra::ignore_nothing{});
+  bool big_step(Ptr ptr, const wide_read& read, indx_c<idx_> idx) {
+    return small_step(ptr, read, idx, eve_extra::ignore_nothing{});
   }
 
   template <typename Ptr>
@@ -83,7 +92,7 @@ void inclusive_scan_inplace_aligned(I _f, I _l, Op op,
 
   auto [f, l] = drill_down_range(_f, _l);
 
-  iteration_aligned<iteration_traits_t<Traits>>(f, l, body);
+  iteration_one_range_aligned_stores<iteration_traits_t<Traits>>(f, l, body);
 }
 
 template <typename Traits, contigious_iterator I, typename Op>

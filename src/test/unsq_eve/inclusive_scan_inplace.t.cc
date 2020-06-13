@@ -74,6 +74,10 @@ void common_any_test_impl(Alg alg) {
     for (auto* it = f; it < l; ++it) {
       INFO("length: " << (l - f) << " from the beginning: " << it - f);
 
+      if ((l - f) == 50 && sizeof(T) == 4 && (it - f) == 28) {
+        INFO("blabla");
+      }
+
       std::vector<T> expected(l - it);
       std::inclusive_scan(it, l, expected.begin());
 

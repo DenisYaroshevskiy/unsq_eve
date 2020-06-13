@@ -1,8 +1,9 @@
-#include "unsq_eve/reduce.h"
+// #include "unsq_eve/transform.h"
+#include "unsq_eve/inclusive_scan.h"
 
-using T = char;
-using traits = unsq_eve::algorithm_traits<short, 256, 4>;
+using T = short;
+using traits = unsq_eve::algorithm_traits<T, 256, 2>;
 
-short reduce(const char* f, const char* l) {
-  return unsq_eve::reduce<traits>(f, l);
+void transform(T* f, T* l) {
+  unsq_eve::inclusive_scan_inplace_aligned<traits>(f, l);
 }

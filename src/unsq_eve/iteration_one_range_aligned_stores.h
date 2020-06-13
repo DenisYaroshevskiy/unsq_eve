@@ -69,6 +69,39 @@ StopReason main_loop(Ptr aligned_f, Ptr aligned_l, Wide& cur,
 }
 
 template <typename Traits, typename Ptr, typename Wide, typename Delegate>
+StopReason big_steps(Ptr& aligned_f, std::ptrdiff_t big_steps_count, Wide& cur,
+                     Delegate& delegate) {
+  using wide = Wide;
+  static constexpr std::ptrdiff_t big_step =
+      Traits::chunk_size() * Traits::unroll();
+
+  delegate.before_big_steps();
+
+  do {
+    delegate.start_big_step(aligned_f);
+
+    StopReason res = unroll<Traits::unroll()>([&](auto idx) mutable {
+      Ptr offset_ptr{aligned_f + Traits::chunk_size() * idx};
+      cur = wide{offset_ptr};
+      if (delegate.big_step(offset_ptr, cur, idx))
+        return StopReason::Terminated;
+      return StopReason::No;
+    });
+
+    if (res != StopReason::No) return res;
+
+    if (delegate.complete_big_step(aligned_f)) return StopReason::Terminated;
+
+    aligned_f += big_step;
+    --big_steps_count;
+  } while (big_steps_count);
+
+  delegate.after_big_steps();
+
+  return StopReason::No;
+}
+
+template <typename Traits, typename Ptr, typename Wide, typename Delegate>
 StopReason main_loop(Ptr aligned_f, Ptr aligned_l, Wide& cur,
                      Delegate& delegate) {
   using wide = Wide;
@@ -90,7 +123,7 @@ StopReason main_loop(Ptr aligned_f, Ptr aligned_l, Wide& cur,
           cur = wide{aligned_f};
           if (aligned_f.get() == aligned_l.get()) return StopReason::EndReached;
 
-          if (delegate.small_step(aligned_f, cur, indx_c<idx - 1>{},
+          if (delegate.small_step(aligned_f, cur, indx_c<idx + 1>{},
                                   eve_extra::ignore_nothing{}))
             return StopReason::Terminated;
 
@@ -105,30 +138,11 @@ StopReason main_loop(Ptr aligned_f, Ptr aligned_l, Wide& cur,
 
     std::ptrdiff_t big_steps_count =
         (aligned_l.get() - aligned_f.get()) / big_step;
-    if (!big_steps_count) continue;
-
-    delegate.before_big_steps();
-
-    do {
-      delegate.start_big_step(aligned_f);
-
-      res = unroll<Traits::unroll()>([&](auto idx) mutable {
-        Ptr offset_ptr{aligned_f + Traits::chunk_size() * idx};
-        cur = wide{offset_ptr};
-        if (delegate.big_step(offset_ptr, cur, idx))
-          return StopReason::Terminated;
-        return StopReason::No;
-      });
-
+    if (big_steps_count) {
+      res = big_steps<Traits>(aligned_f, big_steps_count, cur, delegate);
       if (res != StopReason::No) return res;
+    }
 
-      if (delegate.complete_big_step(aligned_f)) return StopReason::Terminated;
-
-      aligned_f += big_step;
-      --big_steps_count;
-    } while (big_steps_count);
-
-    delegate.after_big_steps();
     cur = wide{aligned_f};
   }
 }
@@ -171,7 +185,8 @@ Delegate iteration_one_range_aligned_stores(T* f, T* l, Delegate delegate) {
   T* load_last_from = l - Traits::chunk_size();
   wide next{load_last_from};
 
-  eve_extra::ignore_last_n ignore{static_cast<std::size_t>(load_last_from - f)};
+  eve_extra::ignore_last_n ignore{
+      static_cast<std::size_t>(f + Traits::chunk_size() - load_last_from)};
   if (delegate.small_step(f, cur, indx_c<0>{}, ignore)) return delegate;
 
   delegate.small_step(load_last_from, next, indx_c<0>{},
