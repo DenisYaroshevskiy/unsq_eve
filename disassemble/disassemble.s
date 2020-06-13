@@ -241,7 +241,7 @@ _ZN8unsq_eve34iteration_one_range_aligned_storesINS_16iteration_traitsILm16ELm2E
 	vpaddw	ymm3, ymm3, ymm4
 	vpshufhw	ymm4, ymm3, 239 # ymm4 = ymm3[0,1,2,3,7,7,6,7,8,9,10,11,15,15,14,15]
 	vpermd	ymm4, ymm0, ymm4
-	vmovdqa	ymmword ptr [rax + 64], ymm4
+	vmovdqa	ymmworqd ptr [rax + 64], ymm4
 	vmovdqa	ymmword ptr [rsi], ymm3
 	add	rdi, 64
 	mov	rcx, r8
