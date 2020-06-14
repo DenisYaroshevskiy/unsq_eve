@@ -120,13 +120,13 @@ _Z9transformPsS_:                       # @_Z9transformPsS_
 	vmovdqa	ymm2, ymmword ptr [rcx + 192]
 	vmovdqa	ymm3, ymmword ptr [rcx + 224]
 	vpaddw	ymm0, ymm0, ymm0
+	vpaddw	ymm1, ymm1, ymm1
+	vpaddw	ymm2, ymm2, ymm2
+	vpaddw	ymm3, ymm3, ymm3
 	vmovdqa	ymmword ptr [rcx + 128], ymm0
-	vpaddw	ymm0, ymm1, ymm1
-	vmovdqa	ymmword ptr [rcx + 160], ymm0
-	vpaddw	ymm0, ymm2, ymm2
-	vmovdqa	ymmword ptr [rcx + 192], ymm0
-	vpaddw	ymm0, ymm3, ymm3
-	vmovdqa	ymmword ptr [rcx + 224], ymm0
+	vmovdqa	ymmword ptr [rcx + 160], ymm1
+	vmovdqa	ymmword ptr [rcx + 192], ymm2
+	vmovdqa	ymmword ptr [rcx + 224], ymm3
 	add	rcx, 256
 	dec	rdx
 	mov	rdi, rcx
@@ -141,25 +141,25 @@ _Z9transformPsS_:                       # @_Z9transformPsS_
 	vmovdqa	ymm2, ymmword ptr [rdi + 64]
 	vmovdqa	ymm3, ymmword ptr [rdi + 96]
 	vpaddw	ymm0, ymm0, ymm0
+	vpaddw	ymm1, ymm1, ymm1
+	vpaddw	ymm2, ymm2, ymm2
+	vpaddw	ymm3, ymm3, ymm3
 	vmovdqa	ymmword ptr [rdi], ymm0
-	vpaddw	ymm0, ymm1, ymm1
-	vmovdqa	ymmword ptr [rdi + 32], ymm0
-	vpaddw	ymm0, ymm2, ymm2
-	vmovdqa	ymmword ptr [rdi + 64], ymm0
-	vpaddw	ymm0, ymm3, ymm3
-	vmovdqa	ymmword ptr [rdi + 96], ymm0
+	vmovdqa	ymmword ptr [rdi + 32], ymm1
+	vmovdqa	ymmword ptr [rdi + 64], ymm2
+	vmovdqa	ymmword ptr [rdi + 96], ymm3
 	vmovdqa	ymm0, ymmword ptr [rdi + 128]
+	vmovdqa	ymm1, ymmword ptr [rdi + 160]
+	vmovdqa	ymm2, ymmword ptr [rdi + 192]
+	vmovdqa	ymm3, ymmword ptr [rdi + 224]
 	vpaddw	ymm0, ymm0, ymm0
+	vpaddw	ymm1, ymm1, ymm1
+	vpaddw	ymm2, ymm2, ymm2
+	vpaddw	ymm3, ymm3, ymm3
 	vmovdqa	ymmword ptr [rdi + 128], ymm0
-	vmovdqa	ymm0, ymmword ptr [rdi + 160]
-	vpaddw	ymm0, ymm0, ymm0
-	vmovdqa	ymmword ptr [rdi + 160], ymm0
-	vmovdqa	ymm0, ymmword ptr [rdi + 192]
-	vpaddw	ymm0, ymm0, ymm0
-	vmovdqa	ymmword ptr [rdi + 192], ymm0
-	vmovdqa	ymm0, ymmword ptr [rdi + 224]
-	vpaddw	ymm0, ymm0, ymm0
-	vmovdqa	ymmword ptr [rdi + 224], ymm0
+	vmovdqa	ymmword ptr [rdi + 160], ymm1
+	vmovdqa	ymmword ptr [rdi + 192], ymm2
+	vmovdqa	ymmword ptr [rdi + 224], ymm3
 	add	rdi, 256
 	add	rdx, -2
 	jne	.LBB0_15

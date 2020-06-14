@@ -34,6 +34,8 @@ struct inplace_body {
 
   Op op;
 
+  std::array<wide, Traits::unroll()> regs;
+
   inplace_body(Op op) : op(op) {}
 
   template <typename Ptr, std::size_t idx, typename Ignore>
@@ -59,13 +61,24 @@ struct inplace_body {
   template <typename Ptr>
   void start_big_step(Ptr) {}
 
-  template <typename Ptr, std::size_t idx_>
-  bool big_step(Ptr ptr, const wide_read& read, indx_c<idx_> idx) {
-    return small_step(ptr, read, idx, eve_extra::ignore_nothing{});
+  template <typename Ptr, std::size_t idx>
+  bool big_step(Ptr, const wide_read& read, indx_c<idx>) {
+    regs[idx] = eve::convert(read, eve::as_<T>{});
+    return false;
   }
 
   template <typename Ptr>
-  bool complete_big_step(Ptr) {
+  bool complete_big_step(Ptr ptr) {
+    for (auto& reg : regs) {
+      reg = op(reg);
+    }
+
+    for (Ptr it = ptr; auto& reg : regs) {
+      wide_read ys = eve::convert(reg, eve::as_<value_type<I>>{});
+      eve::store(ys, it);
+      it += wide_read::static_size;
+    }
+
     return false;
   }
 

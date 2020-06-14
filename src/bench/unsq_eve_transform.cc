@@ -40,8 +40,8 @@ struct unsq_eve_transform {
 }  // namespace
 
 int main(int argc, char** argv) {
-  bench::bench_main<bench::inplace_transform_bench<unsq_eve_transform<128, 1>,
-                                                   unsq_eve_transform<256, 1>,
+  bench::bench_main<bench::inplace_transform_bench</*unsq_eve_transform<128, 1>,
+                                                   unsq_eve_transform<256, 1>,*/
                                                    unsq_eve_transform<256, 4>>>(
       argc, argv);
 }
