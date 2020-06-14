@@ -22,10 +22,10 @@
 namespace {
 
 template <std::size_t width, std::size_t unroll>
-struct unsq_eve_inclusive_scan_inplace {
+struct unsq_eve_inclusive_scan_inplace_overlap_stores {
   std::string name() const {
-    return "unsq_eve::inclusive_scan_inplace<" + std::to_string(width) + ", " +
-           std::to_string(unroll) + '>';
+    return "unsq_eve::inclusive_scan_inplace_overlap_stores<" +
+           std::to_string(width) + ", " + std::to_string(unroll) + '>';
   }
 
   template <typename I>
@@ -33,27 +33,24 @@ struct unsq_eve_inclusive_scan_inplace {
     using traits =
         unsq_eve::algorithm_traits<unsq_eve::value_type<I>, width, unroll>;
 
-    unsq_eve::inclusive_scan_inplace<traits>(f, l);
+    unsq_eve::inclusive_scan_inplace_overlap_stores<traits>(f, l);
   }
 };
 
 }  // namespace
 
 int main(int argc, char** argv) {
-  using char_bench =
-      bench::inplace_transform_bench<char,
-                                     unsq_eve_inclusive_scan_inplace<128, 1>,
-                                     unsq_eve_inclusive_scan_inplace<256, 1>,
-                                     unsq_eve_inclusive_scan_inplace<256, 2>,
-                                     unsq_eve_inclusive_scan_inplace<256, 4>>;
+  using char_bench = bench::inplace_transform_bench<
+      char, unsq_eve_inclusive_scan_inplace_overlap_stores<128, 1>,
+      unsq_eve_inclusive_scan_inplace_overlap_stores<256, 1>,
+      unsq_eve_inclusive_scan_inplace_overlap_stores<256, 2>,
+      unsq_eve_inclusive_scan_inplace_overlap_stores<256, 4>>;
 
-  using short_bench =
-      bench::inplace_transform_bench<short,
-                                     unsq_eve_inclusive_scan_inplace<256, 2>>;
+  using short_bench = bench::inplace_transform_bench<
+      short, unsq_eve_inclusive_scan_inplace_overlap_stores<256, 2>>;
 
-  using int_bench =
-      bench::inplace_transform_bench<int,
-                                     unsq_eve_inclusive_scan_inplace<256, 2>>;
+  using int_bench = bench::inplace_transform_bench<
+      int, unsq_eve_inclusive_scan_inplace_overlap_stores<256, 2>>;
 
   bench::bench_main<char_bench, short_bench, int_bench>(argc, argv);
 }

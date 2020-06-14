@@ -23,6 +23,7 @@
 #include "eve_extra/eve_extra.h"
 #include "unsq_eve/concepts.h"
 #include "unsq_eve/iteration_guarded.h"
+#include "unsq_eve/iteration_one_range_aligned_stores.h"
 
 namespace unsq_eve {
 
@@ -41,13 +42,17 @@ struct inplace_body {
   inplace_body(Op op, T zero) : op(op), zeroes(zero), running_sum(zeroes) {}
 
   template <typename Ptr, std::size_t idx, typename Ignore>
-  bool small_step(Ptr ptr, indx_c<idx>, Ignore ignore) {
-    wide_read read;
-    if constexpr (std::is_same_v<Ignore, eve_extra::ignore_nothing>) {
-      read = wide{ptr};
-    } else {
-      read = eve_extra::load_unsafe(ptr, eve::as_<wide>{});
-    }
+  void under_chunk_size_step(Ptr ptr, indx_c<idx>, const wide_read& read,
+                             Ignore ignore) {
+    wide xs = eve::convert(read, eve::as_<T>{});
+    xs = eve_extra::replace_ignored(xs, ignore, zeroes);
+    xs = eve_extra::inclusive_scan_wide(xs, op, zeroes);
+    wide_read ys = eve::convert(xs, eve::as_<value_type<I>>{});
+    eve_extra::store(ys, ptr, ignore);
+  }
+
+  template <typename Ptr, std::size_t idx, typename Ignore>
+  bool small_step(Ptr ptr, const wide_read& read, indx_c<idx>, Ignore ignore) {
     wide xs = eve::convert(read, eve::as_<T>{});
     xs = eve_extra::replace_ignored(xs, ignore, zeroes);
     xs = eve_extra::inclusive_scan_wide(xs, op, zeroes);
@@ -60,14 +65,30 @@ struct inplace_body {
     return false;
   }
 
+  template <typename Ptr, std::size_t _idx, typename Ignore>
+  bool small_step(Ptr ptr, indx_c<_idx> idx, Ignore ignore) {
+    wide_read read;
+    if constexpr (std::is_same_v<Ignore, eve_extra::ignore_nothing>) {
+      read = wide{ptr};
+    } else {
+      read = eve_extra::load_unsafe(ptr, eve::as_<wide>{});
+    }
+    return small_step(ptr, read, idx, ignore);
+  }
+
   void before_big_steps() {}
 
   template <typename Ptr>
   void start_big_step(Ptr) {}
 
-  template <typename Ptr, std::size_t idx_>
-  bool big_step(Ptr ptr, indx_c<idx_> idx) {
-    return small_step(ptr, idx, eve_extra::ignore_nothing{});
+  template <typename Ptr, std::size_t _idx>
+  bool big_step(Ptr ptr, const wide_read& read, indx_c<_idx> idx) {
+    return small_step(ptr, read, idx, eve_extra::ignore_nothing{});
+  }
+
+  template <typename Ptr, std::size_t _idx>
+  bool big_step(Ptr ptr, indx_c<_idx> idx) {
+    return big_step(ptr, wide_read{ptr}, idx);
   }
 
   template <typename Ptr>
@@ -81,8 +102,8 @@ struct inplace_body {
 }  // namespace _inclusive_scan
 
 template <typename Traits, contigious_iterator I, typename Op>
-EVE_FORCEINLINE void inclusive_scan_inplace_aligned(I _f, I _l, Op op,
-                                                    const value_type<I>& zero) {
+EVE_FORCEINLINE void inclusive_scan_inplace(I _f, I _l, Op op,
+                                            const value_type<I>& zero) {
   _inclusive_scan::inplace_body<Traits, I, Op> body{op, zero};
 
   auto [f, l] = drill_down_range(_f, _l);
@@ -91,13 +112,34 @@ EVE_FORCEINLINE void inclusive_scan_inplace_aligned(I _f, I _l, Op op,
 }
 
 template <typename Traits, contigious_iterator I, typename Op>
-EVE_FORCEINLINE void inclusive_scan_inplace_aligned(I f, I l, Op op) {
-  unsq_eve::inclusive_scan_inplace_aligned<Traits>(f, l, op, value_type<I>{});
+EVE_FORCEINLINE void inclusive_scan_inplace(I f, I l, Op op) {
+  unsq_eve::inclusive_scan_inplace<Traits>(f, l, op, value_type<I>{});
 }
 
 template <typename Traits, contigious_iterator I>
-EVE_FORCEINLINE void inclusive_scan_inplace_aligned(I f, I l) {
-  unsq_eve::inclusive_scan_inplace_aligned<Traits>(f, l, eve::add);
+EVE_FORCEINLINE void inclusive_scan_inplace(I f, I l) {
+  unsq_eve::inclusive_scan_inplace<Traits>(f, l, eve::add);
+}
+
+template <typename Traits, contigious_iterator I, typename Op>
+EVE_FORCEINLINE void inclusive_scan_inplace_overlap_stores(
+    I _f, I _l, Op op, const value_type<I>& zero) {
+  _inclusive_scan::inplace_body<Traits, I, Op> body{op, zero};
+
+  auto [f, l] = drill_down_range(_f, _l);
+
+  iteration_one_range_aligned_stores<iteration_traits_t<Traits>>(f, l, body);
+}
+
+template <typename Traits, contigious_iterator I, typename Op>
+EVE_FORCEINLINE void inclusive_scan_inplace_overlap_stores(I f, I l, Op op) {
+  unsq_eve::inclusive_scan_inplace_overlap_stores<Traits>(f, l, op,
+                                                          value_type<I>{});
+}
+
+template <typename Traits, contigious_iterator I>
+EVE_FORCEINLINE void inclusive_scan_inplace_overlap_stores(I f, I l) {
+  unsq_eve::inclusive_scan_inplace_overlap_stores<Traits>(f, l, eve::add);
 }
 
 }  // namespace unsq_eve
