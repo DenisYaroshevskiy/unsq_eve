@@ -22,7 +22,7 @@
 
 #include "eve_extra/eve_extra.h"
 #include "unsq_eve/concepts.h"
-#include "unsq_eve/iteration_one_range_aligned_stores.h"
+#include "unsq_eve/iteration_guarded.h"
 
 namespace unsq_eve {
 
@@ -38,22 +38,16 @@ struct inplace_body {
   wide zeroes;
   wide running_sum;
 
-  EVE_FORCEINLINE inplace_body(Op op, T zero)
-      : op(op), zeroes(zero), running_sum(zeroes) {}
+  inplace_body(Op op, T zero) : op(op), zeroes(zero), running_sum(zeroes) {}
 
   template <typename Ptr, std::size_t idx, typename Ignore>
-  void under_chunk_size_step(Ptr ptr, indx_c<idx>, const wide_read& read,
-                             Ignore ignore) {
-    wide xs = eve::convert(read, eve::as_<T>{});
-    xs = eve_extra::replace_ignored(xs, ignore, zeroes);
-    xs = eve_extra::inclusive_scan_wide(xs, op, zeroes);
-    // Running sum is zeroes.
-    wide_read ys = eve::convert(xs, eve::as_<value_type<I>>{});
-    eve_extra::store(ys, ptr, ignore);
-  }
-
-  template <typename Ptr, std::size_t idx, typename Ignore>
-  bool small_step(Ptr ptr, const wide_read& read, indx_c<idx>, Ignore ignore) {
+  bool small_step(Ptr ptr, indx_c<idx>, Ignore ignore) {
+    wide_read read;
+    if constexpr (std::is_same_v<Ignore, eve_extra::ignore_nothing>) {
+      read = wide{ptr};
+    } else {
+      read = eve_extra::load_unsafe(ptr, eve::as_<wide>{});
+    }
     wide xs = eve::convert(read, eve::as_<T>{});
     xs = eve_extra::replace_ignored(xs, ignore, zeroes);
     xs = eve_extra::inclusive_scan_wide(xs, op, zeroes);
@@ -61,7 +55,7 @@ struct inplace_body {
     running_sum = wide(xs.back());
 
     wide_read ys = eve::convert(xs, eve::as_<value_type<I>>{});
-    eve::store(ys, ptr);
+    eve_extra::store(ys, ptr, ignore);
 
     return false;
   }
@@ -72,8 +66,8 @@ struct inplace_body {
   void start_big_step(Ptr) {}
 
   template <typename Ptr, std::size_t idx_>
-  bool big_step(Ptr ptr, const wide_read& read, indx_c<idx_> idx) {
-    return small_step(ptr, read, idx, eve_extra::ignore_nothing{});
+  bool big_step(Ptr ptr, indx_c<idx_> idx) {
+    return small_step(ptr, idx, eve_extra::ignore_nothing{});
   }
 
   template <typename Ptr>
@@ -93,7 +87,7 @@ EVE_FORCEINLINE void inclusive_scan_inplace_aligned(I _f, I _l, Op op,
 
   auto [f, l] = drill_down_range(_f, _l);
 
-  iteration_one_range_aligned_stores<iteration_traits_t<Traits>>(f, l, body);
+  iteration_aligned<iteration_traits_t<Traits>>(f, l, body);
 }
 
 template <typename Traits, contigious_iterator I, typename Op>
