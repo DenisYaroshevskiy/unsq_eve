@@ -46,19 +46,19 @@ BENCH_NOINLINE void inplace_transform_driver::operator()(
 
 // Benchmarks ------------------------------------------------------
 
-template <typename... Algorithms>
+template <typename TestType, typename... Algorithms>
 struct inplace_transform_bench {
   const char* name() const { return "inplace transform"; }
 
   inplace_transform_driver driver() const { return {}; }
 
-  std::vector<std::size_t> sizes() const { return {40, 1000, 10'000}; }
+  std::vector<std::size_t> sizes() const { return {28, 40, 1000, 10'000}; }
 
   std::vector<std::size_t> percentage_points() const { return {100}; }
 
   bench::type_list<Algorithms...> algorithms() const { return {}; }
 
-  bench::type_list<char, short, int> types() const { return {}; }
+  bench::type_list<TestType> types() const { return {}; }
 
   template <typename T>
   auto input(struct bench::type_t<T>, std::size_t size,

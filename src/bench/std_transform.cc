@@ -33,5 +33,8 @@ struct std_transform {
 }  // namespace
 
 int main(int argc, char** argv) {
-  bench::bench_main<bench::inplace_transform_bench<std_transform>>(argc, argv);
+  bench::bench_main<bench::inplace_transform_bench<char, std_transform>,
+                    bench::inplace_transform_bench<short, std_transform>,
+                    bench::inplace_transform_bench<int, std_transform>>(argc,
+                                                                        argv);
 }

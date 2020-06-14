@@ -21,6 +21,8 @@
 
 #include "eve_extra/eve_extra.h"
 #include "unsq_eve/concepts.h"
+
+#include "unsq_eve/iteration_guarded.h"
 #include "unsq_eve/iteration_one_range_aligned_stores.h"
 
 namespace unsq_eve {
@@ -48,12 +50,23 @@ struct inplace_body {
   }
 
   template <typename Ptr, std::size_t idx, typename Ignore>
-  bool small_step(Ptr ptr, const wide_read& read, indx_c<idx>, Ignore) {
+  bool small_step(Ptr ptr, const wide_read& read, indx_c<idx>, Ignore ignore) {
     wide xs = eve::convert(read, eve::as_<T>{});
     wide transfromed = op(xs);
     wide_read ys = eve::convert(transfromed, eve::as_<value_type<I>>{});
-    eve::store(ys, ptr);
+    eve_extra::store(ys, ptr, ignore);
     return false;
+  }
+
+  template <typename Ptr, std::size_t _idx, typename Ignore>
+  bool small_step(Ptr ptr, indx_c<_idx> idx, Ignore ignore) {
+    wide_read read;
+    if constexpr (std::is_same_v<Ignore, eve_extra::ignore_nothing>) {
+      read = wide_read{ptr};
+    } else {
+      read = eve_extra::load_unsafe(ptr, eve::as_<wide_read>{});
+    }
+    return small_step(ptr, read, idx, ignore);
   }
 
   void before_big_steps() {}
@@ -65,6 +78,11 @@ struct inplace_body {
   bool big_step(Ptr, const wide_read& read, indx_c<idx>) {
     regs[idx] = eve::convert(read, eve::as_<T>{});
     return false;
+  }
+
+  template <typename Ptr, std::size_t _idx>
+  bool big_step(Ptr ptr, indx_c<_idx> idx) {
+    return big_step(ptr, wide_read{ptr}, idx);
   }
 
   template <typename Ptr>
@@ -93,6 +111,14 @@ EVE_FORCEINLINE void transform(I _f, I _l, Op op) {
   _transform::inplace_body<Traits, I, Op> body{op};
   auto [f, l] = drill_down_range(_f, _l);
   iteration_one_range_aligned_stores<iteration_traits_t<Traits>>(f, l, body);
+}
+
+template <typename Traits, contigious_iterator I,
+          wide_map_unary<typename Traits::wide> Op>
+EVE_FORCEINLINE void transform_masked(I _f, I _l, Op op) {
+  _transform::inplace_body<Traits, I, Op> body{op};
+  auto [f, l] = drill_down_range(_f, _l);
+  iteration_aligned<iteration_traits_t<Traits>>(f, l, body);
 }
 
 }  // namespace unsq_eve
