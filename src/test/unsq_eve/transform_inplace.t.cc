@@ -131,11 +131,12 @@ TEST_CASE("unsq_eve.transform_inplace_basic", "[unsq_eve]") {
   });
 }
 
-TEST_CASE("unsq_eve.transform_masked", "[unsq_eve]") {
+TEST_CASE("unsq_eve.transform_overlapping_stores", "[unsq_eve]") {
   common_any_test([](auto variation, auto f, auto l) {
     using traits = typename decltype(variation)::traits;
     using wide = typename traits::wide;
-    unsq_eve::transform_masked<traits>(f, l, [](wide x) { return x + x; });
+    unsq_eve::transform_overlap_stores<traits>(f, l,
+                                               [](wide x) { return x + x; });
   });
 }
 

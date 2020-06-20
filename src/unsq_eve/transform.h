@@ -111,15 +111,15 @@ template <typename Traits, contigious_iterator I,
 EVE_FORCEINLINE void transform(I _f, I _l, Op op) {
   _transform::inplace_body<Traits, I, Op> body{op};
   auto [f, l] = drill_down_range(_f, _l);
-  iteration_one_range_aligned_stores<iteration_traits_t<Traits>>(f, l, body);
+  iteration_aligned<iteration_traits_t<Traits>>(f, l, body);
 }
 
 template <typename Traits, contigious_iterator I,
           wide_map_unary<typename Traits::wide> Op>
-EVE_FORCEINLINE void transform_masked(I _f, I _l, Op op) {
+EVE_FORCEINLINE void transform_overlap_stores(I _f, I _l, Op op) {
   _transform::inplace_body<Traits, I, Op> body{op};
   auto [f, l] = drill_down_range(_f, _l);
-  iteration_aligned<iteration_traits_t<Traits>>(f, l, body);
+  iteration_one_range_aligned_stores<iteration_traits_t<Traits>>(f, l, body);
 }
 
 template <typename Traits, contigious_iterator I,
