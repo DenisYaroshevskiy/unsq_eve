@@ -51,23 +51,29 @@ struct inplace_body {
   }
 
   template <typename Ptr, std::size_t idx, typename Ignore>
-  bool small_step(Ptr ptr, const wide_read& read, indx_c<idx>, Ignore ignore) {
+  bool small_step(Ptr ptr, const wide_read& read, indx_c<idx>, Ignore) {
     wide xs = eve::convert(read, eve::as_<T>{});
     wide transfromed = op(xs);
     wide_read ys = eve::convert(transfromed, eve::as_<value_type<I>>{});
-    eve_extra::store(ys, ptr, ignore);
+    eve::store(ys, ptr);
     return false;
   }
 
-  template <typename Ptr, std::size_t _idx, typename Ignore>
-  bool small_step(Ptr ptr, indx_c<_idx> idx, Ignore ignore) {
+  template <typename Ptr, std::size_t idx, typename Ignore>
+  bool small_step(Ptr ptr, indx_c<idx>, Ignore ignore) {
     wide_read read;
+
     if constexpr (std::is_same_v<Ignore, eve_extra::ignore_nothing>) {
       read = wide_read{ptr};
     } else {
       read = eve_extra::load_unsafe(ptr, eve::as_<wide_read>{});
     }
-    return small_step(ptr, read, idx, ignore);
+
+    wide xs = eve::convert(read, eve::as_<T>{});
+    wide transfromed = op(xs);
+    wide_read ys = eve::convert(transfromed, eve::as_<value_type<I>>{});
+    eve_extra::store(ys, ptr, ignore);
+    return false;
   }
 
   void before_big_steps() {}
