@@ -5,6 +5,6 @@
 using T = int;
 using traits = unsq_eve::algorithm_traits<T, 256, 4>;
 
-void transform(T* f, T* l) {
-  unsq_eve::transform<traits>(f, l, [](auto x) { return x + x; });
+void transform_unaligned(T* f, T* l) {
+  unsq_eve::transform_unaligned<traits>(f, l, [](auto x) { return x + x; });
 }
