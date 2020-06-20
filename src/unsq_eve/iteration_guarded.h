@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
+#ifndef UNSQ_EVE_ITERATION_GUARDED_H_
+#define UNSQ_EVE_ITERATION_GUARDED_H_
+
 #include "eve_extra/eve_extra.h"
 #include "unsq_eve/iteration_traits.h"
 #include "unsq_eve/unroll.h"
-
-#ifndef UNSQ_EVE_ITERATION_GUARDED_H_
-#define UNSQ_EVE_ITERATION_GUARDED_H_
 
 namespace unsq_eve {
 namespace _iteration_guarded {

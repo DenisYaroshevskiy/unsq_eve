@@ -139,4 +139,12 @@ TEST_CASE("unsq_eve.transform_masked", "[unsq_eve]") {
   });
 }
 
+TEST_CASE("unsq_eve.transform_unaligned", "[unsq_eve]") {
+  common_any_test([](auto variation, auto f, auto l) {
+    using traits = typename decltype(variation)::traits;
+    using wide = typename traits::wide;
+    unsq_eve::transform_unaligned<traits>(f, l, [](wide x) { return x + x; });
+  });
+}
+
 }  // namespace

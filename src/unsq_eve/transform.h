@@ -23,6 +23,7 @@
 #include "unsq_eve/concepts.h"
 
 #include "unsq_eve/iteration_guarded.h"
+#include "unsq_eve/iteration_guarded_unaligned.h"
 #include "unsq_eve/iteration_one_range_aligned_stores.h"
 
 namespace unsq_eve {
@@ -119,6 +120,14 @@ EVE_FORCEINLINE void transform_masked(I _f, I _l, Op op) {
   _transform::inplace_body<Traits, I, Op> body{op};
   auto [f, l] = drill_down_range(_f, _l);
   iteration_aligned<iteration_traits_t<Traits>>(f, l, body);
+}
+
+template <typename Traits, contigious_iterator I,
+          wide_map_unary<typename Traits::wide> Op>
+EVE_FORCEINLINE void transform_unaligned(I _f, I _l, Op op) {
+  _transform::inplace_body<Traits, I, Op> body{op};
+  auto [f, l] = drill_down_range(_f, _l);
+  iteration_unaligned<iteration_traits_t<Traits>>(f, l, body);
 }
 
 }  // namespace unsq_eve
