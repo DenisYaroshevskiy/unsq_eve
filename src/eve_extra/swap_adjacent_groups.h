@@ -81,34 +81,21 @@ Wide swap_adjacent_groups(const Wide& x) {
 }
 
 template <std::size_t group_size, composite_wide Wide>
-Wide swap_adjacent_groups(const Wide& x) requires(group_size <
-                                                  small_size<Wide>) {
-  auto for_segment = [](const auto& seg) {
-    return swap_adjacent_groups<group_size>(seg);
-  };
+Wide swap_adjacent_groups(const Wide& x) {
+  Wide y;
 
-  using storage_type = typename Wide::storage_type;
+  const auto& [xl, xr] = x.storage().segments;
+  auto& [yl, yr] = y.storage().segments;
 
-  storage_type converted{map_array(x.storage().segments, for_segment)};
-
-  return Wide{converted};
-}
-
-template <std::size_t group_size, composite_wide Wide>
-Wide swap_adjacent_groups(const Wide& x) requires(group_size >=
-                                                  small_size<Wide>) {
-  static constexpr std::size_t segments_in_group =
-      group_size / small_size<Wide>;
-
-  Wide res = x;
-  auto& segments = res.storage().segments;
-
-  for (auto f = segments.begin(); f != segments.end();
-       f += 2 * segments_in_group) {
-    std::swap_ranges(f, f + segments_in_group, f + segments_in_group);
+  if constexpr (group_size == Wide::static_size / 2) {
+    yl = xr;
+    yr = xl;
+  } else {
+    yl = swap_adjacent_groups<group_size>(xl);
+    yr = swap_adjacent_groups<group_size>(xr);
   }
 
-  return res;
+  return y;
 }
 
 }  // namespace eve_extra

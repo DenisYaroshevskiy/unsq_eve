@@ -71,7 +71,8 @@ concept native_logical =
     eve_logical<Logical>&& native_wide<typename Logical::bits_type>;
 
 template <composite_wide Wide>
-constexpr std::ptrdiff_t small_size = Wide::storage_type::small_size;
+constexpr std::ptrdiff_t small_size =
+    Wide::storage_type::subvalue_type::static_size;
 
 }  // namespace eve_extra
 

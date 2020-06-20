@@ -25,7 +25,7 @@ template <std::size_t x>
 using indx_c = std::integral_constant<std::size_t, x>;
 
 TEMPLATE_TEST_CASE("eve_extra.swap_adjacent_groups", "[eve_extra]",
-                   ALL_TEST_PACKS) {
+                   (eve::wide<std::uint64_t, eve::fixed<4>>)) {
   using wide = TestType;
 
   using T = typename wide::value_type;
@@ -44,6 +44,8 @@ TEMPLATE_TEST_CASE("eve_extra.swap_adjacent_groups", "[eve_extra]",
            f += 2 * group_size) {
         std::swap_ranges(f, f + group_size, f + group_size);
       }
+      INFO("group size: " << group_size << "\nexpected: " << expected
+                          << "\nactual: " << actual);
       REQUIRE(eve::all(expected == actual));
     }
   };
