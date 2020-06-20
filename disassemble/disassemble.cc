@@ -3,6 +3,8 @@
 #include "unsq_eve/transform.h"
 
 using T = int;
-using traits = unsq_eve::algorithm_traits<T, 256, 4>;
+using traits = unsq_eve::algorithm_traits<T, 256, 1>;
 
-auto reduce(T* f, T* l) { return unsq_eve::reduce<traits>(f, l); }
+void inclusive_scan(T* f, T* l) {
+  unsq_eve::inclusive_scan_inplace<traits>(f, l);
+}
