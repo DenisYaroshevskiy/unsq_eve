@@ -3,8 +3,8 @@
 #include "unsq_eve/transform.h"
 
 using T = int;
-using traits = unsq_eve::algorithm_traits<T, 256, 1>;
+using traits = unsq_eve::algorithm_traits<T, 256, 4>;
 
-void inclusive_scan_overlap_stores(T* f, T* l) {
-  unsq_eve::inclusive_scan_inplace_overlap_stores<traits>(f, l);
+void transform(T* f, T* l) {
+  unsq_eve::transform<traits>(f, l, [](auto x) { return x + x; });
 }
