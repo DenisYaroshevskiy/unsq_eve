@@ -5,6 +5,6 @@
 using T = int;
 using traits = unsq_eve::algorithm_traits<T, 256, 1>;
 
-void inclusive_scan(T* f, T* l) {
-  unsq_eve::inclusive_scan_inplace<traits>(f, l);
+void inclusive_scan_overlap_stores(T* f, T* l) {
+  unsq_eve::inclusive_scan_inplace_overlap_stores<traits>(f, l);
 }
