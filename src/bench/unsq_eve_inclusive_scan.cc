@@ -49,6 +49,7 @@ int main(int argc, char** argv) {
 
   using short_bench =
       bench::inplace_transform_bench<short,
+                                     unsq_eve_inclusive_scan_inplace<256, 1>,
                                      unsq_eve_inclusive_scan_inplace<256, 2>>;
 
   using int_bench =
