@@ -143,11 +143,4 @@ TEST_CASE("unsq_eve.inclusive_scan_inplace.basic", "[unsq_eve]") {
   });
 }
 
-TEST_CASE("unsq_eve.inclusive_scan_inplace_overlap_stores.basic",
-          "[unsq_eve]") {
-  common_any_test([](auto traits, auto f, auto l) {
-    unsq_eve::inclusive_scan_inplace_overlap_stores<decltype(traits)>(f, l);
-  });
-}
-
 }  // namespace

@@ -21,10 +21,7 @@
 
 #include "eve_extra/eve_extra.h"
 #include "unsq_eve/concepts.h"
-
 #include "unsq_eve/iteration_guarded.h"
-#include "unsq_eve/iteration_guarded_unaligned.h"
-#include "unsq_eve/iteration_one_range_aligned_stores.h"
 
 namespace unsq_eve {
 namespace _transform {
@@ -40,24 +37,6 @@ struct inplace_body {
   std::array<wide, Traits::unroll()> regs;
 
   inplace_body(Op op) : op(op) {}
-
-  template <typename Ptr, std::size_t idx, typename Ignore>
-  void under_chunk_size_step(Ptr ptr, indx_c<idx>, const wide_read& read,
-                             Ignore ignore) {
-    wide xs = eve::convert(read, eve::as_<T>{});
-    wide transfromed = op(xs);
-    wide_read ys = eve::convert(transfromed, eve::as_<value_type<I>>{});
-    eve_extra::store(ys, ptr, ignore);
-  }
-
-  template <typename Ptr, std::size_t idx, typename Ignore>
-  bool small_step(Ptr ptr, const wide_read& read, indx_c<idx>, Ignore) {
-    wide xs = eve::convert(read, eve::as_<T>{});
-    wide transfromed = op(xs);
-    wide_read ys = eve::convert(transfromed, eve::as_<value_type<I>>{});
-    eve::store(ys, ptr);
-    return false;
-  }
 
   template <typename Ptr, std::size_t idx, typename Ignore>
   bool small_step(Ptr ptr, indx_c<idx>, Ignore ignore) {
@@ -82,14 +61,9 @@ struct inplace_body {
   void start_big_step(Ptr) {}
 
   template <typename Ptr, std::size_t idx>
-  bool big_step(Ptr, const wide_read& read, indx_c<idx>) {
-    regs[idx] = eve::convert(read, eve::as_<T>{});
+  bool big_step(Ptr ptr, indx_c<idx>) {
+    regs[idx] = eve::convert(wide_read{ptr}, eve::as_<T>{});
     return false;
-  }
-
-  template <typename Ptr, std::size_t _idx>
-  bool big_step(Ptr ptr, indx_c<_idx> idx) {
-    return big_step(ptr, wide_read{ptr}, idx);
   }
 
   template <typename Ptr>
@@ -118,22 +92,6 @@ EVE_FORCEINLINE void transform(I _f, I _l, Op op) {
   _transform::inplace_body<Traits, I, Op> body{op};
   auto [f, l] = drill_down_range(_f, _l);
   iteration_aligned<iteration_traits_t<Traits>>(f, l, body);
-}
-
-template <typename Traits, contigious_iterator I,
-          wide_map_unary<typename Traits::wide> Op>
-EVE_FORCEINLINE void transform_overlap_stores(I _f, I _l, Op op) {
-  _transform::inplace_body<Traits, I, Op> body{op};
-  auto [f, l] = drill_down_range(_f, _l);
-  iteration_one_range_aligned_stores<iteration_traits_t<Traits>>(f, l, body);
-}
-
-template <typename Traits, contigious_iterator I,
-          wide_map_unary<typename Traits::wide> Op>
-EVE_FORCEINLINE void transform_unaligned(I _f, I _l, Op op) {
-  _transform::inplace_body<Traits, I, Op> body{op};
-  auto [f, l] = drill_down_range(_f, _l);
-  iteration_unaligned<iteration_traits_t<Traits>>(f, l, body);
 }
 
 }  // namespace unsq_eve
