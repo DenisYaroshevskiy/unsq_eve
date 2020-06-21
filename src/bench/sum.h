@@ -46,7 +46,7 @@ BENCH_NOINLINE void sum_driver::operator()(Slide slide, benchmark::State& state,
 
 // Benchmarks ------------------------------------------------------
 
-template <typename ElementType, typename... Algorithms>
+template <typename TestType, typename... Algorithms>
 struct sum_bench {
   const char* name() const { return "sum"; }
 
@@ -58,7 +58,7 @@ struct sum_bench {
 
   bench::type_list<Algorithms...> algorithms() const { return {}; }
 
-  bench::type_list<ElementType> types() const { return {}; }
+  bench::type_list<TestType> types() const { return {}; }
 
   template <typename T>
   auto input(struct bench::type_t<T>, std::size_t size,

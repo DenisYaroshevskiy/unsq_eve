@@ -28,7 +28,7 @@ struct std_reduce {
   }
 
   template <typename I>
-  BENCH_ALWAYS_INLINE SumType operator()(I f, I l) {
+  BENCH_ALWAYS_INLINE SumType operator()(I f, I l) const {
     return std::reduce(f, l, SumType{0});
   }
 };

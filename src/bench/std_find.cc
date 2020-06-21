@@ -26,7 +26,7 @@ struct std_strlen {
   const char* name() const { return "std::strlen"; }
 
   template <typename I, typename T>
-  BENCH_ALWAYS_INLINE I operator()(I f, I, const T&) {
+  BENCH_ALWAYS_INLINE I operator()(I f, I, const T&) const {
     return f + std::strlen(&*f);
   }
 };
@@ -35,7 +35,7 @@ struct std_find {
   const char* name() const { return "std::find"; }
 
   template <typename I, typename T>
-  BENCH_ALWAYS_INLINE I operator()(I f, I l, const T& x) {
+  BENCH_ALWAYS_INLINE I operator()(I f, I l, const T& x) const {
     return std::find(f, l, x);
   }
 };
@@ -44,7 +44,7 @@ struct find_unguarded {
   const char* name() const { return "find_unguarded"; }
 
   template <typename I, typename T>
-  BENCH_ALWAYS_INLINE I operator()(I f, I, const T& x) {
+  BENCH_ALWAYS_INLINE I operator()(I f, I, const T& x) const {
     while (true) {
       if (*f == x) return f;
       ++f;
@@ -52,13 +52,15 @@ struct find_unguarded {
   }
 };
 
-struct strlen_bench : bench::find_0_bench<std_strlen> {
-  bench::type_list<char> types() const { return {}; }
-};
-
 }  // namespace
 
 int main(int argc, char** argv) {
-  bench::bench_main<bench::find_0_bench<std_find, find_unguarded>,
-                    strlen_bench>(argc, argv);
+  using char_bench =
+      bench::find_0_bench<char, std_strlen, std_find, find_unguarded>;
+
+  using short_bench = bench::find_0_bench<short, std_find, find_unguarded>;
+
+  using int_bench = bench::find_0_bench<int, std_find, find_unguarded>;
+
+  bench::bench_main<char_bench, short_bench, int_bench>(argc, argv);
 }

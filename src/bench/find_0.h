@@ -46,7 +46,7 @@ BENCH_NOINLINE void find_0_driver::operator()(
 
 // Benchmarks ------------------------------------------------------
 
-template <typename... Algorithms>
+template <typename TestType, typename... Algorithms>
 struct find_0_bench {
   const char* name() const { return "find 0"; }
 
@@ -58,7 +58,7 @@ struct find_0_bench {
 
   bench::type_list<Algorithms...> algorithms() const { return {}; }
 
-  bench::type_list<char, short, int> types() const { return {}; }
+  bench::type_list<TestType> types() const { return {}; }
 
   template <typename T>
   auto input(struct bench::type_t<T>, std::size_t size,
