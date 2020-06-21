@@ -52,7 +52,7 @@ struct inplace_transform_bench {
 
   inplace_transform_driver driver() const { return {}; }
 
-  std::vector<std::size_t> sizes() const { return {28, 40, 1000, 10'000}; }
+  std::vector<std::size_t> sizes() const { return {40, 1000, 10'000}; }
 
   std::vector<std::size_t> percentage_points() const { return {100}; }
 

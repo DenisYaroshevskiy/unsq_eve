@@ -29,7 +29,7 @@ struct unsq_eve_inclusive_scan_inplace {
   }
 
   template <typename I>
-  BENCH_ALWAYS_INLINE void operator()(I f, I l) {
+  BENCH_ALWAYS_INLINE void operator()(I f, I l) const {
     using traits =
         unsq_eve::algorithm_traits<unsq_eve::value_type<I>, width, unroll>;
 

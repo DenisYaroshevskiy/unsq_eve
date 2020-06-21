@@ -22,7 +22,7 @@
 namespace {
 
 struct std_transform {
-  std::string name() const { return "std_transform"; }
+  std::string name() const { return "std::transform"; }
 
   template <typename I>
   BENCH_ALWAYS_INLINE void operator()(I f, I l) {

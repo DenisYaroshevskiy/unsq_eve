@@ -15,30 +15,26 @@
  * limitations under the License.
  */
 
-#include "bench/sum.h"
+#include "bench/inplace_transform.h"
 
 #include <numeric>
 
 namespace {
 
-template <typename SumType>
 struct std_inclusive_scan {
-  std::string name() const {
-    return std::string("std::inclusive_scan/sum_type:") +
-           bench::type_name<SumType>{}();
-  }
+  std::string name() const { return std::string("std::inclusive_scan"); }
 
   template <typename I>
-  BENCH_ALWAYS_INLINE SumType operator()(I f, I l) {
+  BENCH_ALWAYS_INLINE void operator()(I f, I l) const {
     std::inclusive_scan(f, l, f);
-    return 0;
   }
 };
 
 }  // namespace
 
 int main(int argc, char** argv) {
-  bench::bench_main<bench::sum_bench<char, std_inclusive_scan<char>>,
-                    bench::sum_bench<short, std_inclusive_scan<short>>,
-                    bench::sum_bench<int, std_inclusive_scan<int>>>(argc, argv);
+  bench::bench_main<bench::inplace_transform_bench<char, std_inclusive_scan>,
+                    bench::inplace_transform_bench<short, std_inclusive_scan>,
+                    bench::inplace_transform_bench<int, std_inclusive_scan>>(
+      argc, argv);
 }
