@@ -2,7 +2,7 @@
 <html>
 <meta charset='utf-8'>
 
-<title>Reduce results</title>
+<title>reduce results</title>
 <script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
 <script type='text/javascript' src='scripts/bench.js'></script>
 
@@ -36,7 +36,7 @@
   I have seen mutliple times quite poor perfromance of scalar code for chars.
   <br /><br />
   With respect to code alignment, `unsq_eve` version cares very little - at most
-  10% for 1000 bytes. <br />
+  15% for 1000 bytes of chars. <br />
   `std::reduce` - not so lucky - at 10k swings up to 44% and this does not seem
   to be the scalar code's code fault. <br />
 
@@ -115,8 +115,8 @@
   <h3> reducing 40 bytes </h3>
 
   On 40 bytes not peeling loops gives the most effect.<br />
-  adding chars to `short` is 4 times faster and adding to `int` ~30%. <br />
-  adding shorts to `int` is 1.75 times faster. <br />
+  adding chars to `short` is 3.3 times faster and adding to `int` ~30%. <br />
+  adding shorts to `int` is 1.7 times faster. <br />
 
   <h4> reducing chars 40 bytes data </h4>
 

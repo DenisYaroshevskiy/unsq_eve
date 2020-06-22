@@ -2,7 +2,7 @@
 <html>
 <meta charset='utf-8'>
 
-<title>inclusive scan results</title>
+<title>transform results</title>
 <script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
 <script type='text/javascript' src='scripts/bench.js'></script>
 
@@ -12,8 +12,24 @@
   <h1> transform </h1>
 
   So far only have an inplace version. <br />
+  My benchmark: double every element `x = x + x`. <br />
+  `std::transform` is consistently vectorized by clang (<a
+    href=https://gcc.godbolt.org/z/MrKGEG>godbolt</a>) so no purely scalar
+  baseline. <br />
+  Clang peels loop while I don't.<br />
+  Clang also uses unaligned loads and stores, even for an inplace version.
+  <br />
+  I experminented with different more fancy iteration patterns - didn't have
+  much success: <a
+    href="https://stackoverflow.com/a/62492369/5021064">StackOverflow</a>.<br />
 
   <h2> 40 bytes summary </h2>
+
+  For 40 bytes of data cannot beat loop peeling for int. <br />
+  2 times win for char, nothing for short loose about 30% for int. <br />
+  Code alignment is a pain for both me and standard but for different types,
+  <br />
+  chars for me - 1.6 times, shorts - 2 times for standard. <br />
 
   <h3> 40 bytes, data</h3>
 
@@ -27,10 +43,30 @@
       padding: 'min',
       group: 'intel_9700K',
       percentage: 100,
-    }, ['transform']);
+    }, ['transform<256, 4>', 'std::transform']);
+  </script>
+
+  <h3> 40 bytes, code alignment</h3>
+
+  <div id='40_bytes_data_code_alignment'></div>
+  <script>dynamicEntryPoint('40_bytes_data_code_alignment', {
+      name: 'inplace transform',
+      size: 40,
+      algorithm: 'selection',
+      type: 'selection',
+      time: 'y',
+      padding: 'minmax',
+      group: 'intel_9700K',
+      percentage: 100,
+    }, ['transform<256, 4>', 'std::transform']);
   </script>
 
   <h2> 1000 bytes summary </h2>
+
+  Not peeling is a good win on a 1000 bytes. 4 times chars, 2 times shorts, 1.5
+  ints. <br />
+  Code alignment for unsq_eve is about 20% for chars and shorts. <br />
+  For std ints misbehavae, showing abou 1.5 swings. <br />
 
   <h3> 1000 bytes, data</h3>
 
@@ -44,13 +80,60 @@
       padding: 'min',
       group: 'intel_9700K',
       percentage: 100,
-    }, ['transform']);
+    }, ['transform<256, 4>', 'std::transform']);
+  </script>
+
+  <h3> 1000 bytes, code alignment</h3>
+
+  <div id='1000_bytes_data_code_alignment'></div>
+  <script>dynamicEntryPoint('1000_bytes_data_code_alignment', {
+      name: 'inplace transform',
+      size: 1000,
+      algorithm: 'selection',
+      type: 'selection',
+      time: 'y',
+      padding: 'minmax',
+      group: 'intel_9700K',
+      percentage: 100,
+    }, ['transform<256, 4>', 'std::transform']);
   </script>
 
   <h2> 10'000 bytes summary </h2>
 
+  10'000 bytes behaves roughly identical. <br />
+  std suffers from code alignment issues - 1.7 times swings. <br />
+  I suspect unaligned loads/stores (see again <a
+    href="https://stackoverflow.com/a/62492369/5021064">StackOverflow</a>).<br />
+
   <h3> 10'000 bytes, data</h3>
 
+  <div id='10000_bytes_data'></div>
+  <script>dynamicEntryPoint('10000_bytes_data', {
+      name: 'inplace transform',
+      size: 10000,
+      algorithm: 'selection',
+      type: 'x',
+      time: 'y',
+      padding: 'min',
+      group: 'intel_9700K',
+      percentage: 100,
+    }, ['transform<256, 4>', 'std::transform']);
+  </script>
+
+  <h3> 10'000 bytes, code alignment</h3>
+
+  <div id='10000_bytes_data_code_alignment'></div>
+  <script>dynamicEntryPoint('10000_bytes_data_code_alignment', {
+      name: 'inplace transform',
+      size: 10000,
+      algorithm: 'selection',
+      type: 'selection',
+      time: 'y',
+      padding: 'minmax',
+      group: 'intel_9700K',
+      percentage: 100,
+    }, ['transform<256, 4>', 'std::transform']);
+  </script>
 
   <h2> Total benchmark </h2>
   <div id='total_benchmark'></div>
