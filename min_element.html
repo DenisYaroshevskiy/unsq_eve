@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+<meta charset='utf-8'>
+
+<title>min_element results</title>
+<script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
+<script type='text/javascript' src='scripts/bench.js'></script>
+
+</html>
+
+<body>
+  <h1> min_element </h1>
+
+  So far attempt to do indexes is unsuccessful (compared to reduce + find).
+
+  <h2> Total benchmark </h2>
+  <div id='total_benchmark'></div>
+  <script>dynamicEntryPoint('total_benchmark', {
+      name: 'min',
+      size: 'x',
+      algorithm: 'selection',
+      type: 'selection',
+      time: 'y',
+      padding: 'min',
+      group: 'intel_9700K',
+      percentage: 100,
+    }, ['min']);
+  </script>
+</body>
