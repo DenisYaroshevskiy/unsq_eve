@@ -18,7 +18,6 @@
 #define UNSQ_EVE_MIN_ELEMENT_H_
 
 #include <array>
-#include <iostream>
 
 #include <eve/function/all.hpp>
 #include <eve/function/convert.hpp>
@@ -41,28 +40,27 @@ struct min_body {
 
   Selection sel;
 
-  I best_f;
+  I best_base;
+  wide_idx best_idx;
   wide best;
 
-  I base_f;
+  I base;
 
   std::array<wide, Traits::unroll()> regs;
   std::array<wide_idx, Traits::unroll()> idxs;
 
-  min_body(I f, Selection sel) : sel{sel}, best_f(f), best{*f} {
+  min_body(I f, Selection sel)
+      : sel{sel}, best_base(f), best_idx{0u}, best{*f} {
     regs.fill(best);
+    // idxs are deliberetly unitialized since I'm not going to
+    // apply their value if it's not actually less.
   }
 
-  void set_base(I base) {
-    base_f = base;
-    // std::cout << "New base_f - best_f: " << base_f - best_f << std::endl;
-  }
+  void set_base(I _base) { base = _base; }
 
   template <typename Ptr, std::size_t reg_idx, typename Ignore>
   EVE_FORCEINLINE bool step(Ptr from, indx_c<reg_idx>, wide_idx wide_i,
                             Ignore ignore) {
-    // std::cout << "from.get() - best_f: " << from.get() - best_f << std::endl;
-
     wide_read read;
 
     if constexpr (std::is_same_v<Ignore, eve_extra::ignore_nothing>) {
@@ -73,8 +71,6 @@ struct min_body {
 
     wide xs = eve::convert(read, eve::as_<T>{});
     xs = eve_extra::replace_ignored(xs, ignore, regs[reg_idx]);
-    // std::cout << "xs:     " << xs << std::endl;
-    // std::cout << "wide_i: " << wide_i << std::endl;
 
     wide mins = sel(regs[reg_idx], xs);
 
@@ -90,13 +86,8 @@ struct min_body {
   }
 
   EVE_FORCEINLINE void index_overflow() {
-    // std::cout << "base_f - best_f: " << base_f - best_f << std::endl;
-
     wide combined = eve_extra::segment_reduction(regs, sel);
     combined = sel(best, combined);
-
-    // std::cout << "Previous best: " << best << std::endl;
-    // std::cout << "Combined by element: " << combined << std::endl;
 
     if (eve::all(combined == best)) return;
 
@@ -108,13 +99,8 @@ struct min_body {
       idxs[i] = eve::if_else(best == regs[i], idxs[i], max_idx);
     }
 
-    wide_idx res_idx = eve_extra::segment_reduction(idxs, eve::min);
-    res_idx = eve_extra::reduce_wide(res_idx, eve::min);
-
-    best_f = base_f + res_idx.back();
-
-    // std::cout << "best: " << best << std::endl;
-    // std::cout << "combined idx: " << res_idx << std::endl;
+    best_base = base;
+    best_idx = eve_extra::segment_reduction(idxs, eve::min);
   }
 
   void before_big_steps() {}
@@ -136,9 +122,9 @@ struct min_body {
   void after_big_steps() {}
 
   EVE_FORCEINLINE I compute_result() {
-    // std::cout << "compute result" << std::endl;
     index_overflow();
-    return best_f;
+    best_idx = eve_extra::reduce_wide(best_idx, eve::min);
+    return best_base + best_idx.front();
   }
 };
 

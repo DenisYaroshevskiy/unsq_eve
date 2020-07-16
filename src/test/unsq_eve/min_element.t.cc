@@ -53,15 +53,13 @@ void specific_tests(Alg alg) {
     REQUIRE(alg(traits{}, f, l) - f == 12);
   }
 
-  /*
-    // const iterator
-    {
-      std::vector<T> v(27u, T(1));
-      v.back() = T(2);
+  // const iterator
+  {
+    std::vector<T> v(27u, T(2));
+    v[0] = 1;
 
-      REQUIRE(alg(traits{}, v.cbegin(), v.cend(), v.back()) - v.cbegin() == 26);
-    }
-  */
+    REQUIRE(alg(traits{}, v.cbegin(), v.cend()) - v.cbegin() == 0);
+  }
 }
 
 template <typename Variation, typename Alg>

@@ -26,15 +26,45 @@
 namespace unsq_eve {
 namespace _iteration_indexed_guarded {
 
+template <typename Traits>
+constexpr std::ptrdiff_t max_idx() {
+  return std::numeric_limits<index_t<Traits>>::max();
+}
+
+template <typename Traits>
+constexpr std::ptrdiff_t big_step() {
+  return Traits::chunk_size() * Traits::unroll();
+}
+
+template <typename Traits>
+auto wide_step() {
+  return wide_index_t<Traits>{Traits::chunk_size()};
+}
+
+template <typename Traits>
+auto wide_big_step() {
+  return wide_index_t<Traits>{big_step<Traits>()};
+}
+
+template <typename Traits>
+auto wider_iota() {
+  std::array<wide_index_t<Traits>, Traits::unroll()> res;
+
+  auto cur = eve_extra::iota(eve::as_<wide_index_t<Traits>>{});
+
+  for (auto& i : res) {
+    i = cur;
+    cur += wide_step<Traits>();
+  }
+
+  return res;
+}
+
 template <typename Traits, typename Ptr, typename Delegate>
 EVE_FORCEINLINE StopReason
 main_loop(Ptr& aligned_f, Ptr aligned_l, wide_index_t<Traits>& wide_i,
-          const wide_index_t<Traits>& wide_step,
           Delegate& delegate) requires(Traits::unroll() == 1) {
-  static constexpr std::ptrdiff_t max_idx =
-      std::numeric_limits<index_t<Traits>>::max();
-
-  std::ptrdiff_t n = max_idx - Traits::chunk_size();
+  std::ptrdiff_t n = max_idx<Traits>() - Traits::chunk_size();
 
   while (aligned_f != aligned_l) {
     n = std::min(n, aligned_l.get() - aligned_f.get());
@@ -44,13 +74,13 @@ main_loop(Ptr& aligned_f, Ptr aligned_l, wide_index_t<Traits>& wide_i,
       if (delegate.small_step(aligned_f, wide_i, eve_extra::ignore_nothing{})) {
         return StopReason::Terminated;
       }
-      wide_i += wide_step;
+      wide_i += wide_step<Traits>();
       aligned_f += Traits::chunk_size();
     }
 
     delegate.index_overflow();
     delegate.set_base(aligned_f.get());
-    n = max_idx;
+    n = max_idx<Traits>();
     wide_i = eve_extra::iota(eve::as_<wide_index_t<Traits>>{});
   }
 
@@ -58,34 +88,19 @@ main_loop(Ptr& aligned_f, Ptr aligned_l, wide_index_t<Traits>& wide_i,
 }
 
 template <typename Traits, typename Ptr, typename Delegate>
-EVE_FORCEINLINE StopReason
-main_loop_unrolled(Ptr& aligned_f, Ptr aligned_l,
-                   const wide_index_t<Traits>& wide_step, Delegate& delegate) {
-  static constexpr std::ptrdiff_t max_idx =
-      std::numeric_limits<index_t<Traits>>::max();
-  static constexpr std::ptrdiff_t big_step =
-      Traits::chunk_size() * Traits::unroll();
-
+EVE_FORCEINLINE StopReason main_loop_unrolled(Ptr& aligned_f, Ptr aligned_l,
+                                              Delegate& delegate) {
   while (true) {
     delegate.index_overflow();
     delegate.set_base(aligned_f.get());
 
-    auto wider_i = [&] {
-      std::array<wide_index_t<Traits>, Traits::unroll()> is;
-      auto cur = eve_extra::iota(eve::as_<wide_index_t<Traits>>{});
+    std::ptrdiff_t n =
+        std::min(aligned_l.get() - aligned_f.get(), max_idx<Traits>());
+    n /= big_step<Traits>();
 
-      for (auto& i : is) {
-        i = cur;
-        cur += wide_step;
-      }
-      return is;
-    }();
-
-    std::ptrdiff_t n = std::min(aligned_l.get() - aligned_f.get(), max_idx);
-    n /= big_step;
     if (n == 0) return StopReason::No;
 
-    const wide_index_t<Traits> wider_step(big_step);
+    auto wider_i = wider_iota<Traits>();
 
     delegate.before_big_steps();
 
@@ -95,9 +110,9 @@ main_loop_unrolled(Ptr& aligned_f, Ptr aligned_l,
       StopReason res = unroll<Traits::unroll()>([&](auto idx) mutable {
         Ptr offset_ptr{aligned_f + Traits::chunk_size() * idx};
 
-        if (delegate.big_step(offset_ptr, idx, wider_i[idx()]))
+        if (delegate.big_step(offset_ptr, idx, wider_i[idx]))
           return StopReason::Terminated;
-        wider_i[idx()] += wider_step;
+        wider_i[idx] += wide_big_step<Traits>();
 
         return StopReason::No;
       });
@@ -105,7 +120,7 @@ main_loop_unrolled(Ptr& aligned_f, Ptr aligned_l,
       if (res != StopReason::No) return res;
       if (delegate.complete_big_step(aligned_f)) return StopReason::Terminated;
 
-      aligned_f += big_step;
+      aligned_f += big_step<Traits>();
     } while (--n);
 
     delegate.after_big_steps();
@@ -115,11 +130,9 @@ main_loop_unrolled(Ptr& aligned_f, Ptr aligned_l,
 template <typename Traits, typename Ptr, typename Delegate>
 EVE_FORCEINLINE StopReason main_loop(Ptr& aligned_f, Ptr aligned_l,
                                      wide_index_t<Traits>& wide_i,
-                                     const wide_index_t<Traits>& wide_step,
                                      Delegate& delegate) {
-  static constexpr std::ptrdiff_t max_idx =
-      std::numeric_limits<index_t<Traits>>::max();
-  static_assert((Traits::unroll() + 1) * Traits::chunk_size() <= max_idx);
+  static_assert((Traits::unroll() + 1) * Traits::chunk_size() <=
+                max_idx<Traits>());
 
   while (true) {  // To the beginning at most twice
     StopReason res = unroll<Traits::unroll()>([&](auto) mutable {
@@ -129,12 +142,12 @@ EVE_FORCEINLINE StopReason main_loop(Ptr& aligned_f, Ptr aligned_l,
         return StopReason::Terminated;
 
       aligned_f += Traits::chunk_size();
-      wide_i += wide_step;
+      wide_i += wide_step<Traits>();
       return StopReason::No;
     });
 
     if (res != StopReason::No) return res;
-    res = main_loop_unrolled<Traits>(aligned_f, aligned_l, wide_step, delegate);
+    res = main_loop_unrolled<Traits>(aligned_f, aligned_l, delegate);
     if (res != StopReason::No) return res;
 
     wide_i = eve_extra::iota(eve::as_<wide_index_t<Traits>>{});
@@ -157,17 +170,16 @@ EVE_FORCEINLINE Delegate iteration_indexed_aligned(T* f, T* l,
   delegate.set_base(aligned_f.get());
 
   idx_t wide_i = eve_extra::iota(eve::as_<idx_t>{});
-  const idx_t wide_step{Traits::chunk_size()};
 
   if (aligned_f != aligned_l) {
     if (delegate.small_step(aligned_f, wide_i, ignore_first)) return delegate;
 
     ignore_first = eve_extra::ignore_first_n{0};
     aligned_f += Traits::chunk_size();
-    wide_i += wide_step;
+    wide_i += _iteration_indexed_guarded::wide_step<Traits>();
 
     StopReason stop = _iteration_indexed_guarded::main_loop<Traits>(
-        aligned_f, aligned_l, wide_i, wide_step, delegate);
+        aligned_f, aligned_l, wide_i, delegate);
 
     if (stop == StopReason::Terminated || aligned_l.get() == l) return delegate;
   }

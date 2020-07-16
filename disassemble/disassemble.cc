@@ -7,6 +7,6 @@
 #include "unsq_eve/transform.h"
 
 using T = int;
-using traits = unsq_eve::algorithm_traits<T, 256, 1>;
+using traits = unsq_eve::algorithm_traits<T, 256, 4>;
 
 T* min_element(T* f, T* l) { return unsq_eve::min_element<traits>(f, l); }
