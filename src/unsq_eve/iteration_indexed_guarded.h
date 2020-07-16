@@ -66,16 +66,18 @@ main_loop(Ptr& aligned_f, Ptr aligned_l, wide_index_t<Traits>& wide_i,
           Delegate& delegate) requires(Traits::unroll() == 1) {
   std::ptrdiff_t n = max_idx<Traits>() - Traits::chunk_size();
 
+  const auto step = wide_step<Traits>();
+
   while (aligned_f != aligned_l) {
     n = std::min(n, aligned_l.get() - aligned_f.get());
-    n /= Traits::chunk_size();
+    auto* end = aligned_f.get() + n;
 
-    while (n--) {
+    while (aligned_f.get() < end) {
       if (delegate.small_step(aligned_f, indx_c<0>{}, wide_i,
                               eve_extra::ignore_nothing{})) {
         return StopReason::Terminated;
       }
-      wide_i += wide_step<Traits>();
+      wide_i += step;
       aligned_f += Traits::chunk_size();
     }
 
