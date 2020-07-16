@@ -59,8 +59,8 @@ struct min_body {
   void set_base(I _base) { base = _base; }
 
   template <typename Ptr, std::size_t reg_idx, typename Ignore>
-  EVE_FORCEINLINE bool step(Ptr from, indx_c<reg_idx>, wide_idx wide_i,
-                            Ignore ignore) {
+  EVE_FORCEINLINE bool small_step(Ptr from, indx_c<reg_idx>, wide_idx wide_i,
+                                  Ignore ignore) {
     wide_read read;
 
     if constexpr (std::is_same_v<Ignore, eve_extra::ignore_nothing>) {
@@ -78,11 +78,6 @@ struct min_body {
     regs[reg_idx] = mins;
 
     return false;
-  }
-
-  template <typename Ptr, typename Ignore>
-  EVE_FORCEINLINE bool small_step(Ptr from, wide_idx wide_i, Ignore ignore) {
-    return step(from, indx_c<0>{}, wide_i, ignore);
   }
 
   EVE_FORCEINLINE void index_overflow() {
@@ -111,7 +106,7 @@ struct min_body {
   template <typename Ptr, std::size_t reg_idx>
   EVE_FORCEINLINE bool big_step(Ptr ptr, indx_c<reg_idx> reg_i,
                                 wide_idx wide_i) {
-    return step(ptr, reg_i, wide_i, eve_extra::ignore_nothing{});
+    return small_step(ptr, reg_i, wide_i, eve_extra::ignore_nothing{});
   }
 
   template <typename Ptr>

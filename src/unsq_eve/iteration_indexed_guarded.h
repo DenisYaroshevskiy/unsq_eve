@@ -71,7 +71,8 @@ main_loop(Ptr& aligned_f, Ptr aligned_l, wide_index_t<Traits>& wide_i,
     n /= Traits::chunk_size();
 
     while (n--) {
-      if (delegate.small_step(aligned_f, wide_i, eve_extra::ignore_nothing{})) {
+      if (delegate.small_step(aligned_f, indx_c<0>{}, wide_i,
+                              eve_extra::ignore_nothing{})) {
         return StopReason::Terminated;
       }
       wide_i += wide_step<Traits>();
@@ -135,10 +136,11 @@ EVE_FORCEINLINE StopReason main_loop(Ptr& aligned_f, Ptr aligned_l,
                 max_idx<Traits>());
 
   while (true) {  // To the beginning at most twice
-    StopReason res = unroll<Traits::unroll()>([&](auto) mutable {
+    StopReason res = unroll<Traits::unroll()>([&](auto reg_idx) mutable {
       if (aligned_f.get() == aligned_l.get()) return StopReason::EndReached;
 
-      if (delegate.small_step(aligned_f, wide_i, eve_extra::ignore_nothing{}))
+      if (delegate.small_step(aligned_f, reg_idx, wide_i,
+                              eve_extra::ignore_nothing{}))
         return StopReason::Terminated;
 
       aligned_f += Traits::chunk_size();
@@ -172,7 +174,8 @@ EVE_FORCEINLINE Delegate iteration_indexed_aligned(T* f, T* l,
   idx_t wide_i = eve_extra::iota(eve::as_<idx_t>{});
 
   if (aligned_f != aligned_l) {
-    if (delegate.small_step(aligned_f, wide_i, ignore_first)) return delegate;
+    if (delegate.small_step(aligned_f, indx_c<0>{}, wide_i, ignore_first))
+      return delegate;
 
     ignore_first = eve_extra::ignore_first_n{0};
     aligned_f += Traits::chunk_size();
@@ -187,7 +190,7 @@ EVE_FORCEINLINE Delegate iteration_indexed_aligned(T* f, T* l,
   const std::ptrdiff_t last_offset = aligned_l.get() + Traits::chunk_size() - l;
 
   eve_extra::ignore_last_n ignore_last{static_cast<std::size_t>(last_offset)};
-  delegate.small_step(aligned_l, wide_i,
+  delegate.small_step(aligned_l, indx_c<0>{}, wide_i,
                       eve_extra::combine(ignore_first, ignore_last));
   return delegate;
 }
