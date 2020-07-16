@@ -56,12 +56,22 @@ concept wide_map_binary =
   ->eve_extra::eve_wide;
 };
 
+template <typename Op, typename Wide>
+concept wide_selection =
+    eve_extra::eve_wide<Wide>&& requires(Op&& op, const Wide& wide) {
+  { op(wide, wide) }
+  ->std::same_as<Wide>;
+};
+
 template <typename Op, typename Traits, typename I>
 concept wide_predicate_for = wide_predicate<Op, wide_for<Traits, I>>;
 
 template <typename Op, typename Traits, typename I>
 concept wide_map_unary_for =
     wide_map_unary<Op, eve::wide<value_type<I>, width_t<Traits>>>;
+
+template <typename Op, typename ATraits>
+concept wide_selection_for = wide_selection<Op, typename ATraits::wide>;
 
 template <typename I>
 concept contigious_iterator =
