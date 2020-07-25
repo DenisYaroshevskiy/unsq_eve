@@ -18,6 +18,8 @@ add_executable(tests)
 
 target_sources(tests PRIVATE
                eve_extra/any.t.cc
+               eve_extra/compress_mask.t.cc
+               eve_extra/compress_store.t.cc
                eve_extra/concepts.t.cc
                eve_extra/eve_extra.t.cc
                eve_extra/first_true_array.t.cc
@@ -34,6 +36,7 @@ target_sources(tests PRIVATE
                unsq_eve/inclusive_scan_inplace.t.cc
                unsq_eve/min_element.t.cc
                unsq_eve/reduce.t.cc
+               unsq_eve/remove.t.cc
                unsq_eve/transform_inplace.t.cc
                unsq_eve/transform_reduce.types.t.cc
                unsq_eve/unroll.t.cc

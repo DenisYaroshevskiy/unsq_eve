@@ -40,6 +40,8 @@ struct inplace_body {
 
   inplace_body(Op op, T zero) : op(op), zeroes(zero), running_sum(zeroes) {}
 
+  void set_base(I) {}
+
   template <typename Ptr, std::size_t idx, typename Ignore>
   bool small_step(Ptr ptr, indx_c<idx>, Ignore ignore) {
     wide_read read;
@@ -84,7 +86,7 @@ struct inplace_body {
 template <typename Traits, contigious_iterator I, typename Op>
 EVE_FORCEINLINE void inclusive_scan_inplace(I _f, I _l, Op op,
                                             const value_type<I>& zero) {
-  _inclusive_scan::inplace_body<Traits, I, Op> body{op, zero};
+  _inclusive_scan::inplace_body<Traits, Pointer<I>, Op> body{op, zero};
 
   auto [f, l] = drill_down_range(_f, _l);
 

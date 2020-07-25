@@ -42,7 +42,7 @@ TEMPLATE_TEST_CASE("eve_extra.reduce_wide", "[eve_extra]", ALL_TEST_PACKS) {
 
       Wide actual = eve_extra::reduce_wide(
           input, [](const Wide& x, const Wide& y) { return x + y; });
-      REQUIRE(expected == actual[0]);
+      REQUIRE(eve::all(Wide{expected} == actual));
     }
 
     // min
@@ -52,7 +52,7 @@ TEMPLATE_TEST_CASE("eve_extra.reduce_wide", "[eve_extra]", ALL_TEST_PACKS) {
       Wide actual = eve_extra::reduce_wide(
           input, [](const Wide& x, const Wide& y) { return eve::min(x, y); });
 
-      REQUIRE(expected == actual[0]);
+      REQUIRE(eve::all(Wide{expected} == actual[0]));
     }
   };
 

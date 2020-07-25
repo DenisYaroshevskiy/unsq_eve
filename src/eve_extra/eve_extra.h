@@ -23,6 +23,7 @@
 #include <eve/function/load.hpp>
 #include <eve/memory/align.hpp>
 
+#include "eve_extra/compress_store.h"
 #include "eve_extra/concepts.h"
 #include "eve_extra/constants.h"
 #include "eve_extra/first_true.h"

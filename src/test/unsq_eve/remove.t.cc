@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "unsq_eve/transform.h"
+#include "unsq_eve/remove.h"
 
 #include <ostream>
 
@@ -47,43 +47,68 @@ void specific_tests(Alg alg) {
   // vector
   {
     std::vector<T> v(13u, T(1));
-    std::vector<T> expected(13u, T(2));
+    std::vector<T> expected(10u, T(1));
+    v[5u] = T(2);
+    v[7u] = T(2);
+    v[11u] = T(2);
 
-    alg(Variation{}, v.begin(), v.end());
+    v.erase(alg(Variation{}, v.begin(), v.end(), 2), v.end());
     REQUIRE(expected == v);
   }
 }
 
 template <typename Variation, typename Alg>
-void common_transform_test_impl(Alg alg) {
+void common_remove_test_impl(Alg alg) {
   INFO("" << Variation{});
   specific_tests<Variation>(alg);
+
   using T = typename Variation::type;
-  std::vector<T, eve::aligned_allocator<T, 4096>> page(4096 / sizeof(T), T{1});
+  std::vector<T, eve::aligned_allocator<T, 4096>> page(4096 / sizeof(T), T{0});
 
   // 50 from the beginning
   auto* f = page.data();
   auto* l = f + 50;
-  auto* page_end = f + page.size();
 
-  auto run = [&] {
+  auto prepopulate = [&](auto it) {
+    std::fill(it, l, 0);
+
+    std::ptrdiff_t count = 0;
+
+    while (it + 1 < l) {
+      *it = 1;
+      ++count;
+      it += 2;
+    }
+
+    return count;
+  };
+
+  auto run = [&]() {
     for (auto* it = f; it < l; ++it) {
       INFO("length: " << (l - f) << " from the beginning: " << it - f);
+      std::ptrdiff_t count = prepopulate(it);
+      auto end = alg(Variation{}, it, l, 0);
+      REQUIRE(count == end - it);
 
-      std::vector<T> expected(static_cast<std::size_t>(l - it), T(2));
-      alg(Variation{}, it, l);
+      std::vector<T> expected_prefix = std::vector<T>(it - f, 0);
+      REQUIRE(expected_prefix == std::vector<T>(f, it));
 
-      if (it != f) REQUIRE(*f == T(1));
-      if (l != page_end) REQUIRE(*l == T(1));
+      std::vector<T> expected_suffix = std::vector<T>(count, 1);
+      REQUIRE(expected_suffix == std::vector<T>(it, end));
 
-      REQUIRE(expected == std::vector<T>(it, l));
-      std::fill(it, l, 1);
+      *it = 0;
+
+      if (l - page.data() != static_cast<std::ptrdiff_t>(page.size())) {
+        REQUIRE(*l == T{0});
+      }
     }
   };
 
   while (f < l) {
     run();
+    *l = 0;
     --l;
+    *f = 0;
     ++f;
   }
 
@@ -93,41 +118,42 @@ void common_transform_test_impl(Alg alg) {
 
   while (f < l) {
     run();
+    *l = 0;
     --l;
+    *f = 0;
     ++f;
   }
 }
 
 template <typename T, typename Alg>
-void common_transform_test_traits_combinations(Alg alg) {
-  common_transform_test_impl<variation<T, 16, 1>>(alg);
-  common_transform_test_impl<variation<T, 16, 2>>(alg);
-  common_transform_test_impl<variation<T, 16, 4>>(alg);
-  common_transform_test_impl<variation<T, 32, 1>>(alg);
-  common_transform_test_impl<variation<T, 32, 2>>(alg);
-  common_transform_test_impl<variation<T, 32, 4>>(alg);
+void common_remove_test_traits_combinations(Alg alg) {
+  common_remove_test_impl<variation<T, 16, 1>>(alg);
+  common_remove_test_impl<variation<T, 16, 2>>(alg);
+  common_remove_test_impl<variation<T, 16, 4>>(alg);
+  common_remove_test_impl<variation<T, 32, 1>>(alg);
+  common_remove_test_impl<variation<T, 32, 2>>(alg);
+  common_remove_test_impl<variation<T, 32, 4>>(alg);
 }
 
 template <typename T, typename Alg>
-void common_transform_test_min_combinations(Alg alg) {
-  common_transform_test_impl<variation<T, 32, 4>>(alg);
+void common_remove_test_min_combinations(Alg alg) {
+  common_remove_test_impl<variation<T, 32, 4>>(alg);
 }
 
 template <typename Alg>
-void common_transform_test(Alg alg) {
-  common_transform_test_traits_combinations<std::int8_t>(alg);
-  common_transform_test_min_combinations<std::int16_t>(alg);
-  common_transform_test_traits_combinations<std::int32_t>(alg);
-  common_transform_test_min_combinations<std::int64_t>(alg);
-  common_transform_test_min_combinations<float>(alg);
-  common_transform_test_min_combinations<double>(alg);
+void common_remove_test(Alg alg) {
+  common_remove_test_traits_combinations<std::int8_t>(alg);
+  common_remove_test_min_combinations<std::int16_t>(alg);
+  common_remove_test_traits_combinations<std::int32_t>(alg);
+  common_remove_test_min_combinations<std::int64_t>(alg);
+  common_remove_test_min_combinations<float>(alg);
+  common_remove_test_min_combinations<double>(alg);
 }
 
-TEST_CASE("unsq_eve.transform_inplace_basic", "[unsq_eve]") {
-  common_transform_test([](auto variation, auto f, auto l) {
+TEST_CASE("unsq_eve.remove", "[unsq_eve]") {
+  common_remove_test([](auto variation, auto f, auto l, auto x) {
     using traits = typename decltype(variation)::traits;
-    using wide = typename traits::wide;
-    unsq_eve::transform<traits>(f, l, [](wide x) { return x + x; });
+    return unsq_eve::remove<traits>(f, l, x);
   });
 }
 

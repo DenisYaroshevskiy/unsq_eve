@@ -44,6 +44,8 @@ struct unary_body {
     regs.fill(zeroes);
   }
 
+  void set_base(I) {}
+
   template <typename Ptr, std::size_t idx, typename Ignore>
   bool small_step(Ptr from, indx_c<idx>, Ignore ignore) {
     wide_read read;
@@ -95,9 +97,10 @@ EVE_FORCEINLINE typename Traits::type transform_reduce(I _f, I _l,
                                                        Map map) {
   static_assert(sizeof(typename Traits::type) >= sizeof(T));
 
-  _transform_reduce::unary_body<Traits, I, Reduction, Map> body(map, reduce,
-                                                                zero);
   auto [f, l] = drill_down_range(_f, _l);
+
+  _transform_reduce::unary_body<Traits, Pointer<I>, Reduction, Map> body(
+      map, reduce, zero);
 
   return iteration_aligned<iteration_traits_t<Traits>>(f, l, body)
       .final_reduction();

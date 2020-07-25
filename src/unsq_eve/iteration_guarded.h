@@ -94,6 +94,8 @@ EVE_FORCEINLINE Delegate iteration_aligned(T* f, T* l, Delegate delegate) {
   auto aligned_f = Traits::previous_aligned_address(f);
   auto aligned_l = Traits::previous_aligned_address(l);
 
+  delegate.set_base(aligned_f.get());
+
   eve_extra::ignore_first_n ignore_first{
       static_cast<std::size_t>(f - aligned_f.get())};
 

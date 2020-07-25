@@ -43,6 +43,8 @@ struct any_body {
 
   explicit any_body(PV p) : p(p) {}
 
+  void set_base(StrippedI) {}
+
   template <typename Ptr, std::size_t idx, typename Ignore>
   bool small_step(Ptr ptr, indx_c<idx>, Ignore ignore) {
     if constexpr (std::is_same_v<Ignore, eve_extra::ignore_nothing>) {
@@ -86,8 +88,7 @@ struct any_body {
 
 }  // namespace _all_any_none
 
-template <typename Traits, contigious_iterator I,
-          wide_predicate_for<Traits, I> PV>
+template <typename Traits, contigious_iterator I, wide_predicate_for<Traits> PV>
 EVE_FORCEINLINE bool any_of(I _f, I _l, PV p) {
   auto [f, l] = drill_down_range(_f, _l);
 

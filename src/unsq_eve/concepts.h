@@ -63,8 +63,8 @@ concept wide_selection =
   ->std::same_as<Wide>;
 };
 
-template <typename Op, typename Traits, typename I>
-concept wide_predicate_for = wide_predicate<Op, wide_for<Traits, I>>;
+template <typename Op, typename ATraits>
+concept wide_predicate_for = wide_predicate<Op, typename ATraits::wide>;
 
 template <typename Op, typename Traits, typename I>
 concept wide_map_unary_for =

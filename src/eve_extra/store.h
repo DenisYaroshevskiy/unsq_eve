@@ -32,37 +32,6 @@
 namespace eve_extra {
 namespace _store {
 
-template <typename T, typename Mask, typename Register>
-void maskstore(T* to, Mask mask, Register reg) requires(std::integral<T> &&
-                                                        sizeof(T) >= 4 &&
-                                                        sizeof(T) <= 8) {
-  static_assert(sizeof(Mask) == sizeof(Register));
-
-  if constexpr (sizeof(T) == 4 && sizeof(Register) == 16)
-    _mm_maskstore_epi32(reinterpret_cast<std::int32_t*>(to), mask, reg);
-  if constexpr (sizeof(T) == 4 && sizeof(Register) == 32)
-    _mm256_maskstore_epi32(reinterpret_cast<std::int32_t*>(to), mask, reg);
-  if constexpr (sizeof(T) == 8 && sizeof(Register) == 16)
-    _mm_maskstore_epi64(reinterpret_cast<long long*>(to), mask, reg);
-  if constexpr (sizeof(T) == 8 && sizeof(Register) == 32)
-    _mm256_maskstore_epi64(reinterpret_cast<long long*>(to), mask, reg);
-}
-
-template <typename T, typename Mask, typename Register>
-void maskstore(T* to, Mask mask,
-               Register reg) requires(std::floating_point<T>) {
-  static_assert(sizeof(Mask) == sizeof(Register));
-
-  if constexpr (std::is_same_v<T, float> && sizeof(Register) == 16)
-    _mm_maskstore_ps(to, mask, reg);
-  if constexpr (std::is_same_v<T, float> && sizeof(Register) == 32)
-    _mm256_maskstore_ps(to, mask, reg);
-  if constexpr (std::is_same_v<T, double> && sizeof(Register) == 16)
-    _mm_maskstore_pd(to, mask, reg);
-  if constexpr (std::is_same_v<T, double> && sizeof(Register) == 32)
-    _mm256_maskstore_pd(to, mask, reg);
-}
-
 template <typename T, std::size_t A>
 T* raw_pointer(eve::aligned_ptr<T, A> ptr) {
   return ptr.get();
@@ -90,7 +59,7 @@ void store(const Wide& wide, Ptr ptr, Ignore ignore) {
     const auto mask = ignore_broadcast<eve::logical<Wide>>(ignore).storage();
     const auto reg = wide.storage();
 
-    _store::maskstore(raw_ptr, mask, reg);
+    mm::maskstore(raw_ptr, mask, reg);
     return;
   }
 
@@ -106,6 +75,8 @@ void store(const Wide& wide, Ptr ptr, Ignore ignore) {
     n -= ignore.first_n + ignore.last_n;
   }
 
+  // memcpy requires not null for pointers - this is the easiest check
+  if (!n) return;
   std::memcpy(raw_ptr + start, &wide[start], n * sizeof(T));
 }
 

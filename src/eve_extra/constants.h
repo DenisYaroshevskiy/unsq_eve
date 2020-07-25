@@ -20,23 +20,11 @@
 #include <eve/eve.hpp>
 
 namespace eve_extra {
-namespace _constants {
-
-template <typename T, std::size_t N>
-constexpr auto iota = [] {
-  std::array<T, N> res = {};
-  for (T i = 0; i < static_cast<T>(N); ++i) {
-    res[i] = i;
-  }
-  return res;
-}();
-
-}  // namespace _constants
 
 // Should dissapear
 template <typename T, typename N, typename ABI>
 auto iota(const eve::as_<eve::wide<T, N, ABI>>&) {
-  return eve::wide<T, N, ABI>{_constants::iota<T, N{}()>.begin()};
+  return eve::wide<T, N, ABI>([](int i, int) { return i; });
 }
 
 }  // namespace eve_extra

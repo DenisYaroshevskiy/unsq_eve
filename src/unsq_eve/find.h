@@ -44,6 +44,8 @@ struct body {
 
   body(PV p, StrippedI found) : p(p), found(found) {}
 
+  void set_base(StrippedI) {}
+
   template <typename Ptr, std::size_t idx, typename Ignore>
   bool small_step(Ptr from, indx_c<idx>, Ignore ignore) {
     // For unguarded we never know if we are complete in the data
@@ -91,8 +93,7 @@ struct body {
 
 }  // namespace _find
 
-template <typename Traits, contigious_iterator I,
-          wide_predicate_for<Traits, I> PV>
+template <typename Traits, contigious_iterator I, wide_predicate_for<Traits> PV>
 EVE_FORCEINLINE I find_if(I _f, I _l, PV p) {
   auto [f, l] = drill_down_range(_f, _l);
 
@@ -108,8 +109,7 @@ EVE_FORCEINLINE I find(I f, I l, const T& x) {
   return unsq_eve::find_if<Traits>(f, l, equal_to<Traits, I>(x));
 }
 
-template <typename Traits, contigious_iterator I,
-          wide_predicate_for<Traits, I> PV>
+template <typename Traits, contigious_iterator I, wide_predicate_for<Traits> PV>
 EVE_FORCEINLINE I find_if_unguarded(I _f, PV p) {
   auto* f = drill_down(_f);
 

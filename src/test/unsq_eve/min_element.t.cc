@@ -70,9 +70,12 @@ void common_min_test_impl(Alg alg) {
   using T = typename Variation::type;
   std::vector<T, eve::aligned_allocator<T, 4096>> page(4096 / sizeof(T), T{1});
 
-  // 300 from the beginning
+  // 300 from the beginning for chars
+
+  std::ptrdiff_t n = std::is_same_v<T, char> ? 300 : 50;
+
   auto* f = page.data();
-  auto* l = f + 300;
+  auto* l = f + n;
 
   auto run = [&]() {
     typename Variation::traits traits{};
@@ -96,8 +99,8 @@ void common_min_test_impl(Alg alg) {
     ++f;
   }
 
-  // 300 from the end
-  f = page.data() + page.size() - 300;
+  // n from the end
+  f = page.data() + page.size() - n;
   l = page.data() + page.size() - 1;
 
   while (f < l) {

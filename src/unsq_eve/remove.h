@@ -14,34 +14,40 @@
  * limitations under the License.
  */
 
-#ifndef UNSQ_EVE_TRANSFORM_H_
-#define UNSQ_EVE_TRANSFORM_H_
+#ifndef UNSQ_EVE_REMOVE_H_
+#define UNSQ_EVE_REMOVE_H_
 
 #include <eve/function/convert.hpp>
 
 #include "eve_extra/eve_extra.h"
 #include "unsq_eve/concepts.h"
 #include "unsq_eve/iteration_guarded.h"
+#include "unsq_eve/predicate_helpers.h"
+
+#include <iostream>
 
 namespace unsq_eve {
-namespace _transform {
+namespace _remove {
 
-template <typename Traits, typename I, typename Op>
-struct inplace_body {
+template <typename Traits, typename I, typename PV>
+struct body {
   using T = typename Traits::type;
   using wide_read = eve::wide<value_type<I>, width_t<Traits>>;
   using wide = typename Traits::wide;
+  using logical_wide = eve::logical<wide>;
+  using logical_wide_read = eve::logical<wide_read>;
 
-  Op op;
+  PV p;
 
+  I out;
   std::array<wide, Traits::unroll()> regs;
 
-  explicit inplace_body(Op op) : op(op) {}
+  explicit body(PV p) : p(p) {}
 
-  void set_base(I) {}
+  void set_base(I base) { out = base; }
 
   template <typename Ptr, std::size_t idx, typename Ignore>
-  bool small_step(Ptr ptr, indx_c<idx>, Ignore ignore) {
+  EVE_FORCEINLINE bool small_step(Ptr ptr, indx_c<idx>, Ignore ignore) {
     wide_read read;
 
     if constexpr (std::is_same_v<Ignore, eve_extra::ignore_nothing>) {
@@ -51,9 +57,12 @@ struct inplace_body {
     }
 
     wide xs = eve::convert(read, eve::as_<T>{});
-    wide transfromed = op(xs);
-    wide_read ys = eve::convert(transfromed, eve::as_<value_type<I>>{});
-    eve_extra::store(ys, ptr, ignore);
+    const eve::logical<wide> mask = p(xs);
+    const eve::logical<wide_read> read_mask =
+        eve::convert(mask, eve::as_<typename logical_wide_read::value_type>{});
+
+    out = eve_extra::compress_store_unsafe(read, out, !read_mask, ignore);
+
     return false;
   }
 
@@ -62,42 +71,40 @@ struct inplace_body {
   template <typename Ptr>
   void start_big_step(Ptr) {}
 
-  template <typename Ptr, std::size_t idx>
-  bool big_step(Ptr ptr, indx_c<idx>) {
-    regs[idx] = eve::convert(wide_read{ptr}, eve::as_<T>{});
-    return false;
+  template <typename Ptr, std::size_t _idx>
+  EVE_FORCEINLINE bool big_step(Ptr ptr, indx_c<_idx> idx) {
+    return small_step(ptr, idx, eve_extra::ignore_nothing{});
   }
 
   template <typename Ptr>
-  bool complete_big_step(Ptr ptr) {
-    for (auto& reg : regs) {
-      reg = op(reg);
-    }
-
-    for (Ptr it = ptr; auto& reg : regs) {
-      wide_read ys = eve::convert(reg, eve::as_<value_type<I>>{});
-      eve::store(ys, it);
-      it += wide_read::static_size;
-    }
-
+  bool complete_big_step(Ptr) {
     return false;
   }
 
   void after_big_steps() {}
 };
 
-}  // namespace _transform
+}  // namespace _remove
+
+template <typename Traits, contigious_iterator I, wide_predicate_for<Traits> PV>
+EVE_FORCEINLINE I remove_if(I _f, I _l, PV p) {
+  if (_f == _l) return _f;
+
+  auto [f, l] = drill_down_range(_f, _l);
+
+  _remove::body<Traits, Pointer<I>, PV> body{p};
+  Pointer<I> out =
+      iteration_aligned<iteration_traits_t<Traits>>(f, l, body).out;
+
+  return undo_drill_down(_f, out);
+}
 
 template <typename Traits, contigious_iterator I,
-          wide_map_unary<typename Traits::wide> Op>
-EVE_FORCEINLINE void transform(I _f, I _l, Op op) {
-  if (_f == _l) return;
-
-  _transform::inplace_body<Traits, Pointer<I>, Op> body{op};
-  auto [f, l] = drill_down_range(_f, _l);
-  iteration_aligned<iteration_traits_t<Traits>>(f, l, body);
+          std::convertible_to<value_type<I>> T>
+EVE_FORCEINLINE I remove(I f, I l, const T& x) {
+  return unsq_eve::remove_if<Traits>(f, l, equal_to<Traits, I>(x));
 }
 
 }  // namespace unsq_eve
 
-#endif  // UNSQ_EVE_TRANSFORM_H_
+#endif  // UNSQ_EVE_REMOVE_H_
