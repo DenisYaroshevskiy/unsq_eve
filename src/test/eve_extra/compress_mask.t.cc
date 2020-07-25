@@ -43,7 +43,7 @@ TEMPLATE_TEST_CASE("simd.pack.compress_mask", "[simd]",
   logical mask{false};
 
   auto run_compress = [&] {
-    std::uint32_t mmask = movemask(mask);
+    std::uint32_t mmask = extended_movemask(mask);
     if constexpr (sizeof(wide) == 16) {
       return compress_mask_for_shuffle_epi8<scalar>(mmask);
     } else {

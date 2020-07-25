@@ -19,35 +19,24 @@
 #include "test/catch.h"
 #include "test/eve_extra/common.h"
 
+namespace eve_extra {
 namespace {
 
-TEMPLATE_TEST_CASE("eve_extra.first_true_array", "[eve_extra]",
-                   (eve::wide<std::int8_t, eve::fixed<16>>)) {
+TEMPLATE_TEST_CASE("eve_extra.mmask_operations", "[eve_extra]",
+                   ALL_TEST_PACKS) {
   using wide = TestType;
-  using logical = eve::logical<wide>;
+  using scalar = typename wide::value_type;
+  constexpr std::ptrdiff_t size = wide::static_size;
 
-  auto run = [&](auto test) {
-    wide x{0}, y{1};
+  wide x{scalar(1)}, y{scalar(2)};
 
-    test.fill(x == y);
+  REQUIRE(0 == extended_movemask(x == y));
+  REQUIRE(set_lower_n_bits(size * sizeof(scalar)) == extended_movemask(x != y));
 
-    using namespace eve_extra;
-    REQUIRE(!first_true_array(test));
-
-    x[1] = 1;
-
-    for (std::size_t i = 0; i != test.size(); ++i) {
-      test[i] = (x == y);
-      std::uint32_t expected = (wide::static_size * i) + 1;
-      REQUIRE(first_true_array(test));
-      REQUIRE(*first_true_array(test) == expected);
-      test[i] = (x != x);
-    }
-  };
-
-  run(std::array<logical, 1>{});
-  run(std::array<logical, 2>{});
-  run(std::array<logical, 4>{});
+  REQUIRE(0 == extended_movemask(eve::if_not_(x != y)));
+  REQUIRE(set_lower_n_bits(size * sizeof(scalar)) ==
+          extended_movemask(eve::if_not_(x == y)));
 }
 
 }  // namespace
+}  // namespace eve_extra

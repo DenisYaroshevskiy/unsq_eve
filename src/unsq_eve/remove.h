@@ -17,6 +17,7 @@
 #ifndef UNSQ_EVE_REMOVE_H_
 #define UNSQ_EVE_REMOVE_H_
 
+#include <eve/conditional.hpp>
 #include <eve/function/convert.hpp>
 
 #include "eve_extra/eve_extra.h"
@@ -61,7 +62,8 @@ struct body {
     const eve::logical<wide_read> read_mask =
         eve::convert(mask, eve::as_<typename logical_wide_read::value_type>{});
 
-    out = eve_extra::compress_store_unsafe(read, out, !read_mask, ignore);
+    out = eve_extra::compress_store_unsafe(read, out, eve::if_not_(read_mask),
+                                           ignore);
 
     return false;
   }

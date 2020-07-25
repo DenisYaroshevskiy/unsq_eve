@@ -20,6 +20,7 @@
 #include <immintrin.h>
 #include <array>
 
+#include <eve/conditional.hpp>
 #include <eve/eve.hpp>
 
 #include "eve_extra/compress_mask.h"
@@ -66,11 +67,11 @@ T* compress_store_impl(Reg reg, T* out,
 }  // namespace _compress_store
 
 template <native_wide Wide, std::same_as<typename Wide::value_type> T,
-          typename Ignore>
-T* compress_store_precise(const Wide& wide, T* out,
-                          const eve::logical<Wide>& wide_mask, Ignore ignore) {
+          extended_logical Mask, typename Ignore>
+T* compress_store_precise(const Wide& wide, T* out, const Mask& wide_mask,
+                          Ignore ignore) {
   const auto reg = mm::cast_to_integral(wide.storage());
-  std::uint32_t mmask = movemask(wide_mask.storage());
+  std::uint32_t mmask = extended_movemask(wide_mask);
   mmask = clear_ingored<eve::logical<Wide>>(mmask, ignore);
 
   if constexpr (std::same_as<Ignore, ignore_first_n>) {
@@ -90,14 +91,14 @@ T* compress_store_precise(const Wide& wide, T* out,
 }
 
 template <native_wide Wide, std::same_as<typename Wide::value_type> T,
-          typename Ignore>
-T* compress_store_unsafe(const Wide& wide, T* out,
-                         const eve::logical<Wide>& wide_mask, Ignore ignore) {
+          extended_logical Mask, typename Ignore>
+T* compress_store_unsafe(const Wide& wide, T* out, const Mask& wide_mask,
+                         Ignore ignore) {
   if constexpr (!std::same_as<Ignore, ignore_nothing>) {
     return compress_store_precise(wide, out, wide_mask, ignore);
   } else {
     const auto reg = mm::cast_to_integral(wide.storage());
-    const std::uint32_t mmask = movemask(wide_mask.storage());
+    const std::uint32_t mmask = extended_movemask(wide_mask);
 
     return _compress_store::compress_store_impl(reg, out, mmask);
   }

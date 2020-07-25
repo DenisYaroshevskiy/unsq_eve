@@ -24,6 +24,7 @@ target_sources(tests PRIVATE
                eve_extra/eve_extra.t.cc
                eve_extra/first_true_array.t.cc
                eve_extra/first_true.t.cc
+               eve_extra/mmask_operations.t.cc
                eve_extra/reduce_wide.t.cc
                eve_extra/replace_ignored.t.cc
                eve_extra/scan_wide.t.cc

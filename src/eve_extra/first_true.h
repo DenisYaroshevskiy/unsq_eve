@@ -76,7 +76,7 @@ std::array<std::uint32_t, N> move_masks(const std::array<Logical, N>& regs) {
   std::array<std::uint32_t, N> mmasks;
 
   std::transform(regs.begin(), regs.end(), mmasks.begin(),
-                 [](auto reg) { return movemask(reg.bits()); });
+                 [](auto reg) { return extended_movemask(reg); });
 
   return mmasks;
 }
@@ -92,14 +92,14 @@ std::uint32_t first_true_pos(std::uint32_t offset, std::uint32_t mmask) {
 
 template <eve_logical Logical, typename Ignore>
 bool any(const Logical& vbool, Ignore ignore) {
-  std::uint32_t mmask = eve_extra::movemask(vbool.bits());
+  std::uint32_t mmask = extended_movemask(vbool);
   mmask = eve_extra::clear_ingored<Logical>(mmask, ignore);
   return mmask;
 }
 
 template <eve_logical Logical, typename Ignore>
 std::optional<std::size_t> first_true(Logical logical, Ignore ignore) {
-  std::uint32_t mmask = eve_extra::movemask(logical.bits());
+  std::uint32_t mmask = extended_movemask(logical);
   mmask = eve_extra::clear_ingored<Logical>(mmask, ignore);
 
   if (!mmask) return {};

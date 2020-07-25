@@ -52,12 +52,11 @@ _Z9remove_0sPiS_:                       # @_Z9remove_0sPiS_
 	cmp	r14, r8
 	je	.LBB0_2
 # %bb.3:
-	vmovdqa	ymm2, ymmword ptr [r14]
+	vmovdqa	ymm1, ymmword ptr [r14]
 	vpbroadcastd	ymm0, dword ptr [rip + .LCPI0_0] # ymm0 = [1,1,1,1,1,1,1,1]
-	vpcmpeqd	ymm3, ymm2, ymm0
-	vpcmpeqd	ymm1, ymm1, ymm1
-	vpcmpgtb	ymm3, ymm3, ymm1
-	vpmovmskb	ecx, ymm3
+	vpcmpeqd	ymm2, ymm1, ymm0
+	vpmovmskb	ecx, ymm2
+	not	ecx
 	and	al, 28
 	shrx	ecx, ecx, eax
 	shlx	ecx, ecx, eax
@@ -66,16 +65,16 @@ _Z9remove_0sPiS_:                       # @_Z9remove_0sPiS_
 	lea	rdx, [rdx + 2*rdx]
 	popcnt	ecx, ecx
 	pext	rdx, r10, rdx
-	vmovq	xmm3, rdx
-	vpmovzxbd	ymm3, xmm3      # ymm3 = xmm3[0],zero,zero,zero,xmm3[1],zero,zero,zero,xmm3[2],zero,zero,zero,xmm3[3],zero,zero,zero,xmm3[4],zero,zero,zero,xmm3[5],zero,zero,zero,xmm3[6],zero,zero,zero,xmm3[7],zero,zero,zero
+	vmovq	xmm2, rdx
+	vpmovzxbd	ymm2, xmm2      # ymm2 = xmm2[0],zero,zero,zero,xmm2[1],zero,zero,zero,xmm2[2],zero,zero,zero,xmm2[3],zero,zero,zero,xmm2[4],zero,zero,zero,xmm2[5],zero,zero,zero,xmm2[6],zero,zero,zero,xmm2[7],zero,zero,zero
 	and	ecx, -4
-	vpermd	ymm2, ymm3, ymm2
+	vpermd	ymm1, ymm2, ymm1
 	add	rax, rcx
 	shr	rcx, 2
-	vmovd	xmm3, ecx
-	vpbroadcastd	ymm3, xmm3
-	vpcmpgtd	ymm3, ymm3, ymmword ptr [rip + .LCPI0_1]
-	vpmaskmovd	ymmword ptr [r14 + 4*r9], ymm3, ymm2
+	vmovd	xmm2, ecx
+	vpbroadcastd	ymm2, xmm2
+	vpcmpgtd	ymm2, ymm2, ymmword ptr [rip + .LCPI0_1]
+	vpmaskmovd	ymmword ptr [r14 + 4*r9], ymm2, ymm1
 	add	r14, 32
 	.p2align	4, 0x90
 .LBB0_4:                                # =>This Loop Header: Depth=1
@@ -83,73 +82,73 @@ _Z9remove_0sPiS_:                       # @_Z9remove_0sPiS_
 	cmp	r14, r8
 	je	.LBB0_9
 # %bb.5:                                #   in Loop: Header=BB0_4 Depth=1
-	vmovdqa	ymm2, ymmword ptr [r14]
-	vpcmpeqd	ymm3, ymm2, ymm0
-	vpcmpgtb	ymm3, ymm3, ymm1
-	vpmovmskb	ecx, ymm3
+	vmovdqa	ymm1, ymmword ptr [r14]
+	vpcmpeqd	ymm2, ymm1, ymm0
+	vpmovmskb	ecx, ymm2
+	not	ecx
 	pdep	rdx, rcx, r11
 	lea	rdx, [rdx + 2*rdx]
 	popcnt	ecx, ecx
 	pext	rdx, r10, rdx
-	vmovq	xmm3, rdx
-	vpmovzxbd	ymm3, xmm3      # ymm3 = xmm3[0],zero,zero,zero,xmm3[1],zero,zero,zero,xmm3[2],zero,zero,zero,xmm3[3],zero,zero,zero,xmm3[4],zero,zero,zero,xmm3[5],zero,zero,zero,xmm3[6],zero,zero,zero,xmm3[7],zero,zero,zero
+	vmovq	xmm2, rdx
+	vpmovzxbd	ymm2, xmm2      # ymm2 = xmm2[0],zero,zero,zero,xmm2[1],zero,zero,zero,xmm2[2],zero,zero,zero,xmm2[3],zero,zero,zero,xmm2[4],zero,zero,zero,xmm2[5],zero,zero,zero,xmm2[6],zero,zero,zero,xmm2[7],zero,zero,zero
 	and	ecx, -4
-	vpermd	ymm2, ymm3, ymm2
-	vmovdqu	ymmword ptr [rax], ymm2
+	vpermd	ymm1, ymm2, ymm1
+	vmovdqu	ymmword ptr [rax], ymm1
 	add	rax, rcx
 	lea	rcx, [r14 + 32]
 	cmp	rcx, r8
 	je	.LBB0_9
 # %bb.6:                                #   in Loop: Header=BB0_4 Depth=1
-	vmovdqa	ymm2, ymmword ptr [r14 + 32]
-	vpcmpeqd	ymm3, ymm2, ymm0
-	vpcmpgtb	ymm3, ymm3, ymm1
-	vpmovmskb	ecx, ymm3
+	vmovdqa	ymm1, ymmword ptr [r14 + 32]
+	vpcmpeqd	ymm2, ymm1, ymm0
+	vpmovmskb	ecx, ymm2
+	not	ecx
 	pdep	rdx, rcx, r11
 	lea	rdx, [rdx + 2*rdx]
 	popcnt	ecx, ecx
 	pext	rdx, r10, rdx
-	vmovq	xmm3, rdx
-	vpmovzxbd	ymm3, xmm3      # ymm3 = xmm3[0],zero,zero,zero,xmm3[1],zero,zero,zero,xmm3[2],zero,zero,zero,xmm3[3],zero,zero,zero,xmm3[4],zero,zero,zero,xmm3[5],zero,zero,zero,xmm3[6],zero,zero,zero,xmm3[7],zero,zero,zero
+	vmovq	xmm2, rdx
+	vpmovzxbd	ymm2, xmm2      # ymm2 = xmm2[0],zero,zero,zero,xmm2[1],zero,zero,zero,xmm2[2],zero,zero,zero,xmm2[3],zero,zero,zero,xmm2[4],zero,zero,zero,xmm2[5],zero,zero,zero,xmm2[6],zero,zero,zero,xmm2[7],zero,zero,zero
 	and	ecx, -4
-	vpermd	ymm2, ymm3, ymm2
-	vmovdqu	ymmword ptr [rax], ymm2
+	vpermd	ymm1, ymm2, ymm1
+	vmovdqu	ymmword ptr [rax], ymm1
 	add	rax, rcx
 	lea	rcx, [r14 + 64]
 	cmp	rcx, r8
 	je	.LBB0_9
 # %bb.7:                                #   in Loop: Header=BB0_4 Depth=1
-	vmovdqa	ymm2, ymmword ptr [r14 + 64]
-	vpcmpeqd	ymm3, ymm2, ymm0
-	vpcmpgtb	ymm3, ymm3, ymm1
-	vpmovmskb	ecx, ymm3
+	vmovdqa	ymm1, ymmword ptr [r14 + 64]
+	vpcmpeqd	ymm2, ymm1, ymm0
+	vpmovmskb	ecx, ymm2
+	not	ecx
 	pdep	rdx, rcx, r11
 	lea	rdx, [rdx + 2*rdx]
 	popcnt	ecx, ecx
 	pext	rdx, r10, rdx
-	vmovq	xmm3, rdx
-	vpmovzxbd	ymm3, xmm3      # ymm3 = xmm3[0],zero,zero,zero,xmm3[1],zero,zero,zero,xmm3[2],zero,zero,zero,xmm3[3],zero,zero,zero,xmm3[4],zero,zero,zero,xmm3[5],zero,zero,zero,xmm3[6],zero,zero,zero,xmm3[7],zero,zero,zero
+	vmovq	xmm2, rdx
+	vpmovzxbd	ymm2, xmm2      # ymm2 = xmm2[0],zero,zero,zero,xmm2[1],zero,zero,zero,xmm2[2],zero,zero,zero,xmm2[3],zero,zero,zero,xmm2[4],zero,zero,zero,xmm2[5],zero,zero,zero,xmm2[6],zero,zero,zero,xmm2[7],zero,zero,zero
 	and	ecx, -4
-	vpermd	ymm2, ymm3, ymm2
-	vmovdqu	ymmword ptr [rax], ymm2
+	vpermd	ymm1, ymm2, ymm1
+	vmovdqu	ymmword ptr [rax], ymm1
 	add	rcx, rax
 	lea	rax, [r14 + 96]
 	cmp	rax, r8
 	je	.LBB0_8
 # %bb.13:                               #   in Loop: Header=BB0_4 Depth=1
-	vmovdqa	ymm2, ymmword ptr [r14 + 96]
-	vpcmpeqd	ymm3, ymm2, ymm0
-	vpcmpgtb	ymm3, ymm3, ymm1
-	vpmovmskb	eax, ymm3
+	vmovdqa	ymm1, ymmword ptr [r14 + 96]
+	vpcmpeqd	ymm2, ymm1, ymm0
+	vpmovmskb	eax, ymm2
+	not	eax
 	pdep	rdx, rax, r11
 	lea	rdx, [rdx + 2*rdx]
 	popcnt	eax, eax
 	pext	rdx, r10, rdx
-	vmovq	xmm3, rdx
-	vpmovzxbd	ymm3, xmm3      # ymm3 = xmm3[0],zero,zero,zero,xmm3[1],zero,zero,zero,xmm3[2],zero,zero,zero,xmm3[3],zero,zero,zero,xmm3[4],zero,zero,zero,xmm3[5],zero,zero,zero,xmm3[6],zero,zero,zero,xmm3[7],zero,zero,zero
+	vmovq	xmm2, rdx
+	vpmovzxbd	ymm2, xmm2      # ymm2 = xmm2[0],zero,zero,zero,xmm2[1],zero,zero,zero,xmm2[2],zero,zero,zero,xmm2[3],zero,zero,zero,xmm2[4],zero,zero,zero,xmm2[5],zero,zero,zero,xmm2[6],zero,zero,zero,xmm2[7],zero,zero,zero
 	and	eax, -4
-	vpermd	ymm2, ymm3, ymm2
-	vmovdqu	ymmword ptr [rcx], ymm2
+	vpermd	ymm1, ymm2, ymm1
+	vmovdqu	ymmword ptr [rcx], ymm1
 	add	rax, rcx
 	sub	r14, -128
 	mov	rdx, r8
@@ -165,63 +164,63 @@ _Z9remove_0sPiS_:                       # @_Z9remove_0sPiS_
 	.p2align	4, 0x90
 .LBB0_15:                               #   Parent Loop BB0_4 Depth=1
                                         # =>  This Inner Loop Header: Depth=2
-	vmovdqa	ymm2, ymmword ptr [r14]
-	vpcmpeqd	ymm3, ymm2, ymm0
-	vpcmpgtb	ymm3, ymm3, ymm1
-	vpmovmskb	edx, ymm3
+	vmovdqa	ymm1, ymmword ptr [r14]
+	vpcmpeqd	ymm2, ymm1, ymm0
+	vpmovmskb	edx, ymm2
+	not	edx
 	pdep	rdi, rdx, r11
 	lea	rdi, [rdi + 2*rdi]
 	popcnt	edx, edx
 	pext	rdi, r10, rdi
-	vmovq	xmm3, rdi
-	vpmovzxbd	ymm3, xmm3      # ymm3 = xmm3[0],zero,zero,zero,xmm3[1],zero,zero,zero,xmm3[2],zero,zero,zero,xmm3[3],zero,zero,zero,xmm3[4],zero,zero,zero,xmm3[5],zero,zero,zero,xmm3[6],zero,zero,zero,xmm3[7],zero,zero,zero
+	vmovq	xmm2, rdi
+	vpmovzxbd	ymm2, xmm2      # ymm2 = xmm2[0],zero,zero,zero,xmm2[1],zero,zero,zero,xmm2[2],zero,zero,zero,xmm2[3],zero,zero,zero,xmm2[4],zero,zero,zero,xmm2[5],zero,zero,zero,xmm2[6],zero,zero,zero,xmm2[7],zero,zero,zero
 	and	edx, -4
-	vpermd	ymm2, ymm3, ymm2
-	vmovdqu	ymmword ptr [rax], ymm2
+	vpermd	ymm1, ymm2, ymm1
+	vmovdqu	ymmword ptr [rax], ymm1
 	lea	r9, [rax + rdx]
-	vmovdqa	ymm2, ymmword ptr [r14 + 32]
-	vpcmpeqd	ymm3, ymm2, ymm0
-	vpcmpgtb	ymm3, ymm3, ymm1
-	vpmovmskb	ebx, ymm3
+	vmovdqa	ymm1, ymmword ptr [r14 + 32]
+	vpcmpeqd	ymm2, ymm1, ymm0
+	vpmovmskb	ebx, ymm2
+	not	ebx
 	pdep	rdi, rbx, r11
 	lea	rdi, [rdi + 2*rdi]
 	popcnt	ebx, ebx
 	pext	rdi, r10, rdi
-	vmovq	xmm3, rdi
-	vpmovzxbd	ymm3, xmm3      # ymm3 = xmm3[0],zero,zero,zero,xmm3[1],zero,zero,zero,xmm3[2],zero,zero,zero,xmm3[3],zero,zero,zero,xmm3[4],zero,zero,zero,xmm3[5],zero,zero,zero,xmm3[6],zero,zero,zero,xmm3[7],zero,zero,zero
+	vmovq	xmm2, rdi
+	vpmovzxbd	ymm2, xmm2      # ymm2 = xmm2[0],zero,zero,zero,xmm2[1],zero,zero,zero,xmm2[2],zero,zero,zero,xmm2[3],zero,zero,zero,xmm2[4],zero,zero,zero,xmm2[5],zero,zero,zero,xmm2[6],zero,zero,zero,xmm2[7],zero,zero,zero
 	and	ebx, -4
-	vpermd	ymm2, ymm3, ymm2
-	vmovdqu	ymmword ptr [rax + rdx], ymm2
+	vpermd	ymm1, ymm2, ymm1
+	vmovdqu	ymmword ptr [rax + rdx], ymm1
 	lea	r15, [r9 + rbx]
-	vmovdqa	ymm2, ymmword ptr [r14 + 64]
-	vpcmpeqd	ymm3, ymm2, ymm0
-	vpcmpgtb	ymm3, ymm3, ymm1
-	vpmovmskb	eax, ymm3
+	vmovdqa	ymm1, ymmword ptr [r14 + 64]
+	vpcmpeqd	ymm2, ymm1, ymm0
+	vpmovmskb	eax, ymm2
+	not	eax
 	pdep	rdi, rax, r11
 	lea	rdi, [rdi + 2*rdi]
 	xor	edx, edx
 	popcnt	edx, eax
 	pext	rax, r10, rdi
-	vmovq	xmm3, rax
-	vpmovzxbd	ymm3, xmm3      # ymm3 = xmm3[0],zero,zero,zero,xmm3[1],zero,zero,zero,xmm3[2],zero,zero,zero,xmm3[3],zero,zero,zero,xmm3[4],zero,zero,zero,xmm3[5],zero,zero,zero,xmm3[6],zero,zero,zero,xmm3[7],zero,zero,zero
+	vmovq	xmm2, rax
+	vpmovzxbd	ymm2, xmm2      # ymm2 = xmm2[0],zero,zero,zero,xmm2[1],zero,zero,zero,xmm2[2],zero,zero,zero,xmm2[3],zero,zero,zero,xmm2[4],zero,zero,zero,xmm2[5],zero,zero,zero,xmm2[6],zero,zero,zero,xmm2[7],zero,zero,zero
 	and	edx, -4
-	vpermd	ymm2, ymm3, ymm2
-	vmovdqu	ymmword ptr [rbx + r9], ymm2
+	vpermd	ymm1, ymm2, ymm1
+	vmovdqu	ymmword ptr [rbx + r9], ymm1
 	lea	rdi, [r15 + rdx]
-	vmovdqa	ymm2, ymmword ptr [r14 + 96]
-	vpcmpeqd	ymm3, ymm2, ymm0
-	vpcmpgtb	ymm3, ymm3, ymm1
-	vpmovmskb	eax, ymm3
+	vmovdqa	ymm1, ymmword ptr [r14 + 96]
+	vpcmpeqd	ymm2, ymm1, ymm0
+	vpmovmskb	eax, ymm2
+	not	eax
 	pdep	rbx, rax, r11
 	lea	rbx, [rbx + 2*rbx]
 	popcnt	eax, eax
 	pext	rbx, r10, rbx
-	vmovq	xmm3, rbx
-	vpmovzxbd	ymm3, xmm3      # ymm3 = xmm3[0],zero,zero,zero,xmm3[1],zero,zero,zero,xmm3[2],zero,zero,zero,xmm3[3],zero,zero,zero,xmm3[4],zero,zero,zero,xmm3[5],zero,zero,zero,xmm3[6],zero,zero,zero,xmm3[7],zero,zero,zero
+	vmovq	xmm2, rbx
+	vpmovzxbd	ymm2, xmm2      # ymm2 = xmm2[0],zero,zero,zero,xmm2[1],zero,zero,zero,xmm2[2],zero,zero,zero,xmm2[3],zero,zero,zero,xmm2[4],zero,zero,zero,xmm2[5],zero,zero,zero,xmm2[6],zero,zero,zero,xmm2[7],zero,zero,zero
 	and	eax, -4
 	add	rax, rdi
-	vpermd	ymm2, ymm3, ymm2
-	vmovdqu	ymmword ptr [rdx + r15], ymm2
+	vpermd	ymm1, ymm2, ymm1
+	vmovdqu	ymmword ptr [rdx + r15], ymm1
 	sub	r14, -128
 	dec	rcx
 	jne	.LBB0_15
@@ -240,8 +239,6 @@ _Z9remove_0sPiS_:                       # @_Z9remove_0sPiS_
 	vmovdqa	ymm0, ymmword ptr [r8]
 	vpbroadcastd	ymm1, dword ptr [rip + .LCPI0_0] # ymm1 = [1,1,1,1,1,1,1,1]
 	vpcmpeqd	ymm1, ymm0, ymm1
-	vpcmpeqd	ymm2, ymm2, ymm2
-	vpcmpgtb	ymm1, ymm1, ymm2
 	vpmovmskb	ecx, ymm1
 	lea	edx, [4*r9]
 	sub	esi, r8d
@@ -251,23 +248,23 @@ _Z9remove_0sPiS_:                       # @_Z9remove_0sPiS_
 	not	esi
 	shrx	esi, esi, edx
 	shlx	edx, esi, edx
-	and	edx, ecx
-	lea	rcx, [rax + 4*r9]
-	pdep	rsi, rdx, r11
+	andn	ecx, ecx, edx
+	lea	rdx, [rax + 4*r9]
+	pdep	rsi, rcx, r11
 	lea	rsi, [rsi + 2*rsi]
-	popcnt	edx, edx
+	popcnt	ecx, ecx
 	pext	rsi, r10, rsi
 	vmovq	xmm1, rsi
 	vpmovzxbd	ymm1, xmm1      # ymm1 = xmm1[0],zero,zero,zero,xmm1[1],zero,zero,zero,xmm1[2],zero,zero,zero,xmm1[3],zero,zero,zero,xmm1[4],zero,zero,zero,xmm1[5],zero,zero,zero,xmm1[6],zero,zero,zero,xmm1[7],zero,zero,zero
-	and	edx, -4
+	and	ecx, -4
 	vpermd	ymm0, ymm1, ymm0
-	add	rcx, rdx
-	shr	rdx, 2
-	vmovd	xmm1, edx
+	add	rdx, rcx
+	shr	rcx, 2
+	vmovd	xmm1, ecx
 	vpbroadcastd	ymm1, xmm1
 	vpcmpgtd	ymm1, ymm1, ymmword ptr [rip + .LCPI0_1]
 	vpmaskmovd	ymmword ptr [rax + 4*r9], ymm1, ymm0
-	mov	rax, rcx
+	mov	rax, rdx
 .LBB0_12:
 	lea	rsp, [rbp - 24]
 	pop	rbx

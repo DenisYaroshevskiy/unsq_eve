@@ -22,6 +22,7 @@
 
 #include "eve_extra/concepts.h"
 #include "eve_extra/constants.h"
+#include "eve_extra/mm.h"
 
 #include <iostream>
 
@@ -109,17 +110,24 @@ std::uint32_t clear_ingored(std::uint32_t mmask, ignore_first_last ignore) {
   return clear_ingored<Logical>(mmask, ignore_last_n{ignore.last_n});
 };
 
-template <typename Register>
-std::uint32_t movemask(Register reg) {
-  if constexpr (sizeof(reg) == 16) {
-    return _mm_movemask_epi8(reg);
-  } else {
-    return _mm256_movemask_epi8(reg);
-  }
+template <eve_logical Logical>
+std::uint32_t extended_movemask(Logical logical) {
+  return mm::movemask(logical.storage());
 }
 
-namespace _mmask_operations {
+template <eve_logical Logical>
+std::uint32_t extended_movemask(eve::if_not_<Logical> logical) {
+  using scalar = typename Logical::value_type;
+  return set_lower_n_bits(Logical::static_size * sizeof(scalar)) &
+         ~extended_movemask(logical.condition_);
+}
 
+template <typename T>
+concept extended_logical = requires(const T& x) {
+  {extended_movemask(x)};
+};
+
+namespace _mmask_operations {
 template <typename Wide>
 auto do_signed_integer_wide() {
   using T = typename Wide::value_type;
