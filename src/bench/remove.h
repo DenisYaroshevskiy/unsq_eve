@@ -69,11 +69,13 @@ struct remove_bench {
   template <typename T>
   auto input(struct bench::type_t<T>, std::size_t size,
              std::size_t percentage) const {
-    std::vector<T> data(size, 1);
-    std::fill(data.begin(), data.begin() + size * percentage / 100, 0);
+    std::size_t size_in_elements = size / sizeof(T);
+
+    std::vector<T> data(size_in_elements, 1);
+    std::fill(data.begin(), data.begin() + size_in_elements * percentage / 100,
+              0);
     std::shuffle(data.begin(), data.end(), std::mt19937{});
 
-    std::size_t size_in_elements = size / sizeof(T);
     return remove_params<T>{data, std::vector<T>(size_in_elements), 0};
   }
 };
