@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+<meta charset='utf-8'>
+
+<title>remove results</title>
+<script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
+<script type='text/javascript' src='scripts/bench.js'></script>
+
+</html>
+
+<body>
+  <h1>remove</h1>
+
+  <h2> Total benchmark </h2>
+  <div id='total_benchmark'></div>
+  <script>dynamicEntryPoint('total_benchmark', {
+      name: 'remove 0',
+      size: 'selection',
+      algorithm: 'selection',
+      type: 'selection',
+      sum_type: 'selection',
+      time: 'y',
+      padding: 'min',
+      group: 'intel_9700K',
+      percentage: 'x',
+    }, ['remove']);
+  </script>
+
+</body>
