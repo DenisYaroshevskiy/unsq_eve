@@ -1,285 +1,228 @@
 	.text
 	.intel_syntax noprefix
 	.file	"disassemble.cc"
-	.section	.rodata.cst4,"aM",@progbits,4
-	.p2align	2               # -- Begin function _Z9remove_0sPiS_
-.LCPI0_0:
-	.long	1                       # 0x1
-	.section	.rodata.cst32,"aM",@progbits,32
-	.p2align	5
-.LCPI0_1:
-	.long	0                       # 0x0
-	.long	1                       # 0x1
-	.long	2                       # 0x2
-	.long	3                       # 0x3
-	.long	4                       # 0x4
-	.long	5                       # 0x5
-	.long	6                       # 0x6
-	.long	7                       # 0x7
-	.text
-	.globl	_Z9remove_0sPiS_
+	.globl	_Z3anyPKiS0_i           # -- Begin function _Z3anyPKiS0_i
 	.p2align	4, 0x90
-	.type	_Z9remove_0sPiS_,@function
-_Z9remove_0sPiS_:                       # @_Z9remove_0sPiS_
+	.type	_Z3anyPKiS0_i,@function
+_Z3anyPKiS0_i:                          # @_Z3anyPKiS0_i
 	.cfi_startproc
 # %bb.0:
-	push	rbp
-	.cfi_def_cfa_offset 16
-	.cfi_offset rbp, -16
-	mov	rbp, rsp
-	.cfi_def_cfa_register rbp
-	push	r15
-	push	r14
-	push	rbx
-	and	rsp, -32
-	sub	rsp, 96
-	.cfi_offset rbx, -40
-	.cfi_offset r14, -32
-	.cfi_offset r15, -24
 	mov	rax, rdi
-	cmp	rdi, rsi
-	je	.LBB0_12
+	vmovd	xmm0, edx
+	vpbroadcastd	ymm0, xmm0
+	mov	rdx, rdi
+	and	rdx, -32
+	mov	r10, rsi
+	and	r10, -32
+	and	eax, 28
+	cmp	rdx, r10
+	je	.LBB0_18
 # %bb.1:
-	mov	r14, rax
-	and	r14, -32
-	mov	r8, rsi
-	and	r8, -32
-	mov	r9d, eax
-	shr	r9d, 2
-	and	r9d, 7
-	movabs	r11, 6148914691236517205
-	movabs	r10, 506097522914230528
-	cmp	r14, r8
+	vpcmpeqd	ymm1, ymm0, ymmword ptr [rdx]
+	vpmovmskb	edi, ymm1
+	shrx	edi, edi, eax
+	shlx	edi, edi, eax
+	mov	al, 1
+	test	edi, edi
 	je	.LBB0_2
-# %bb.3:
-	vmovdqa	ymm1, ymmword ptr [r14]
-	vpbroadcastd	ymm0, dword ptr [rip + .LCPI0_0] # ymm0 = [1,1,1,1,1,1,1,1]
-	vpcmpeqd	ymm2, ymm1, ymm0
-	vpmovmskb	ecx, ymm2
-	not	ecx
-	and	al, 28
-	shrx	ecx, ecx, eax
-	shlx	ecx, ecx, eax
-	lea	rax, [r14 + 4*r9]
-	pdep	rdx, rcx, r11
-	lea	rdx, [rdx + 2*rdx]
-	popcnt	ecx, ecx
-	pext	rdx, r10, rdx
-	vmovq	xmm2, rdx
-	vpmovzxbd	ymm2, xmm2      # ymm2 = xmm2[0],zero,zero,zero,xmm2[1],zero,zero,zero,xmm2[2],zero,zero,zero,xmm2[3],zero,zero,zero,xmm2[4],zero,zero,zero,xmm2[5],zero,zero,zero,xmm2[6],zero,zero,zero,xmm2[7],zero,zero,zero
-	and	ecx, -4
-	vpermd	ymm1, ymm2, ymm1
-	add	rax, rcx
-	shr	rcx, 2
-	vmovd	xmm2, ecx
-	vpbroadcastd	ymm2, xmm2
-	vpcmpgtd	ymm2, ymm2, ymmword ptr [rip + .LCPI0_1]
-	vpmaskmovd	ymmword ptr [r14 + 4*r9], ymm2, ymm1
-	add	r14, 32
-	.p2align	4, 0x90
-.LBB0_4:                                # =>This Loop Header: Depth=1
-                                        #     Child Loop BB0_15 Depth 2
-	cmp	r14, r8
-	je	.LBB0_9
-# %bb.5:                                #   in Loop: Header=BB0_4 Depth=1
-	vmovdqa	ymm1, ymmword ptr [r14]
-	vpcmpeqd	ymm2, ymm1, ymm0
-	vpmovmskb	ecx, ymm2
-	not	ecx
-	pdep	rdx, rcx, r11
-	lea	rdx, [rdx + 2*rdx]
-	popcnt	ecx, ecx
-	pext	rdx, r10, rdx
-	vmovq	xmm2, rdx
-	vpmovzxbd	ymm2, xmm2      # ymm2 = xmm2[0],zero,zero,zero,xmm2[1],zero,zero,zero,xmm2[2],zero,zero,zero,xmm2[3],zero,zero,zero,xmm2[4],zero,zero,zero,xmm2[5],zero,zero,zero,xmm2[6],zero,zero,zero,xmm2[7],zero,zero,zero
-	and	ecx, -4
-	vpermd	ymm1, ymm2, ymm1
-	vmovdqu	ymmword ptr [rax], ymm1
-	add	rax, rcx
-	lea	rcx, [r14 + 32]
-	cmp	rcx, r8
-	je	.LBB0_9
-# %bb.6:                                #   in Loop: Header=BB0_4 Depth=1
-	vmovdqa	ymm1, ymmword ptr [r14 + 32]
-	vpcmpeqd	ymm2, ymm1, ymm0
-	vpmovmskb	ecx, ymm2
-	not	ecx
-	pdep	rdx, rcx, r11
-	lea	rdx, [rdx + 2*rdx]
-	popcnt	ecx, ecx
-	pext	rdx, r10, rdx
-	vmovq	xmm2, rdx
-	vpmovzxbd	ymm2, xmm2      # ymm2 = xmm2[0],zero,zero,zero,xmm2[1],zero,zero,zero,xmm2[2],zero,zero,zero,xmm2[3],zero,zero,zero,xmm2[4],zero,zero,zero,xmm2[5],zero,zero,zero,xmm2[6],zero,zero,zero,xmm2[7],zero,zero,zero
-	and	ecx, -4
-	vpermd	ymm1, ymm2, ymm1
-	vmovdqu	ymmword ptr [rax], ymm1
-	add	rax, rcx
-	lea	rcx, [r14 + 64]
-	cmp	rcx, r8
-	je	.LBB0_9
-# %bb.7:                                #   in Loop: Header=BB0_4 Depth=1
-	vmovdqa	ymm1, ymmword ptr [r14 + 64]
-	vpcmpeqd	ymm2, ymm1, ymm0
-	vpmovmskb	ecx, ymm2
-	not	ecx
-	pdep	rdx, rcx, r11
-	lea	rdx, [rdx + 2*rdx]
-	popcnt	ecx, ecx
-	pext	rdx, r10, rdx
-	vmovq	xmm2, rdx
-	vpmovzxbd	ymm2, xmm2      # ymm2 = xmm2[0],zero,zero,zero,xmm2[1],zero,zero,zero,xmm2[2],zero,zero,zero,xmm2[3],zero,zero,zero,xmm2[4],zero,zero,zero,xmm2[5],zero,zero,zero,xmm2[6],zero,zero,zero,xmm2[7],zero,zero,zero
-	and	ecx, -4
-	vpermd	ymm1, ymm2, ymm1
-	vmovdqu	ymmword ptr [rax], ymm1
-	add	rcx, rax
-	lea	rax, [r14 + 96]
-	cmp	rax, r8
-	je	.LBB0_8
-# %bb.13:                               #   in Loop: Header=BB0_4 Depth=1
-	vmovdqa	ymm1, ymmword ptr [r14 + 96]
-	vpcmpeqd	ymm2, ymm1, ymm0
-	vpmovmskb	eax, ymm2
-	not	eax
-	pdep	rdx, rax, r11
-	lea	rdx, [rdx + 2*rdx]
-	popcnt	eax, eax
-	pext	rdx, r10, rdx
-	vmovq	xmm2, rdx
-	vpmovzxbd	ymm2, xmm2      # ymm2 = xmm2[0],zero,zero,zero,xmm2[1],zero,zero,zero,xmm2[2],zero,zero,zero,xmm2[3],zero,zero,zero,xmm2[4],zero,zero,zero,xmm2[5],zero,zero,zero,xmm2[6],zero,zero,zero,xmm2[7],zero,zero,zero
-	and	eax, -4
-	vpermd	ymm1, ymm2, ymm1
-	vmovdqu	ymmword ptr [rcx], ymm1
-	add	rax, rcx
-	sub	r14, -128
-	mov	rdx, r8
-	sub	rdx, r14
-	sar	rdx, 2
-	lea	rcx, [rdx + 31]
-	cmp	rcx, 63
-	jb	.LBB0_4
-# %bb.14:                               #   in Loop: Header=BB0_4 Depth=1
-	test	rdx, rdx
-	cmovns	rcx, rdx
-	sar	rcx, 5
-	.p2align	4, 0x90
-.LBB0_15:                               #   Parent Loop BB0_4 Depth=1
-                                        # =>  This Inner Loop Header: Depth=2
-	vmovdqa	ymm1, ymmword ptr [r14]
-	vpcmpeqd	ymm2, ymm1, ymm0
-	vpmovmskb	edx, ymm2
-	not	edx
-	pdep	rdi, rdx, r11
-	lea	rdi, [rdi + 2*rdi]
-	popcnt	edx, edx
-	pext	rdi, r10, rdi
-	vmovq	xmm2, rdi
-	vpmovzxbd	ymm2, xmm2      # ymm2 = xmm2[0],zero,zero,zero,xmm2[1],zero,zero,zero,xmm2[2],zero,zero,zero,xmm2[3],zero,zero,zero,xmm2[4],zero,zero,zero,xmm2[5],zero,zero,zero,xmm2[6],zero,zero,zero,xmm2[7],zero,zero,zero
-	and	edx, -4
-	vpermd	ymm1, ymm2, ymm1
-	vmovdqu	ymmword ptr [rax], ymm1
-	lea	r9, [rax + rdx]
-	vmovdqa	ymm1, ymmword ptr [r14 + 32]
-	vpcmpeqd	ymm2, ymm1, ymm0
-	vpmovmskb	ebx, ymm2
-	not	ebx
-	pdep	rdi, rbx, r11
-	lea	rdi, [rdi + 2*rdi]
-	popcnt	ebx, ebx
-	pext	rdi, r10, rdi
-	vmovq	xmm2, rdi
-	vpmovzxbd	ymm2, xmm2      # ymm2 = xmm2[0],zero,zero,zero,xmm2[1],zero,zero,zero,xmm2[2],zero,zero,zero,xmm2[3],zero,zero,zero,xmm2[4],zero,zero,zero,xmm2[5],zero,zero,zero,xmm2[6],zero,zero,zero,xmm2[7],zero,zero,zero
-	and	ebx, -4
-	vpermd	ymm1, ymm2, ymm1
-	vmovdqu	ymmword ptr [rax + rdx], ymm1
-	lea	r15, [r9 + rbx]
-	vmovdqa	ymm1, ymmword ptr [r14 + 64]
-	vpcmpeqd	ymm2, ymm1, ymm0
-	vpmovmskb	eax, ymm2
-	not	eax
-	pdep	rdi, rax, r11
-	lea	rdi, [rdi + 2*rdi]
-	xor	edx, edx
-	popcnt	edx, eax
-	pext	rax, r10, rdi
-	vmovq	xmm2, rax
-	vpmovzxbd	ymm2, xmm2      # ymm2 = xmm2[0],zero,zero,zero,xmm2[1],zero,zero,zero,xmm2[2],zero,zero,zero,xmm2[3],zero,zero,zero,xmm2[4],zero,zero,zero,xmm2[5],zero,zero,zero,xmm2[6],zero,zero,zero,xmm2[7],zero,zero,zero
-	and	edx, -4
-	vpermd	ymm1, ymm2, ymm1
-	vmovdqu	ymmword ptr [rbx + r9], ymm1
-	lea	rdi, [r15 + rdx]
-	vmovdqa	ymm1, ymmword ptr [r14 + 96]
-	vpcmpeqd	ymm2, ymm1, ymm0
-	vpmovmskb	eax, ymm2
-	not	eax
-	pdep	rbx, rax, r11
-	lea	rbx, [rbx + 2*rbx]
-	popcnt	eax, eax
-	pext	rbx, r10, rbx
-	vmovq	xmm2, rbx
-	vpmovzxbd	ymm2, xmm2      # ymm2 = xmm2[0],zero,zero,zero,xmm2[1],zero,zero,zero,xmm2[2],zero,zero,zero,xmm2[3],zero,zero,zero,xmm2[4],zero,zero,zero,xmm2[5],zero,zero,zero,xmm2[6],zero,zero,zero,xmm2[7],zero,zero,zero
-	and	eax, -4
-	add	rax, rdi
-	vpermd	ymm1, ymm2, ymm1
-	vmovdqu	ymmword ptr [rdx + r15], ymm1
-	sub	r14, -128
-	dec	rcx
-	jne	.LBB0_15
-	jmp	.LBB0_4
+.LBB0_19:
+                                        # kill: def $al killed $al killed $rax
+	vzeroupper
+	ret
 .LBB0_2:
-	mov	rax, r14
-	jmp	.LBB0_11
-.LBB0_8:
-	mov	rax, rcx
-.LBB0_9:
-	cmp	r8, rsi
-	je	.LBB0_12
-# %bb.10:
-	xor	r9d, r9d
-.LBB0_11:
-	vmovdqa	ymm0, ymmword ptr [r8]
-	vpbroadcastd	ymm1, dword ptr [rip + .LCPI0_0] # ymm1 = [1,1,1,1,1,1,1,1]
-	vpcmpeqd	ymm1, ymm0, ymm1
-	vpmovmskb	ecx, ymm1
-	lea	edx, [4*r9]
-	sub	esi, r8d
+	add	rdx, 32
+	cmp	rdx, r10
+	je	.LBB0_17
+# %bb.3:
+	movabs	r8, 4611686018427387872
+	jmp	.LBB0_4
+.LBB0_15:                               #   in Loop: Header=BB0_4 Depth=1
+	mov	rdx, r9
+.LBB0_16:                               #   in Loop: Header=BB0_4 Depth=1
+	cmp	rdx, r10
+	je	.LBB0_17
+.LBB0_4:                                # =>This Loop Header: Depth=1
+                                        #     Child Loop BB0_13 Depth 2
+	vpcmpeqd	ymm1, ymm0, ymmword ptr [rdx]
+	vmovmskps	edi, ymm1
+	test	edi, edi
+	jne	.LBB0_19
+# %bb.5:                                #   in Loop: Header=BB0_4 Depth=1
+	lea	rdi, [rdx + 32]
+	cmp	rdi, r10
+	je	.LBB0_17
+# %bb.6:                                #   in Loop: Header=BB0_4 Depth=1
+	vpcmpeqd	ymm1, ymm0, ymmword ptr [rdi]
+	vmovmskps	edi, ymm1
+	test	edi, edi
+	jne	.LBB0_19
+# %bb.7:                                #   in Loop: Header=BB0_4 Depth=1
+	lea	rdi, [rdx + 64]
+	cmp	rdi, r10
+	je	.LBB0_17
+# %bb.8:                                #   in Loop: Header=BB0_4 Depth=1
+	vpcmpeqd	ymm1, ymm0, ymmword ptr [rdi]
+	vmovmskps	edi, ymm1
+	test	edi, edi
+	jne	.LBB0_19
+# %bb.9:                                #   in Loop: Header=BB0_4 Depth=1
+	lea	rdi, [rdx + 96]
+	cmp	rdi, r10
+	je	.LBB0_17
+# %bb.10:                               #   in Loop: Header=BB0_4 Depth=1
+	vpcmpeqd	ymm1, ymm0, ymmword ptr [rdi]
+	vmovmskps	edi, ymm1
+	test	edi, edi
+	jne	.LBB0_19
+# %bb.11:                               #   in Loop: Header=BB0_4 Depth=1
+	sub	rdx, -128
+	mov	rdi, r10
+	sub	rdi, rdx
+	sar	rdi, 2
+	lea	r9, [rdi + 31]
+	cmp	r9, 63
+	jb	.LBB0_16
+# %bb.12:                               #   in Loop: Header=BB0_4 Depth=1
+	test	rdi, rdi
+	cmovns	r9, rdi
+	mov	rdi, r9
+	sar	rdi, 5
+	and	r9, r8
+	lea	r9, [rdx + 4*r9]
+	.p2align	4, 0x90
+.LBB0_13:                               #   Parent Loop BB0_4 Depth=1
+                                        # =>  This Inner Loop Header: Depth=2
+	vpcmpeqd	ymm1, ymm0, ymmword ptr [rdx]
+	vpcmpeqd	ymm2, ymm0, ymmword ptr [rdx + 32]
+	vpor	ymm1, ymm2, ymm1
+	vpcmpeqd	ymm2, ymm0, ymmword ptr [rdx + 64]
+	vpcmpeqd	ymm3, ymm0, ymmword ptr [rdx + 96]
+	vpor	ymm2, ymm2, ymm3
+	vpor	ymm1, ymm1, ymm2
+	vmovmskps	ecx, ymm1
+	test	ecx, ecx
+	jne	.LBB0_19
+# %bb.14:                               #   in Loop: Header=BB0_13 Depth=2
+	sub	rdx, -128
+	dec	rdi
+	jne	.LBB0_13
+	jmp	.LBB0_15
+.LBB0_17:
+	xor	eax, eax
+	cmp	r10, rsi
+	je	.LBB0_19
+.LBB0_18:
+	vpcmpeqd	ymm0, ymm0, ymmword ptr [r10]
+	vpmovmskb	ecx, ymm0
+	sub	esi, r10d
 	and	sil, -4
-	mov	rdi, -1
-	shlx	rsi, rdi, rsi
-	not	esi
-	shrx	esi, esi, edx
-	shlx	edx, esi, edx
-	andn	ecx, ecx, edx
-	lea	rdx, [rax + 4*r9]
-	pdep	rsi, rcx, r11
-	lea	rsi, [rsi + 2*rsi]
-	popcnt	ecx, ecx
-	pext	rsi, r10, rsi
-	vmovq	xmm1, rsi
-	vpmovzxbd	ymm1, xmm1      # ymm1 = xmm1[0],zero,zero,zero,xmm1[1],zero,zero,zero,xmm1[2],zero,zero,zero,xmm1[3],zero,zero,zero,xmm1[4],zero,zero,zero,xmm1[5],zero,zero,zero,xmm1[6],zero,zero,zero,xmm1[7],zero,zero,zero
-	and	ecx, -4
-	vpermd	ymm0, ymm1, ymm0
-	add	rdx, rcx
-	shr	rcx, 2
-	vmovd	xmm1, ecx
-	vpbroadcastd	ymm1, xmm1
-	vpcmpgtd	ymm1, ymm1, ymmword ptr [rip + .LCPI0_1]
-	vpmaskmovd	ymmword ptr [rax + 4*r9], ymm1, ymm0
-	mov	rax, rdx
-.LBB0_12:
-	lea	rsp, [rbp - 24]
-	pop	rbx
-	pop	r14
-	pop	r15
-	pop	rbp
-	.cfi_def_cfa rsp, 8
+	mov	rdx, -1
+	shlx	rdx, rdx, rsi
+	not	edx
+	shrx	edx, edx, eax
+	shlx	eax, edx, eax
+	test	eax, ecx
+	setne	al
+                                        # kill: def $al killed $al killed $rax
 	vzeroupper
 	ret
 .Lfunc_end0:
-	.size	_Z9remove_0sPiS_, .Lfunc_end0-_Z9remove_0sPiS_
+	.size	_Z3anyPKiS0_i, .Lfunc_end0-_Z3anyPKiS0_i
 	.cfi_endproc
                                         # -- End function
+	.section	.text.startup,"ax",@progbits
+	.p2align	4, 0x90         # -- Begin function _GLOBAL__sub_I_disassemble.cc
+	.type	_GLOBAL__sub_I_disassemble.cc,@function
+_GLOBAL__sub_I_disassemble.cc:          # @_GLOBAL__sub_I_disassemble.cc
+	.cfi_startproc
+# %bb.0:
+	xor	eax, eax
+	#APP
+	xchg	rsi, rbx
+	cpuid
+	xchg	rsi, rbx
+	#NO_APP
+	mov	r11d, eax
+	xor	eax, eax
+	xor	ecx, ecx
+	#APP
+	xchg	rdi, rbx
+	cpuid
+	xchg	rdi, rbx
+	#NO_APP
+	xor	ecx, ecx
+	mov	eax, 1
+	#APP
+	xchg	rsi, rbx
+	cpuid
+	xchg	rsi, rbx
+	#NO_APP
+	mov	r8d, edx
+	mov	r10d, ecx
+	mov	eax, 7
+	xor	ecx, ecx
+	#APP
+	xchg	r9, rbx
+	cpuid
+	xchg	r9, rbx
+	#NO_APP
+	cmp	edi, 1970169159
+	vxorps	xmm0, xmm0, xmm0
+	vmovups	ymmword ptr [rip + _ZN3eve6detail12cpuid_statesE+8], ymm0
+	mov	qword ptr [rip + _ZN3eve6detail12cpuid_statesE+40], 0
+	sete	byte ptr [rip + _ZN3eve6detail12cpuid_statesE]
+	cmp	edi, 1752462657
+	sete	byte ptr [rip + _ZN3eve6detail12cpuid_statesE+1]
+	test	r11d, r11d
+	je	.LBB1_3
+# %bb.1:
+	mov	eax, r10d
+	mov	qword ptr [rip + _ZN3eve6detail12cpuid_statesE+8], rax
+	mov	eax, r8d
+	mov	qword ptr [rip + _ZN3eve6detail12cpuid_statesE+16], rax
+	cmp	r11d, 7
+	jb	.LBB1_3
+# %bb.2:
+	mov	eax, r9d
+	mov	qword ptr [rip + _ZN3eve6detail12cpuid_statesE+24], rax
+	mov	eax, ecx
+	mov	qword ptr [rip + _ZN3eve6detail12cpuid_statesE+32], rax
+.LBB1_3:
+	mov	eax, -2147483648
+	#APP
+	xchg	rsi, rbx
+	cpuid
+	xchg	rsi, rbx
+	#NO_APP
+	cmp	eax, -2147483647
+	jb	.LBB1_5
+# %bb.4:
+	mov	eax, -2147483647
+	xor	ecx, ecx
+	#APP
+	xchg	rsi, rbx
+	cpuid
+	xchg	rsi, rbx
+	#NO_APP
+	mov	eax, ecx
+	mov	qword ptr [rip + _ZN3eve6detail12cpuid_statesE+40], rax
+.LBB1_5:
+	vzeroupper
+	ret
+.Lfunc_end1:
+	.size	_GLOBAL__sub_I_disassemble.cc, .Lfunc_end1-_GLOBAL__sub_I_disassemble.cc
+	.cfi_endproc
+                                        # -- End function
+	.type	_ZN3eve6detail12cpuid_statesE,@object # @_ZN3eve6detail12cpuid_statesE
+	.local	_ZN3eve6detail12cpuid_statesE
+	.comm	_ZN3eve6detail12cpuid_statesE,48,8
+	.section	.init_array,"aw",@init_array
+	.p2align	3
+	.quad	_GLOBAL__sub_I_disassemble.cc
 	.section	".linker-options","e",@llvm_linker_options
 	.ident	"clang version 11.0.0 (https://github.com/llvm/llvm-project.git 448bbc512f456df6fc817b0d7041897eea2375b7)"
 	.section	".note.GNU-stack","",@progbits
 	.addrsig
 	.addrsig_sym __gxx_personality_v0
+	.addrsig_sym _GLOBAL__sub_I_disassemble.cc
+	.addrsig_sym _ZN3eve6detail12cpuid_statesE

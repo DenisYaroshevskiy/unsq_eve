@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <numeric>
 
+#include "unsq_eve/all_any_none.h"
 #include "unsq_eve/inclusive_scan.h"
 #include "unsq_eve/min_element.h"
 #include "unsq_eve/reduce.h"
@@ -10,4 +11,6 @@
 using T = int;
 using traits = unsq_eve::algorithm_traits<T, 256, 4>;
 
-T* remove_0s(T* f, T* l) { return unsq_eve::remove<traits>(f, l, 1); }
+bool any(const T* f, const T* l, T v) {
+  return unsq_eve::any_of_is<traits>(f, l, v);
+}
