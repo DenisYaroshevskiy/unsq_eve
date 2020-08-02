@@ -45,7 +45,7 @@ struct inplace_body {
   template <typename Ptr, std::size_t idx, typename Ignore>
   bool small_step(Ptr ptr, indx_c<idx>, Ignore ignore) {
     wide_read read;
-    if constexpr (std::is_same_v<Ignore, eve_extra::ignore_nothing>) {
+    if constexpr (std::is_same_v<Ignore, eve_extra::ignore_none_t>) {
       read = wide{ptr};
     } else {
       read = eve_extra::load_unsafe(ptr, eve::as_<wide>{});
@@ -70,7 +70,7 @@ struct inplace_body {
 
   template <typename Ptr, std::size_t _idx>
   bool big_step(Ptr ptr, indx_c<_idx> idx) {
-    return small_step(ptr, idx, eve_extra::ignore_nothing{});
+    return small_step(ptr, idx, eve::ignore_none);
   }
 
   template <typename Ptr>

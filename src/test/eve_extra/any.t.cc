@@ -26,10 +26,10 @@ TEMPLATE_TEST_CASE("eve_extra.any", "[eve_extra]", ALL_TEST_PACKS) {
 
   wide x{0}, y{1};
 
-  REQUIRE(!eve_extra::any(x == y, eve_extra::ignore_nothing{}));
+  REQUIRE(!eve_extra::any(x == y, eve::ignore_none));
   x[0] = 1;
-  REQUIRE(eve_extra::any(x == y, eve_extra::ignore_nothing{}));
-  REQUIRE(!eve_extra::any(x == y, eve_extra::ignore_first_n{1}));
+  REQUIRE(eve_extra::any(x == y, eve::ignore_none));
+  REQUIRE(!eve_extra::any(x == y, eve::ignore_first{1}));
 
   SECTION("extra_wide") {
     using T = typename wide::value_type;
@@ -41,11 +41,11 @@ TEMPLATE_TEST_CASE("eve_extra.any", "[eve_extra]", ALL_TEST_PACKS) {
       extra_wide x{0};
       extra_wide y{1};
 
-      REQUIRE(!eve_extra::any(x == y, eve_extra::ignore_nothing{}));
+      REQUIRE(!eve_extra::any(x == y, eve::ignore_none));
 
       for (auto& elem : x) {
         elem = 1;
-        REQUIRE(eve_extra::any(x == y, eve_extra::ignore_nothing{}));
+        REQUIRE(eve_extra::any(x == y, eve::ignore_none));
         elem = 0;
       }
     };

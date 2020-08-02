@@ -14,75 +14,98 @@ _Z3anyPKiS0_i:                          # @_Z3anyPKiS0_i
 	and	rdx, -32
 	mov	r10, rsi
 	and	r10, -32
-	and	eax, 28
+	shr	eax, 2
+	and	eax, 7
 	cmp	rdx, r10
-	je	.LBB0_18
-# %bb.1:
+	je	.LBB0_1
+# %bb.2:
 	vpcmpeqd	ymm1, ymm0, ymmword ptr [rdx]
 	vpmovmskb	edi, ymm1
+	shl	eax, 2
 	shrx	edi, edi, eax
 	shlx	edi, edi, eax
 	mov	al, 1
 	test	edi, edi
-	je	.LBB0_2
-.LBB0_19:
+	je	.LBB0_3
+.LBB0_20:
                                         # kill: def $al killed $al killed $rax
 	vzeroupper
 	ret
-.LBB0_2:
+.LBB0_1:
+	shl	eax, 2
+.LBB0_19:
+	mov	ecx, r10d
+	sub	ecx, esi
+	vpcmpeqd	ymm0, ymm0, ymmword ptr [r10]
+	vpmovmskb	edx, ymm0
+	add	cl, 32
+	and	cl, -4
+	mov	sil, 32
+	sub	sil, cl
+	mov	rcx, -1
+	shlx	rcx, rcx, rsi
+	not	ecx
+	shrx	ecx, ecx, eax
+	shlx	eax, ecx, eax
+	test	eax, edx
+	setne	al
+                                        # kill: def $al killed $al killed $rax
+	vzeroupper
+	ret
+.LBB0_3:
 	add	rdx, 32
 	cmp	rdx, r10
-	je	.LBB0_17
-# %bb.3:
+	je	.LBB0_18
+# %bb.4:
 	movabs	r8, 4611686018427387872
-	jmp	.LBB0_4
-.LBB0_15:                               #   in Loop: Header=BB0_4 Depth=1
+	jmp	.LBB0_5
+.LBB0_16:                               #   in Loop: Header=BB0_5 Depth=1
 	mov	rdx, r9
-.LBB0_16:                               #   in Loop: Header=BB0_4 Depth=1
+.LBB0_17:                               #   in Loop: Header=BB0_5 Depth=1
 	cmp	rdx, r10
-	je	.LBB0_17
-.LBB0_4:                                # =>This Loop Header: Depth=1
-                                        #     Child Loop BB0_13 Depth 2
+	je	.LBB0_18
+.LBB0_5:                                # =>This Loop Header: Depth=1
+                                        #     Child Loop BB0_14 Depth 2
 	vpcmpeqd	ymm1, ymm0, ymmword ptr [rdx]
 	vmovmskps	edi, ymm1
 	test	edi, edi
-	jne	.LBB0_19
-# %bb.5:                                #   in Loop: Header=BB0_4 Depth=1
+	jne	.LBB0_20
+# %bb.6:                                #   in Loop: Header=BB0_5 Depth=1
 	lea	rdi, [rdx + 32]
 	cmp	rdi, r10
-	je	.LBB0_17
-# %bb.6:                                #   in Loop: Header=BB0_4 Depth=1
+	je	.LBB0_18
+# %bb.7:                                #   in Loop: Header=BB0_5 Depth=1
 	vpcmpeqd	ymm1, ymm0, ymmword ptr [rdi]
 	vmovmskps	edi, ymm1
 	test	edi, edi
-	jne	.LBB0_19
-# %bb.7:                                #   in Loop: Header=BB0_4 Depth=1
+	jne	.LBB0_20
+# %bb.8:                                #   in Loop: Header=BB0_5 Depth=1
 	lea	rdi, [rdx + 64]
 	cmp	rdi, r10
-	je	.LBB0_17
-# %bb.8:                                #   in Loop: Header=BB0_4 Depth=1
+	je	.LBB0_18
+# %bb.9:                                #   in Loop: Header=BB0_5 Depth=1
 	vpcmpeqd	ymm1, ymm0, ymmword ptr [rdi]
 	vmovmskps	edi, ymm1
 	test	edi, edi
-	jne	.LBB0_19
-# %bb.9:                                #   in Loop: Header=BB0_4 Depth=1
+	jne	.LBB0_20
+# %bb.10:                               #   in Loop: Header=BB0_5 Depth=1
 	lea	rdi, [rdx + 96]
 	cmp	rdi, r10
-	je	.LBB0_17
-# %bb.10:                               #   in Loop: Header=BB0_4 Depth=1
+	je	.LBB0_18
+# %bb.11:                               #   in Loop: Header=BB0_5 Depth=1
 	vpcmpeqd	ymm1, ymm0, ymmword ptr [rdi]
 	vmovmskps	edi, ymm1
 	test	edi, edi
-	jne	.LBB0_19
-# %bb.11:                               #   in Loop: Header=BB0_4 Depth=1
+	jne	.LBB0_20
+# %bb.12:                               #   in Loop: Header=BB0_5 Depth=1
 	sub	rdx, -128
 	mov	rdi, r10
 	sub	rdi, rdx
 	sar	rdi, 2
 	lea	r9, [rdi + 31]
 	cmp	r9, 63
-	jb	.LBB0_16
-# %bb.12:                               #   in Loop: Header=BB0_4 Depth=1
+	jb	.LBB0_17
+# %bb.13:                               #   in Loop: Header=BB0_5 Depth=1
 	test	rdi, rdi
 	cmovns	r9, rdi
 	mov	rdi, r9
@@ -90,7 +113,7 @@ _Z3anyPKiS0_i:                          # @_Z3anyPKiS0_i
 	and	r9, r8
 	lea	r9, [rdx + 4*r9]
 	.p2align	4, 0x90
-.LBB0_13:                               #   Parent Loop BB0_4 Depth=1
+.LBB0_14:                               #   Parent Loop BB0_5 Depth=1
                                         # =>  This Inner Loop Header: Depth=2
 	vpcmpeqd	ymm1, ymm0, ymmword ptr [rdx]
 	vpcmpeqd	ymm2, ymm0, ymmword ptr [rdx + 32]
@@ -101,31 +124,17 @@ _Z3anyPKiS0_i:                          # @_Z3anyPKiS0_i
 	vpor	ymm1, ymm1, ymm2
 	vmovmskps	ecx, ymm1
 	test	ecx, ecx
-	jne	.LBB0_19
-# %bb.14:                               #   in Loop: Header=BB0_13 Depth=2
+	jne	.LBB0_20
+# %bb.15:                               #   in Loop: Header=BB0_14 Depth=2
 	sub	rdx, -128
 	dec	rdi
-	jne	.LBB0_13
-	jmp	.LBB0_15
-.LBB0_17:
+	jne	.LBB0_14
+	jmp	.LBB0_16
+.LBB0_18:
 	xor	eax, eax
 	cmp	r10, rsi
-	je	.LBB0_19
-.LBB0_18:
-	vpcmpeqd	ymm0, ymm0, ymmword ptr [r10]
-	vpmovmskb	ecx, ymm0
-	sub	esi, r10d
-	and	sil, -4
-	mov	rdx, -1
-	shlx	rdx, rdx, rsi
-	not	edx
-	shrx	edx, edx, eax
-	shlx	eax, edx, eax
-	test	eax, ecx
-	setne	al
-                                        # kill: def $al killed $al killed $rax
-	vzeroupper
-	ret
+	jne	.LBB0_19
+	jmp	.LBB0_20
 .Lfunc_end0:
 	.size	_Z3anyPKiS0_i, .Lfunc_end0-_Z3anyPKiS0_i
 	.cfi_endproc

@@ -19,6 +19,7 @@
 #include "test/catch.h"
 #include "test/eve_extra/common.h"
 
+namespace eve_extra {
 namespace {
 
 TEMPLATE_TEST_CASE("eve_extra.store", "[eve_extra]", ALL_TEST_PACKS) {
@@ -40,16 +41,16 @@ TEMPLATE_TEST_CASE("eve_extra.store", "[eve_extra]", ALL_TEST_PACKS) {
     REQUIRE(expected == actual);
   };
 
-  SECTION("ignore_nothing") {
-    eve_extra::store(x, actual.data(), eve_extra::ignore_nothing{});
+  SECTION("ignore_none") {
+    eve_extra::store(x, actual.data(), eve::ignore_none);
     values_test(0, 0);
   }
 
   SECTION("ignore_first") {
-    for (std::size_t i = 0; i != wide::static_size + 1; ++i) {
+    for (int i = 0; i != wide::static_size + 1; ++i) {
       INFO("i: " << i);
       actual.fill(0);
-      eve_extra::store(x, actual.data(), eve_extra::ignore_first_n{i});
+      eve_extra::store(x, actual.data(), eve::ignore_first{i});
       values_test(i, 0);
 
       actual.fill(0);
@@ -59,10 +60,10 @@ TEMPLATE_TEST_CASE("eve_extra.store", "[eve_extra]", ALL_TEST_PACKS) {
   }
 
   SECTION("ignore_last") {
-    for (std::size_t i = 0; i != wide::static_size + 1; ++i) {
+    for (int i = 0; i != wide::static_size + 1; ++i) {
       INFO("i: " << i);
       actual.fill(0);
-      eve_extra::store(x, actual.data(), eve_extra::ignore_last_n{i});
+      eve_extra::store(x, actual.data(), eve::ignore_last{i});
       values_test(0, i);
 
       actual.fill(0);
@@ -74,8 +75,9 @@ TEMPLATE_TEST_CASE("eve_extra.store", "[eve_extra]", ALL_TEST_PACKS) {
   SECTION("masks_work") {
     scalar where{1};
 
-    for (std::size_t i = 0; i != wide::static_size; ++i) {
-      eve_extra::ignore_first_last ignore{i, wide::static_size - i - 1};
+    for (int i = 0; i != wide::static_size; ++i) {
+      eve_extra::ignore_first_last ignore{
+          i, static_cast<int>(wide::static_size - i - 1)};
 
       store(x, &where - i, ignore);
       REQUIRE(where == x[i]);
@@ -84,3 +86,4 @@ TEMPLATE_TEST_CASE("eve_extra.store", "[eve_extra]", ALL_TEST_PACKS) {
 }
 
 }  // namespace
+}  // namespace eve_extra

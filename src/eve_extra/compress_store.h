@@ -72,21 +72,22 @@ T* compress_store_precise(const Wide& wide, T* out, const Mask& wide_mask,
                           Ignore ignore) {
   const auto reg = mm::cast_to_integral(wide.storage());
   std::uint32_t mmask = extended_movemask(wide_mask);
-  mmask = clear_ingored<eve::logical<Wide>>(mmask, ignore);
+  mmask = clear_ignored<eve::logical<Wide>>(mmask, ignore);
 
-  if constexpr (std::same_as<Ignore, ignore_first_n>) {
-    out += ignore.n;
+  if constexpr (std::same_as<Ignore, eve::ignore_first>) {
+    out += ignore.count_;
   } else if constexpr (std::same_as<Ignore, ignore_first_last>) {
-    out += ignore.first_n;
+    out += ignore.begin_;
   }
 
   Wide buffer;
   T* up_to = _compress_store::compress_store_impl(reg, buffer.begin(), mmask);
 
   // std::copy but memcpy instead of memmove
-  std::size_t n = up_to - buffer.begin();
+  int n = up_to - buffer.begin();
 
-  eve_extra::store(buffer, out, ignore_last_n{Wide::static_size - n});
+  eve_extra::store(buffer, out,
+                   eve::ignore_last{static_cast<int>(Wide::static_size - n)});
   return out + n;
 }
 
@@ -94,7 +95,7 @@ template <native_wide Wide, std::same_as<typename Wide::value_type> T,
           extended_logical Mask, typename Ignore>
 T* compress_store_unsafe(const Wide& wide, T* out, const Mask& wide_mask,
                          Ignore ignore) {
-  if constexpr (!std::same_as<Ignore, ignore_nothing>) {
+  if constexpr (!std::same_as<Ignore, ignore_none_t>) {
     return compress_store_precise(wide, out, wide_mask, ignore);
   } else {
     const auto reg = mm::cast_to_integral(wide.storage());

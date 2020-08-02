@@ -45,7 +45,7 @@ TEMPLATE_TEST_CASE("eve_extra.compress_store_main_logic", "[eve_extra]",
 
     wide actual;
     scalar* out =
-        compress_store_unsafe(x, actual.begin(), mask, ignore_nothing{});
+        compress_store_unsafe(x, actual.begin(), mask, eve::ignore_none);
 
     REQUIRE(out - actual.begin() == static_cast<std::ptrdiff_t>(o));
 
@@ -59,7 +59,7 @@ TEMPLATE_TEST_CASE("eve_extra.compress_store_main_logic", "[eve_extra]",
                                          expected.begin() + o);
     std::vector<scalar> precise_actual(o, scalar(0));
     out = compress_store_precise(x, precise_actual.data(), mask,
-                                 ignore_nothing{});
+                                 eve::ignore_none);
 
     REQUIRE(precise_actual.data() + o == out);
     REQUIRE(precise_expected == precise_actual);
@@ -90,13 +90,13 @@ TEMPLATE_TEST_CASE("eve_extra.compress_store_ignore", "[eve_extra]",
     const auto* f = x.begin();
     const auto* l = x.end();
 
-    if constexpr (std::same_as<decltype(ignore), ignore_first_n>) {
-      f += static_cast<std::ptrdiff_t>(ignore.n);
-    } else if constexpr (std::same_as<decltype(ignore), ignore_last_n>) {
-      l -= static_cast<std::ptrdiff_t>(ignore.n);
+    if constexpr (std::same_as<decltype(ignore), eve::ignore_first>) {
+      f += static_cast<std::ptrdiff_t>(ignore.count_);
+    } else if constexpr (std::same_as<decltype(ignore), eve::ignore_last>) {
+      l -= static_cast<std::ptrdiff_t>(ignore.count_);
     } else if constexpr (std::same_as<decltype(ignore), ignore_first_last>) {
-      f += static_cast<std::ptrdiff_t>(ignore.first_n);
-      l -= static_cast<std::ptrdiff_t>(ignore.last_n);
+      f += static_cast<std::ptrdiff_t>(ignore.begin_);
+      l -= static_cast<std::ptrdiff_t>(ignore.end_);
     }
 
     std::ptrdiff_t ignored_from_the_beginning = f - x.begin();
@@ -120,10 +120,10 @@ TEMPLATE_TEST_CASE("eve_extra.compress_store_ignore", "[eve_extra]",
     REQUIRE(expected == actual);
   };
 
-  for (std::size_t i = 0; i != wide::static_size + 1; ++i) {
-    run(ignore_first_n{i});
-    run(ignore_last_n{i});
-    for (std::size_t j = 0; j != wide::static_size - i; ++j) {
+  for (int i = 0; i != wide::static_size + 1; ++i) {
+    run(eve::ignore_first{i});
+    run(eve::ignore_last{i});
+    for (int j = 0; j != wide::static_size - i; ++j) {
       run(ignore_first_last{i, j});
     }
   }
@@ -134,12 +134,12 @@ TEMPLATE_TEST_CASE("eve_extra.compress_store_ignore", "[eve_extra]",
 
     const wide x = eve_extra::iota(eve::as_<wide>{});
 
-    compress_store_precise(x, &out, mask, ignore_nothing{});
+    compress_store_precise(x, &out, mask, eve::ignore_none);
     REQUIRE(out == 1);
 
     out = scalar{5};
 
-    compress_store_unsafe(x, &out, mask, ignore_last_n{0});
+    compress_store_unsafe(x, &out, mask, eve::ignore_last{0});
     REQUIRE(out == 1);
   }
 }

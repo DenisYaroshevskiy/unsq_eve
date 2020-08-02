@@ -47,6 +47,17 @@ concept eve_wide = is_wide_v<T>;
 template <typename T>
 concept eve_logical = is_logical<T>::value;
 
+template <typename>
+struct wide_for_logical;
+
+template <typename T, typename N, typename ABI>
+struct wide_for_logical<eve::logical<eve::wide<T, N, ABI>>> {
+  using type = eve::wide<T, N, ABI>;
+};
+
+template <eve_logical Logical>
+using wide_for_logical_t = typename wide_for_logical<Logical>::type;
+
 template <typename Wide>
 concept composite_wide = eve_wide<Wide>&& requires(const Wide& x) {
   {x.storage().segments};

@@ -63,7 +63,7 @@ struct min_body {
                                   Ignore ignore) {
     wide_read read;
 
-    if constexpr (std::is_same_v<Ignore, eve_extra::ignore_nothing>) {
+    if constexpr (std::is_same_v<Ignore, eve_extra::ignore_none_t>) {
       read = wide_read{from};
     } else {
       read = eve_extra::load_unsafe(from, eve::as_<wide_read>{});
@@ -106,7 +106,7 @@ struct min_body {
   template <typename Ptr, std::size_t reg_idx>
   EVE_FORCEINLINE bool big_step(Ptr ptr, indx_c<reg_idx> reg_i,
                                 wide_idx wide_i) {
-    return small_step(ptr, reg_i, wide_i, eve_extra::ignore_nothing{});
+    return small_step(ptr, reg_i, wide_i, eve::ignore_none);
   }
 
   template <typename Ptr>

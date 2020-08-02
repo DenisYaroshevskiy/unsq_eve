@@ -29,15 +29,14 @@ EVE_FORCEINLINE Delegate iteration_aligned_unguarded(T* f, Delegate delegate) {
 
   // Deal with first bit, maybe not fully in the data
   {
-    std::size_t to_ignore = static_cast<std::size_t>(f - aligned_f.get());
-    auto ignore = eve_extra::ignore_first_n{to_ignore};
+    eve::ignore_first ignore(f - aligned_f.get());
     if (delegate.small_step(aligned_f, indx_c<0>{}, ignore)) return delegate;
   }
   aligned_f += Traits::chunk_size();
 
   // Everything else is on the caller.
   unroll_iteration<Traits>(aligned_f, [&](auto cur, auto reg_idx) mutable {
-    return delegate.small_step(cur, reg_idx, eve_extra::ignore_nothing{});
+    return delegate.small_step(cur, reg_idx, eve::ignore_none);
   });
 
   return delegate;
