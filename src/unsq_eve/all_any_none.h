@@ -47,7 +47,7 @@ struct any_body {
 
   template <typename Ptr, std::size_t idx, typename Ignore>
   bool small_step(Ptr ptr, indx_c<idx>, Ignore ignore) {
-    if constexpr (std::is_same_v<Ignore, eve_extra::ignore_nothing>) {
+    if constexpr (std::is_same_v<Ignore, eve_extra::ignore_none_t>) {
       regs[idx] = wide{ptr};
     } else {
       regs[idx] = eve_extra::load_unsafe(ptr, eve::as_<wide>{});

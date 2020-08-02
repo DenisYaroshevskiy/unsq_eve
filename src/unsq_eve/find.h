@@ -51,7 +51,7 @@ struct body {
     // For unguarded we never know if we are complete in the data
     regs[idx] = eve_extra::load_unsafe(from, eve::as_<wide>{});
 
-    const std::optional match = first_true(p(regs[idx]), ignore);
+    const std::optional match = eve_extra::first_true(p(regs[idx]), ignore);
     if (!match) return false;
 
     found = &*from + *match;

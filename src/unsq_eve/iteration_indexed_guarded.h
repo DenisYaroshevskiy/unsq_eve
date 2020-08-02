@@ -74,7 +74,7 @@ main_loop(Ptr& aligned_f, Ptr aligned_l, wide_index_t<Traits>& wide_i,
 
     while (aligned_f.get() < end) {
       if (delegate.small_step(aligned_f, indx_c<0>{}, wide_i,
-                              eve_extra::ignore_nothing{})) {
+                              eve::ignore_none)) {
         return StopReason::Terminated;
       }
       wide_i += step;
@@ -141,8 +141,7 @@ EVE_FORCEINLINE StopReason main_loop(Ptr& aligned_f, Ptr aligned_l,
     StopReason res = unroll<Traits::unroll()>([&](auto reg_idx) mutable {
       if (aligned_f.get() == aligned_l.get()) return StopReason::EndReached;
 
-      if (delegate.small_step(aligned_f, reg_idx, wide_i,
-                              eve_extra::ignore_nothing{}))
+      if (delegate.small_step(aligned_f, reg_idx, wide_i, eve::ignore_none))
         return StopReason::Terminated;
 
       aligned_f += Traits::chunk_size();
@@ -168,8 +167,7 @@ EVE_FORCEINLINE Delegate iteration_indexed_aligned(T* f, T* l,
   auto aligned_f = Traits::previous_aligned_address(f);
   auto aligned_l = Traits::previous_aligned_address(l);
 
-  eve_extra::ignore_first_n ignore_first{
-      static_cast<std::size_t>(f - aligned_f.get())};
+  eve::ignore_first ignore_first{static_cast<int>(f - aligned_f.get())};
 
   delegate.set_base(aligned_f.get());
 
@@ -179,7 +177,7 @@ EVE_FORCEINLINE Delegate iteration_indexed_aligned(T* f, T* l,
     if (delegate.small_step(aligned_f, indx_c<0>{}, wide_i, ignore_first))
       return delegate;
 
-    ignore_first = eve_extra::ignore_first_n{0};
+    ignore_first = eve::ignore_first{0};
     aligned_f += Traits::chunk_size();
     wide_i += _iteration_indexed_guarded::wide_step<Traits>();
 
@@ -189,11 +187,11 @@ EVE_FORCEINLINE Delegate iteration_indexed_aligned(T* f, T* l,
     if (stop == StopReason::Terminated || aligned_l.get() == l) return delegate;
   }
 
-  const std::ptrdiff_t last_offset = aligned_l.get() + Traits::chunk_size() - l;
+  const int last_offset = aligned_l.get() + Traits::chunk_size() - l;
 
-  eve_extra::ignore_last_n ignore_last{static_cast<std::size_t>(last_offset)};
+  eve::ignore_last ignore_last{last_offset};
   delegate.small_step(aligned_l, indx_c<0>{}, wide_i,
-                      eve_extra::combine(ignore_first, ignore_last));
+                      eve::keep_between(ignore_first, ignore_last));
   return delegate;
 }
 

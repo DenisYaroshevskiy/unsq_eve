@@ -24,7 +24,7 @@
 namespace eve_extra {
 
 template <eve_wide Wide>
-Wide replace_ignored(Wide x, ignore_nothing, Wide) {
+Wide replace_ignored(Wide x, ignore_none_t, Wide) {
   return x;
 }
 

@@ -93,14 +93,14 @@ std::uint32_t first_true_pos(std::uint32_t offset, std::uint32_t mmask) {
 template <eve_logical Logical, typename Ignore>
 bool any(const Logical& vbool, Ignore ignore) {
   std::uint32_t mmask = extended_movemask(vbool);
-  mmask = eve_extra::clear_ingored<Logical>(mmask, ignore);
+  mmask = eve_extra::clear_ignored<Logical>(mmask, ignore);
   return mmask;
 }
 
 template <eve_logical Logical, typename Ignore>
 std::optional<std::size_t> first_true(Logical logical, Ignore ignore) {
   std::uint32_t mmask = extended_movemask(logical);
-  mmask = eve_extra::clear_ingored<Logical>(mmask, ignore);
+  mmask = eve_extra::clear_ignored<Logical>(mmask, ignore);
 
   if (!mmask) return {};
   return _first_true::first_true_pos<Logical>(0, mmask);
@@ -109,7 +109,7 @@ std::optional<std::size_t> first_true(Logical logical, Ignore ignore) {
 template <eve_logical Logical>
 std::optional<std::uint32_t> first_true_array(
     const std::array<Logical, 1>& xs) {
-  return first_true(xs[0], ignore_nothing{});
+  return first_true(xs[0], eve::ignore_none);
 }
 
 template <eve_logical Logical, std::size_t N>

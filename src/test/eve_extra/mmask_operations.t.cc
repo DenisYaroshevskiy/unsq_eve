@@ -38,5 +38,13 @@ TEMPLATE_TEST_CASE("eve_extra.mmask_operations", "[eve_extra]",
           extended_movemask(eve::if_not_(x == y)));
 }
 
+TEST_CASE("eve_extra.broadcast", "[broadcast]") {
+  using wide = eve::wide<char>;
+  using Logical = eve::logical<wide>;
+  eve::ignore_first first{1};
+  eve::logical<wide> test = first.mask(eve::as_<wide_for_logical_t<Logical>>{});
+  (void)test;
+}
+
 }  // namespace
 }  // namespace eve_extra

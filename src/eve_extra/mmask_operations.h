@@ -17,6 +17,7 @@
 #ifndef EVE_EXTRA_MMASK_OPERATIONS_H_
 #define EVE_EXTRA_MMASK_OPERATIONS_H_
 
+#include <eve/conditional.hpp>
 #include <eve/eve.hpp>
 #include <eve/function/logical_and.hpp>
 
@@ -28,55 +29,11 @@
 
 namespace eve_extra {
 
-struct ignore_nothing {
-  friend std::ostream& operator<<(std::ostream& out, const ignore_nothing&) {
-    out << "ignore_noting";
-    return out;
-  }
-};
-
-struct ignore_first_n {
-  std::size_t n;
-
-  friend std::ostream& operator<<(std::ostream& out,
-                                  const ignore_first_n& ignore) {
-    out << "ignore_first{" << ignore.n << "}";
-    return out;
-  }
-};
-
-struct ignore_last_n {
-  std::size_t n;
-
-  friend std::ostream& operator<<(std::ostream& out,
-                                  const ignore_last_n& ignore) {
-    out << "ignore_last{" << ignore.n << "}";
-    return out;
-  }
-};
-
-struct ignore_first_last {
-  std::size_t first_n;
-  std::size_t last_n;
-
-  friend std::ostream& operator<<(std::ostream& out,
-                                  const ignore_first_last& ignore) {
-    out << "ignore_first_last{" << ignore.first_n << ',' << ignore.last_n
-        << "}";
-    return out;
-  }
-};
-
-constexpr ignore_first_last combine(ignore_first_n x, ignore_last_n y) {
-  return ignore_first_last{x.n, y.n};
-}
-
-constexpr ignore_first_last combine(ignore_last_n x, ignore_first_n y) {
-  return combine(y, x);
-}
+using ignore_none_t = decltype(eve::ignore_none);
+using ignore_first_last = eve::keep_between<true>;
 
 template <native_logical Logical>
-std::uint32_t clear_ingored(std::uint32_t mmask, ignore_nothing) {
+std::uint32_t clear_ignored(std::uint32_t mmask, ignore_none_t) {
   return mmask;
 }
 
@@ -88,27 +45,28 @@ constexpr std::uint32_t set_lower_n_bits(std::uint32_t n) {
 }
 
 template <native_logical Logical>
-std::uint32_t clear_ingored(std::uint32_t mmask, ignore_first_n ignore) {
+std::uint32_t clear_ignored(std::uint32_t mmask, eve::ignore_first ignore) {
   using scalar = typename Logical::value_type;
 
-  std::uint32_t ignore_mask = ~set_lower_n_bits(ignore.n * sizeof(scalar));
+  std::uint32_t ignore_mask = ~set_lower_n_bits(ignore.count_ * sizeof(scalar));
   return ignore_mask & mmask;
 }
 
 template <native_logical Logical>
-std::uint32_t clear_ingored(std::uint32_t mmask, ignore_last_n ignore) {
+std::uint32_t clear_ignored(std::uint32_t mmask, eve::ignore_last ignore) {
   using scalar = typename Logical::value_type;
 
   std::uint32_t ignore_mask = set_lower_n_bits(
-      sizeof(typename Logical::storage_type) - ignore.n * sizeof(scalar));
+      sizeof(typename Logical::storage_type) - ignore.count_ * sizeof(scalar));
   return ignore_mask & mmask;
 }
 
 template <native_logical Logical>
-std::uint32_t clear_ingored(std::uint32_t mmask, ignore_first_last ignore) {
-  mmask = clear_ingored<Logical>(mmask, ignore_first_n{ignore.first_n});
-  return clear_ingored<Logical>(mmask, ignore_last_n{ignore.last_n});
-};
+std::uint32_t clear_ignored(std::uint32_t mmask,
+                            eve::keep_between<true> ignore) {
+  mmask = clear_ignored<Logical>(mmask, eve::ignore_first{ignore.begin_});
+  return clear_ignored<Logical>(mmask, eve::ignore_last{ignore.end_});
+}
 
 template <eve_logical Logical>
 std::uint32_t extended_movemask(Logical logical) {
@@ -150,17 +108,17 @@ using signed_integer_wide =
     decltype(_mmask_operations::do_signed_integer_wide<Wide>());
 
 template <typename Wide>
-Wide ignore_first_broadcast(ignore_first_n ignore) {
+Wide ignore_first_broadcast(eve::ignore_first ignore) {
   using T = typename Wide::value_type;
-  return Wide{static_cast<T>(ignore.n) - 1};
+  return Wide{static_cast<T>(ignore.count_) - 1};
 }
 
 template <typename Wide>
-Wide ignore_last_broadcast(ignore_last_n ignore) {
+Wide ignore_last_broadcast(eve::ignore_last ignore) {
   using T = typename Wide::value_type;
 
   T last_idx = static_cast<T>(Wide::static_size);
-  T offset = static_cast<T>(ignore.n);
+  T offset = static_cast<T>(ignore.count_);
 
   return Wide{last_idx - offset};
 }
@@ -168,12 +126,12 @@ Wide ignore_last_broadcast(ignore_last_n ignore) {
 }  // namespace _mmask_operations
 
 template <eve_logical Logical>
-Logical ignore_broadcast(ignore_nothing) {
-  return Logical{true};
+Logical ignore_broadcast(ignore_none_t) {
+  return eve::ignore_none.mask(eve::as_<typename Logical::parent>{});
 }
 
 template <eve_logical Logical>
-Logical ignore_broadcast(ignore_first_n ignore) {
+Logical ignore_broadcast(eve::ignore_first ignore) {
   using wide = typename Logical::parent;
   using si_wide = _mmask_operations::signed_integer_wide<wide>;
 
@@ -184,8 +142,8 @@ Logical ignore_broadcast(ignore_first_n ignore) {
 }
 
 template <eve_logical Logical>
-Logical ignore_broadcast(ignore_last_n ignore) {
-  using wide = typename Logical::parent;
+Logical ignore_broadcast(eve::ignore_last ignore) {
+  using wide = wide_for_logical_t<Logical>;
   using si_wide = _mmask_operations::signed_integer_wide<wide>;
 
   si_wide idxs = eve_extra::iota(eve::as_<si_wide>{});
@@ -197,13 +155,13 @@ Logical ignore_broadcast(ignore_last_n ignore) {
 template <eve_logical Logical>
 Logical ignore_broadcast(ignore_first_last ignore) {
   using namespace _mmask_operations;
-  using wide = typename Logical::parent;
+  using wide = wide_for_logical_t<Logical>;
   using si_wide = signed_integer_wide<wide>;
 
   si_wide idxs = eve_extra::iota(eve::as_<si_wide>{});
   si_wide first =
-      ignore_first_broadcast<si_wide>(ignore_first_n{ignore.first_n});
-  si_wide last = ignore_last_broadcast<si_wide>(ignore_last_n{ignore.last_n});
+      ignore_first_broadcast<si_wide>(eve::ignore_first{ignore.begin_});
+  si_wide last = ignore_last_broadcast<si_wide>(eve::ignore_last{ignore.end_});
 
   eve::logical<si_wide> first_mask = first < idxs;
   eve::logical<si_wide> last_mask = idxs < last;

@@ -29,8 +29,7 @@ EVE_FORCEINLINE StopReason
 main_loop(Ptr aligned_f, Ptr aligned_l,
           Delegate& delegate) requires(Traits::unroll() == 1) {
   while (aligned_f.get() != aligned_l.get()) {
-    if (delegate.small_step(aligned_f, indx_c<0>{},
-                            eve_extra::ignore_nothing{}))
+    if (delegate.small_step(aligned_f, indx_c<0>{}, eve::ignore_none))
       return StopReason::Terminated;
     aligned_f += Traits::chunk_size();
   }
@@ -47,7 +46,7 @@ EVE_FORCEINLINE StopReason main_loop(Ptr aligned_f, Ptr aligned_l,
     StopReason res = unroll<Traits::unroll()>([&](auto idx) mutable {
       if (aligned_f.get() == aligned_l.get()) return StopReason::EndReached;
 
-      if (delegate.small_step(aligned_f, idx, eve_extra::ignore_nothing{}))
+      if (delegate.small_step(aligned_f, idx, eve::ignore_none))
         return StopReason::Terminated;
 
       aligned_f += Traits::chunk_size();
@@ -96,14 +95,13 @@ EVE_FORCEINLINE Delegate iteration_aligned(T* f, T* l, Delegate delegate) {
 
   delegate.set_base(aligned_f.get());
 
-  eve_extra::ignore_first_n ignore_first{
-      static_cast<std::size_t>(f - aligned_f.get())};
+  eve::ignore_first ignore_first{static_cast<int>(f - aligned_f.get())};
 
   if (aligned_f.get() != aligned_l.get()) {
     // first chunk, maybe partial
     if (delegate.small_step(aligned_f, indx_c<0>{}, ignore_first))
       return delegate;
-    ignore_first = eve_extra::ignore_first_n{0};
+    ignore_first = eve::ignore_first{0};
     aligned_f += Traits::chunk_size();
 
     StopReason stop =
@@ -112,11 +110,11 @@ EVE_FORCEINLINE Delegate iteration_aligned(T* f, T* l, Delegate delegate) {
     if (stop == StopReason::Terminated || aligned_l.get() == l) return delegate;
   }
 
-  const std::ptrdiff_t last_offset = aligned_l.get() + Traits::chunk_size() - l;
+  const int last_offset = aligned_l.get() + Traits::chunk_size() - l;
 
-  eve_extra::ignore_last_n ignore_last{static_cast<std::size_t>(last_offset)};
+  eve::ignore_last ignore_last{last_offset};
   delegate.small_step(aligned_l, indx_c<0>{},
-                      eve_extra::combine(ignore_first, ignore_last));
+                      eve_extra::ignore_first_last{ignore_first, ignore_last});
   return delegate;
 }
 
