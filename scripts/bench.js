@@ -39,7 +39,12 @@ function valuesByKeys(measurements) {
 
 async function loadMeasurements() {
   if (!loadMeasurements.cache) {
-    const loaded = await fetch("data/all.json").then(async (raw) => raw.json());
+    let url = "data/all.json";
+    if (typeof UNSQ_EVE_COMMIT !== 'undefined') {
+      url = `https://raw.githubusercontent.com/DenisYaroshevskiy/unsq_eve/${UNSQ_EVE_COMMIT}/data/all.json`
+    }
+    console.log(url);
+    const loaded = await fetch(url).then(async (raw) => raw.json());
     loadMeasurements.cache = loaded.map(replaceStringValuesWithNumbers);
   }
   return loadMeasurements.cache;
@@ -149,8 +154,8 @@ function applyReduction(selections, varying) {
   if (!varying.reduce) return selections;
 
   const doReduction = varying.x ?
-     (objects, reduction) => reduceInGroups(objects, varying.x, reduction) :
-     (objects, reduction) => [reduction(objects)];
+    (objects, reduction) => reduceInGroups(objects, varying.x, reduction) :
+    (objects, reduction) => [reduction(objects)];
 
   if (varying.reduce === 'minmax') {
     varying.selection.push('variation');
@@ -200,7 +205,7 @@ function makeBarsTrace(ms, traceSelections, varying) {
     return varying.selection.map(key => m[0][key]).join('/')
   });
   const y = ms.map(m => m[0][varying.y]);
-  return {name, x, y};
+  return { name, x, y };
 }
 
 function makeBarsTraces(selections, varying) {
@@ -280,9 +285,9 @@ function drawBarsBenchmars(element, data, traceFilter) {
   const traces = data.traces.map((trace) => {
     return {
       name: trace.name,
-      x : trace.x,
-      y : trace.y,
-      type : 'bar'
+      x: trace.x,
+      y: trace.y,
+      type: 'bar'
     }
   }).filter(traceFilter);
 
@@ -407,14 +412,14 @@ async function dynamicEntryPoint(elementID, defaultSelection, defaultFilter = []
 
 function miniumTimesBySizeTemplate(elementID) {
   dynamicEntryPoint(elementID, {
-      name: 'find 0',
-      algorithm: 'selection',
-      type: 'char',
-      size: 'x',
-      time: 'y',
-      padding: 'min',
-      percentage: 100,
-      group: "intel_9700K"
+    name: 'find 0',
+    algorithm: 'selection',
+    type: 'char',
+    size: 'x',
+    time: 'y',
+    padding: 'min',
+    percentage: 100,
+    group: "intel_9700K"
   });
 }
 
