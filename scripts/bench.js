@@ -247,7 +247,7 @@ function visualizationDataFromMeasurements(varying, fixed, measurements) {
   }
 }
 
-function drawLinesBenchmark(element, data, traceFilter) {
+function drawLinesBenchmark(element, width, data, traceFilter) {
   const traces = data.lines.map(line => {
     return {
       name: line.name,
@@ -274,14 +274,14 @@ function drawLinesBenchmark(element, data, traceFilter) {
       rangemode: 'tozero',
       autorange: true
     },
-    width: 1200,
+    width: width,
     height: 600,
   };
 
   Plotly.newPlot(element, traces, layout);
 }
 
-function drawBarsBenchmars(element, data, traceFilter) {
+function drawBarsBenchmars(element, width, data, traceFilter) {
   const traces = data.traces.map((trace) => {
     return {
       name: trace.name,
@@ -294,7 +294,7 @@ function drawBarsBenchmars(element, data, traceFilter) {
   const layout = {
     title: data.title,
     barmode: 'group',
-    width: 1024,
+    width: width,
     height: 600,
     yaxis: {
       title: {
@@ -305,15 +305,15 @@ function drawBarsBenchmars(element, data, traceFilter) {
   Plotly.newPlot(element, traces, layout);
 }
 
-function drawBenchmark(element, data, traceFilter) {
+function drawBenchmark(element, width, data, traceFilter) {
   if (data.x_title) {
-    drawLinesBenchmark(element, data, traceFilter);
+    drawLinesBenchmark(element, width, data, traceFilter);
   } else {
-    drawBarsBenchmars(element, data, traceFilter);
+    drawBarsBenchmars(element, width, data, traceFilter);
   }
 }
 
-function addTextInput(parent, defaultInput, onChanged) {
+function addTextInput(parent, width, defaultInput, onChanged) {
   let input = document.createElement("INPUT");
 
   let errorMessage = document.createElement('div');
@@ -321,7 +321,7 @@ function addTextInput(parent, defaultInput, onChanged) {
   errorMessage.innerHTML = NO_ERROR;
 
   input.setAttribute('type', 'text');
-  input.style.width = '1200px'
+  input.style.width = width;
   input.setAttribute('value', defaultInput);
 
   input.addEventListener('input', () => {
@@ -394,20 +394,34 @@ async function dynamicEntryPoint(elementID, defaultSelection, defaultFilter = []
     const [varying, fixed] = inputParse(selection, byKeys);
     const traceFilter = filterParse(filter);
     const asVisualized = visualizationDataFromMeasurements(varying, fixed, measurements);
-    drawBenchmark(drawHere, asVisualized, traceFilter);
+    drawBenchmark(drawHere, 1200, asVisualized, traceFilter);
   };
 
-  addTextInput(element, selection, (value) => {
+  addTextInput(element, '1200px', selection, (value) => {
     selection = value;
     redrawCallback();
   });
-  addTextInput(element, filter, (value) => {
+  addTextInput(element, '1200px', filter, (value) => {
     filter = value;
     redrawCallback();
   });
 
   drawHere = element.appendChild(document.createElement('div'));
   redrawCallback();
+}
+
+async function presentationEntryPoint(elementID, selection_, filter_ = []) {
+  const element = document.getElementById(elementID);
+  const measurements = await loadMeasurements();
+  const byKeys = await measurementsByKeys();
+
+  let selection = JSON.stringify(selection_, undefined, 2);
+  let filter = JSON.stringify(filter_, undefined, 2);
+  const [varying, fixed] = inputParse(selection, byKeys);
+  const traceFilter = filterParse(filter);
+  const asVisualized = visualizationDataFromMeasurements(varying, fixed, measurements);
+
+  drawBenchmark(element, 1000, asVisualized, traceFilter);
 }
 
 function miniumTimesBySizeTemplate(elementID) {
