@@ -41,7 +41,7 @@ struct std_find {
 };
 
 struct find_unguarded {
-  const char* name() const { return "find_unguarded"; }
+  const char* name() const { return "std_::find_unguarded"; }
 
   template <typename I, typename T>
   BENCH_ALWAYS_INLINE I operator()(I f, I, const T& x) const {
