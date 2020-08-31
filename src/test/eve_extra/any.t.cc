@@ -27,7 +27,7 @@ TEMPLATE_TEST_CASE("eve_extra.any", "[eve_extra]", ALL_TEST_PACKS) {
   wide x{0}, y{1};
 
   REQUIRE(!eve_extra::any(x == y, eve::ignore_none));
-  x[0] = 1;
+  x.set(0, 1);
   REQUIRE(eve_extra::any(x == y, eve::ignore_none));
   REQUIRE(!eve_extra::any(x == y, eve::ignore_first{1}));
 

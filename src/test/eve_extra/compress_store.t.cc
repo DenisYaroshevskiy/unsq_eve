@@ -40,7 +40,7 @@ TEMPLATE_TEST_CASE("eve_extra.compress_store_main_logic", "[eve_extra]",
     std::uint8_t o = 0;
     for (std::uint8_t i = 0; i != wide::static_size; ++i) {
       if (!mask[i]) continue;
-      expected[o++] = x[i];
+      expected.set(o++, x[i]);
     }
 
     wide actual;
@@ -50,7 +50,7 @@ TEMPLATE_TEST_CASE("eve_extra.compress_store_main_logic", "[eve_extra]",
     REQUIRE(out - actual.begin() == static_cast<std::ptrdiff_t>(o));
 
     // No guarnaties past actual
-    std::copy(out, actual.end(), &expected[o]);
+    std::copy(out, actual.end(), expected.begin() + o);
     INFO("expected: " << expected << " actual: " << actual);
     REQUIRE(eve::all(expected == actual));
 

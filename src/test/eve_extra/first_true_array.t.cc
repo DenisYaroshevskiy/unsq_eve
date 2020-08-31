@@ -34,7 +34,7 @@ TEMPLATE_TEST_CASE("eve_extra.first_true_array", "[eve_extra]",
     using namespace eve_extra;
     REQUIRE(!first_true_array(test));
 
-    x[1] = 1;
+    x.set(1, 1);
 
     for (std::size_t i = 0; i != test.size(); ++i) {
       test[i] = (x == y);

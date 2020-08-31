@@ -57,7 +57,7 @@ TEMPLATE_TEST_CASE("simd.pack.compress_mask", "[simd]",
     std::uint8_t o = 0;
     for (std::uint8_t i = 0; i != wide::static_size; ++i) {
       if (!mask[i]) continue;
-      expected[o++] = element_idxs[i];
+      expected.set(o++, element_idxs[i]);
     }
 
     auto res = run_compress();

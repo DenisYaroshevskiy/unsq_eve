@@ -77,7 +77,7 @@ void store(const Wide& wide, Ptr ptr, Ignore ignore) {
 
   // memcpy requires not null for pointers - this is the easiest check
   if (!n) return;
-  std::memcpy(raw_ptr + start, &wide[start], n * sizeof(T));
+  std::memcpy(raw_ptr + start, wide.begin() + start, n * sizeof(T));
 }
 
 }  // namespace eve_extra

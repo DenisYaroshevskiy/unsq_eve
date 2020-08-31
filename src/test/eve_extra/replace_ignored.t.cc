@@ -80,9 +80,9 @@ TEMPLATE_TEST_CASE("eve_extra.replace_ignored", "[eve_extra][replace_ignored]",
     REQUIRE(actual[1] == 1);
     REQUIRE(actual.back() == 1);
 
-    actual[0] = 0;
-    actual[1] = 0;
-    actual.back() = 0;
+    actual.set(0, 0);
+    actual.set(1, 0);
+    actual.set(wide::static_size - 1, 0);
 
     REQUIRE(eve::all(x == actual));
   }
