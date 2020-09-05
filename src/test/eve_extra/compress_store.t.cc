@@ -90,13 +90,13 @@ TEMPLATE_TEST_CASE("eve_extra.compress_store_ignore", "[eve_extra]",
     const auto* f = x.begin();
     const auto* l = x.end();
 
-    if constexpr (std::same_as<decltype(ignore), eve::ignore_first>) {
+    if constexpr (std::same_as<decltype(ignore), eve::ignore_first_>) {
       f += static_cast<std::ptrdiff_t>(ignore.count_);
-    } else if constexpr (std::same_as<decltype(ignore), eve::ignore_last>) {
+    } else if constexpr (std::same_as<decltype(ignore), eve::ignore_last_>) {
       l -= static_cast<std::ptrdiff_t>(ignore.count_);
-    } else if constexpr (std::same_as<decltype(ignore), ignore_first_last>) {
-      f += static_cast<std::ptrdiff_t>(ignore.begin_);
-      l -= static_cast<std::ptrdiff_t>(ignore.end_);
+    } else if constexpr (std::same_as<decltype(ignore), eve::ignore_extrema_>) {
+      f += static_cast<std::ptrdiff_t>(ignore.first_count_);
+      l -= static_cast<std::ptrdiff_t>(ignore.last_count_);
     }
 
     std::ptrdiff_t ignored_from_the_beginning = f - x.begin();
@@ -121,10 +121,10 @@ TEMPLATE_TEST_CASE("eve_extra.compress_store_ignore", "[eve_extra]",
   };
 
   for (int i = 0; i != wide::static_size + 1; ++i) {
-    run(eve::ignore_first{i});
-    run(eve::ignore_last{i});
+    run(eve::ignore_first_{i});
+    run(eve::ignore_last_{i});
     for (int j = 0; j != wide::static_size - i; ++j) {
-      run(ignore_first_last{i, j});
+      run(eve::ignore_extrema_{i, j});
     }
   }
 
@@ -139,7 +139,7 @@ TEMPLATE_TEST_CASE("eve_extra.compress_store_ignore", "[eve_extra]",
 
     out = scalar{5};
 
-    compress_store_unsafe(x, &out, mask, eve::ignore_last{0});
+    compress_store_unsafe(x, &out, mask, eve::ignore_last_{0});
     REQUIRE(out == 1);
   }
 }

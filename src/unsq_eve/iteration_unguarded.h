@@ -29,7 +29,7 @@ EVE_FORCEINLINE Delegate iteration_aligned_unguarded(T* f, Delegate delegate) {
 
   // Deal with first bit, maybe not fully in the data
   {
-    eve::ignore_first ignore(f - aligned_f.get());
+    eve::ignore_first_ ignore(f - aligned_f.get());
     if (delegate.small_step(aligned_f, indx_c<0>{}, ignore)) return delegate;
   }
   aligned_f += Traits::chunk_size();

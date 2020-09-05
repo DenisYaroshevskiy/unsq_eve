@@ -74,10 +74,10 @@ T* compress_store_precise(const Wide& wide, T* out, const Mask& wide_mask,
   std::uint32_t mmask = extended_movemask(wide_mask);
   mmask = clear_ignored<eve::logical<Wide>>(mmask, ignore);
 
-  if constexpr (std::same_as<Ignore, eve::ignore_first>) {
+  if constexpr (std::same_as<Ignore, eve::ignore_first_>) {
     out += ignore.count_;
-  } else if constexpr (std::same_as<Ignore, ignore_first_last>) {
-    out += ignore.begin_;
+  } else if constexpr (std::same_as<Ignore, eve::ignore_extrema_>) {
+    out += ignore.first_count_;
   }
 
   Wide buffer;
@@ -87,7 +87,7 @@ T* compress_store_precise(const Wide& wide, T* out, const Mask& wide_mask,
   int n = up_to - buffer.begin();
 
   eve_extra::store(buffer, out,
-                   eve::ignore_last{static_cast<int>(Wide::static_size - n)});
+                   eve::ignore_last_{static_cast<int>(Wide::static_size - n)});
   return out + n;
 }
 
@@ -95,7 +95,7 @@ template <native_wide Wide, std::same_as<typename Wide::value_type> T,
           extended_logical Mask, typename Ignore>
 T* compress_store_unsafe(const Wide& wide, T* out, const Mask& wide_mask,
                          Ignore ignore) {
-  if constexpr (!std::same_as<Ignore, ignore_none_t>) {
+  if constexpr (!std::same_as<Ignore, eve::ignore_none_>) {
     return compress_store_precise(wide, out, wide_mask, ignore);
   } else {
     const auto reg = mm::cast_to_integral(wide.storage());

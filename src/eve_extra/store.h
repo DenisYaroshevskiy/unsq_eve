@@ -45,7 +45,7 @@ T* raw_pointer(T* ptr) {
 }  // namespace _store
 
 template <eve_wide Wide, typename Ptr>
-void store(const Wide& wide, Ptr ptr, ignore_none_t) {
+void store(const Wide& wide, Ptr ptr, eve::ignore_none_) {
   eve::store(wide, ptr);
 }
 
@@ -64,15 +64,15 @@ void store(const Wide& wide, Ptr ptr, Ignore ignore) {
   }
 
   std::size_t start = 0, n = Wide::static_size;
-  if constexpr (std::is_same_v<Ignore, eve::ignore_first>) {
+  if constexpr (std::is_same_v<Ignore, eve::ignore_first_>) {
     start += ignore.count_;
     n -= ignore.count_;
-  } else if constexpr (std::is_same_v<Ignore, eve::ignore_last>) {
+  } else if constexpr (std::is_same_v<Ignore, eve::ignore_last_>) {
     n -= ignore.count_;
   } else {
-    static_assert(std::is_same_v<Ignore, ignore_first_last>);
-    start += ignore.begin_;
-    n -= ignore.begin_ + ignore.end_;
+    static_assert(std::is_same_v<Ignore, eve::ignore_extrema_>);
+    start += ignore.first_count_;
+    n -= ignore.first_count_ + ignore.last_count_;
   }
 
   // memcpy requires not null for pointers - this is the easiest check

@@ -41,70 +41,66 @@ TEMPLATE_TEST_CASE("eve_extra.first_true", "[eve_extra]", ALL_TEST_PACKS) {
 
   SECTION("ignore first") {
     for (int i = 0; i != size; ++i) {
-      auto found = eve_extra::first_true(x == y, eve::ignore_first{i});
+      auto found = eve_extra::first_true(x == y, eve::ignore_first_{i});
       REQUIRE(!found);
 
-      found = eve_extra::first_true(x == y, eve_extra::ignore_first_last{i, 0});
+      found = eve_extra::first_true(x == y, eve::ignore_extrema_{i, 0});
       REQUIRE(!found);
 
       x.set(i, 2);
 
-      found = eve_extra::first_true(x == y, eve::ignore_first{i});
+      found = eve_extra::first_true(x == y, eve::ignore_first_{i});
       REQUIRE(found);
       REQUIRE(i == static_cast<int>(*found));
 
-      found = eve_extra::first_true(x == y, eve_extra::ignore_first_last{i, 0});
+      found = eve_extra::first_true(x == y, eve::ignore_extrema_{i, 0});
       REQUIRE(found);
       REQUIRE(i == static_cast<int>(*found));
 
-      found = eve_extra::first_true(x == y, eve::ignore_first{i + 1});
+      found = eve_extra::first_true(x == y, eve::ignore_first_{i + 1});
       REQUIRE(!found);
 
-      found =
-          eve_extra::first_true(x == y, eve_extra::ignore_first_last{i + 1, 0});
+      found = eve_extra::first_true(x == y, eve::ignore_extrema_{i + 1, 0});
       REQUIRE(!found);
     }
   }
 
   SECTION("ignore last") {
     for (int i = size; i != 0; --i) {
-      auto found = eve_extra::first_true(x == y, eve::ignore_last{size - i});
+      auto found = eve_extra::first_true(x == y, eve::ignore_last_{size - i});
       REQUIRE(!found);
 
-      found = eve_extra::first_true(x == y,
-                                    eve_extra::ignore_first_last{0, size - i});
+      found = eve_extra::first_true(x == y, eve::ignore_extrema_{0, size - i});
       REQUIRE(!found);
 
       x.set(i - 1, 2);
 
-      found = eve_extra::first_true(x == y, eve::ignore_last{size - i});
+      found = eve_extra::first_true(x == y, eve::ignore_last_{size - i});
       REQUIRE(found);
       REQUIRE(i - 1 == static_cast<int>(*found));
 
-      found = eve_extra::first_true(x == y,
-                                    eve_extra::ignore_first_last{0, size - i});
+      found = eve_extra::first_true(x == y, eve::ignore_extrema_{0, size - i});
       REQUIRE(found);
       REQUIRE(i - 1 == static_cast<int>(*found));
 
-      found = eve_extra::first_true(x == y, eve::ignore_last{size - i + 1});
+      found = eve_extra::first_true(x == y, eve::ignore_last_{size - i + 1});
       REQUIRE(!found);
 
-      found = eve_extra::first_true(
-          x == y, eve_extra::ignore_first_last{0, size - i + 1});
+      found =
+          eve_extra::first_true(x == y, eve::ignore_extrema_{0, size - i + 1});
       REQUIRE(!found);
     }
   }
 
-  SECTION("ignore_first_last") {
+  SECTION("ignore_extrema_") {
     x.set(0, 2);
     x.set(1, 2);
     x.set(size - 1, 2);
 
-    eve::ignore_first first{2};
-    eve::ignore_last last{1};
+    eve::ignore_first_ first{2};
+    eve::ignore_last_ last{1};
 
-    auto found = eve_extra::first_true(
-        x == y, eve_extra::ignore_first_last(first, last));
+    auto found = eve_extra::first_true(x == y, first && last);
 
     REQUIRE(!found);
   }

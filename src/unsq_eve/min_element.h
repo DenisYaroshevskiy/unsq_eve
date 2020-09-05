@@ -63,7 +63,7 @@ struct min_body {
                                   Ignore ignore) {
     wide_read read;
 
-    if constexpr (std::is_same_v<Ignore, eve_extra::ignore_none_t>) {
+    if constexpr (std::is_same_v<Ignore, eve::ignore_none_>) {
       read = wide_read{from};
     } else {
       read = eve_extra::load_unsafe(from, eve::as_<wide_read>{});

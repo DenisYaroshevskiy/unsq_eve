@@ -29,7 +29,7 @@ TEMPLATE_TEST_CASE("eve_extra.any", "[eve_extra]", ALL_TEST_PACKS) {
   REQUIRE(!eve_extra::any(x == y, eve::ignore_none));
   x.set(0, 1);
   REQUIRE(eve_extra::any(x == y, eve::ignore_none));
-  REQUIRE(!eve_extra::any(x == y, eve::ignore_first{1}));
+  REQUIRE(!eve_extra::any(x == y, eve::ignore_first_{1}));
 
   SECTION("extra_wide") {
     using T = typename wide::value_type;

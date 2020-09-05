@@ -50,11 +50,11 @@ TEMPLATE_TEST_CASE("eve_extra.store", "[eve_extra]", ALL_TEST_PACKS) {
     for (int i = 0; i != wide::static_size + 1; ++i) {
       INFO("i: " << i);
       actual.fill(0);
-      eve_extra::store(x, actual.data(), eve::ignore_first{i});
+      eve_extra::store(x, actual.data(), eve::ignore_first_{i});
       values_test(i, 0);
 
       actual.fill(0);
-      eve_extra::store(x, actual.data(), eve_extra::ignore_first_last{i, 0});
+      eve_extra::store(x, actual.data(), eve::ignore_extrema_{i, 0});
       values_test(i, 0);
     }
   }
@@ -63,11 +63,11 @@ TEMPLATE_TEST_CASE("eve_extra.store", "[eve_extra]", ALL_TEST_PACKS) {
     for (int i = 0; i != wide::static_size + 1; ++i) {
       INFO("i: " << i);
       actual.fill(0);
-      eve_extra::store(x, actual.data(), eve::ignore_last{i});
+      eve_extra::store(x, actual.data(), eve::ignore_last_{i});
       values_test(0, i);
 
       actual.fill(0);
-      eve_extra::store(x, actual.data(), eve_extra::ignore_first_last{0, i});
+      eve_extra::store(x, actual.data(), eve::ignore_extrema_{0, i});
       values_test(0, i);
     }
   }
@@ -76,8 +76,8 @@ TEMPLATE_TEST_CASE("eve_extra.store", "[eve_extra]", ALL_TEST_PACKS) {
     scalar where{1};
 
     for (int i = 0; i != wide::static_size; ++i) {
-      eve_extra::ignore_first_last ignore{
-          i, static_cast<int>(wide::static_size - i - 1)};
+      eve::ignore_extrema_ ignore{i,
+                                  static_cast<int>(wide::static_size - i - 1)};
 
       store(x, &where - i, ignore);
       REQUIRE(where == x[i]);

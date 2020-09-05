@@ -29,11 +29,8 @@
 
 namespace eve_extra {
 
-using ignore_none_t = decltype(eve::ignore_none);
-using ignore_first_last = eve::keep_between<true>;
-
 template <native_logical Logical>
-std::uint32_t clear_ignored(std::uint32_t mmask, ignore_none_t) {
+std::uint32_t clear_ignored(std::uint32_t mmask, eve::ignore_none_) {
   return mmask;
 }
 
@@ -45,7 +42,7 @@ constexpr std::uint32_t set_lower_n_bits(std::uint32_t n) {
 }
 
 template <native_logical Logical>
-std::uint32_t clear_ignored(std::uint32_t mmask, eve::ignore_first ignore) {
+std::uint32_t clear_ignored(std::uint32_t mmask, eve::ignore_first_ ignore) {
   using scalar = typename Logical::value_type;
 
   std::uint32_t ignore_mask = ~set_lower_n_bits(ignore.count_ * sizeof(scalar));
@@ -53,7 +50,7 @@ std::uint32_t clear_ignored(std::uint32_t mmask, eve::ignore_first ignore) {
 }
 
 template <native_logical Logical>
-std::uint32_t clear_ignored(std::uint32_t mmask, eve::ignore_last ignore) {
+std::uint32_t clear_ignored(std::uint32_t mmask, eve::ignore_last_ ignore) {
   using scalar = typename Logical::value_type;
 
   std::uint32_t ignore_mask = set_lower_n_bits(
@@ -62,10 +59,10 @@ std::uint32_t clear_ignored(std::uint32_t mmask, eve::ignore_last ignore) {
 }
 
 template <native_logical Logical>
-std::uint32_t clear_ignored(std::uint32_t mmask,
-                            eve::keep_between<true> ignore) {
-  mmask = clear_ignored<Logical>(mmask, eve::ignore_first{ignore.begin_});
-  return clear_ignored<Logical>(mmask, eve::ignore_last{ignore.end_});
+std::uint32_t clear_ignored(std::uint32_t mmask, eve::ignore_extrema_ ignore) {
+  mmask =
+      clear_ignored<Logical>(mmask, eve::ignore_first_{ignore.first_count_});
+  return clear_ignored<Logical>(mmask, eve::ignore_last_{ignore.last_count_});
 }
 
 template <eve_logical Logical>
@@ -108,13 +105,13 @@ using signed_integer_wide =
     decltype(_mmask_operations::do_signed_integer_wide<Wide>());
 
 template <typename Wide>
-Wide ignore_first_broadcast(eve::ignore_first ignore) {
+Wide ignore_first_broadcast(eve::ignore_first_ ignore) {
   using T = typename Wide::value_type;
   return Wide{static_cast<T>(ignore.count_) - 1};
 }
 
 template <typename Wide>
-Wide ignore_last_broadcast(eve::ignore_last ignore) {
+Wide ignore_last_broadcast(eve::ignore_last_ ignore) {
   using T = typename Wide::value_type;
 
   T last_idx = static_cast<T>(Wide::static_size);
@@ -126,36 +123,31 @@ Wide ignore_last_broadcast(eve::ignore_last ignore) {
 }  // namespace _mmask_operations
 
 template <eve_logical Logical>
-Logical ignore_broadcast(ignore_none_t) {
+Logical ignore_broadcast(eve::ignore_none_) {
   return eve::ignore_none.mask(eve::as_<wide_for_logical_t<Logical>>{});
 }
 
 template <eve_logical Logical>
-Logical ignore_broadcast(eve::ignore_first ignore) {
+Logical ignore_broadcast(eve::ignore_first_ ignore) {
   return ignore.mask(eve::as_<wide_for_logical_t<Logical>>{});
 }
 
 template <eve_logical Logical>
-Logical ignore_broadcast(eve::ignore_last ignore) {
-  using wide = wide_for_logical_t<Logical>;
-  using si_wide = _mmask_operations::signed_integer_wide<wide>;
-
-  si_wide idxs = eve_extra::iota(eve::as_<si_wide>{});
-  si_wide vignore = _mmask_operations::ignore_last_broadcast<si_wide>(ignore);
-
-  return Logical{idxs < vignore};
+Logical ignore_broadcast(eve::ignore_last_ ignore) {
+  return ignore.mask(eve::as_<wide_for_logical_t<Logical>>{});
 }
 
 template <eve_logical Logical>
-Logical ignore_broadcast(ignore_first_last ignore) {
+Logical ignore_broadcast(eve::ignore_extrema_ ignore) {
   using namespace _mmask_operations;
   using wide = wide_for_logical_t<Logical>;
   using si_wide = signed_integer_wide<wide>;
 
   si_wide idxs = eve_extra::iota(eve::as_<si_wide>{});
   si_wide first =
-      ignore_first_broadcast<si_wide>(eve::ignore_first{ignore.begin_});
-  si_wide last = ignore_last_broadcast<si_wide>(eve::ignore_last{ignore.end_});
+      ignore_first_broadcast<si_wide>(eve::ignore_first_{ignore.first_count_});
+  si_wide last =
+      ignore_last_broadcast<si_wide>(eve::ignore_last_{ignore.last_count_});
 
   eve::logical<si_wide> first_mask = first < idxs;
   eve::logical<si_wide> last_mask = idxs < last;

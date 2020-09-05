@@ -167,7 +167,7 @@ EVE_FORCEINLINE Delegate iteration_indexed_aligned(T* f, T* l,
   auto aligned_f = Traits::previous_aligned_address(f);
   auto aligned_l = Traits::previous_aligned_address(l);
 
-  eve::ignore_first ignore_first{static_cast<int>(f - aligned_f.get())};
+  eve::ignore_first_ ignore_first{static_cast<int>(f - aligned_f.get())};
 
   delegate.set_base(aligned_f.get());
 
@@ -177,7 +177,7 @@ EVE_FORCEINLINE Delegate iteration_indexed_aligned(T* f, T* l,
     if (delegate.small_step(aligned_f, indx_c<0>{}, wide_i, ignore_first))
       return delegate;
 
-    ignore_first = eve::ignore_first{0};
+    ignore_first = eve::ignore_first_{0};
     aligned_f += Traits::chunk_size();
     wide_i += _iteration_indexed_guarded::wide_step<Traits>();
 
@@ -189,9 +189,9 @@ EVE_FORCEINLINE Delegate iteration_indexed_aligned(T* f, T* l,
 
   const int last_offset = aligned_l.get() + Traits::chunk_size() - l;
 
-  eve::ignore_last ignore_last{last_offset};
+  eve::ignore_last_ ignore_last{last_offset};
   delegate.small_step(aligned_l, indx_c<0>{}, wide_i,
-                      eve::keep_between(ignore_first, ignore_last));
+                      ignore_first && ignore_last);
   return delegate;
 }
 
