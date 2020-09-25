@@ -18,7 +18,6 @@
 #define EVE_EXTRA_COMPRESS_STORE_H_
 
 #include <immintrin.h>
-#include <array>
 
 #include <eve/conditional.hpp>
 #include <eve/eve.hpp>

@@ -139,20 +139,7 @@ Logical ignore_broadcast(eve::ignore_last_ ignore) {
 
 template <eve_logical Logical>
 Logical ignore_broadcast(eve::ignore_extrema_ ignore) {
-  using namespace _mmask_operations;
-  using wide = wide_for_logical_t<Logical>;
-  using si_wide = signed_integer_wide<wide>;
-
-  si_wide idxs = eve_extra::iota(eve::as_<si_wide>{});
-  si_wide first =
-      ignore_first_broadcast<si_wide>(eve::ignore_first_{ignore.first_count_});
-  si_wide last =
-      ignore_last_broadcast<si_wide>(eve::ignore_last_{ignore.last_count_});
-
-  eve::logical<si_wide> first_mask = first < idxs;
-  eve::logical<si_wide> last_mask = idxs < last;
-
-  return Logical{eve::logical_and(first_mask, last_mask)};
+  return ignore.mask(eve::as_<wide_for_logical_t<Logical>>{});
 }
 
 }  // namespace eve_extra

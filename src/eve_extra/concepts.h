@@ -64,8 +64,11 @@ concept composite_wide = eve_wide<Wide>&& requires(const Wide& x) {
 };
 
 template <eve_wide Wide>
-constexpr std::size_t static_byte_size_v = Wide::static_size *
-                                           sizeof(typename Wide::value_type);
+constexpr std::size_t element_size_v = sizeof(typename Wide::value_type);
+
+template <eve_wide Wide>
+constexpr std::size_t static_byte_size_v =
+    Wide::static_size* element_size_v<Wide>;
 
 template <typename Wide>
 concept native_wide = eve_wide<Wide> && ((static_byte_size_v<Wide> == 16) ||

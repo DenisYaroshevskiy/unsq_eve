@@ -30,6 +30,7 @@
 #include "eve_extra/mmask_operations.h"
 #include "eve_extra/reduce_wide.h"
 #include "eve_extra/replace_ignored.h"
+#include "eve_extra/reverse.h"
 #include "eve_extra/scan_wide.h"
 #include "eve_extra/shift_pair.h"
 #include "eve_extra/store.h"

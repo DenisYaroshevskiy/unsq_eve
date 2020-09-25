@@ -27,6 +27,7 @@ target_sources(tests PRIVATE
                eve_extra/mmask_operations.t.cc
                eve_extra/reduce_wide.t.cc
                eve_extra/replace_ignored.t.cc
+               eve_extra/reverse.t.cc
                eve_extra/scan_wide.t.cc
                eve_extra/shift_pair.t.cpp
                eve_extra/store.t.cc
