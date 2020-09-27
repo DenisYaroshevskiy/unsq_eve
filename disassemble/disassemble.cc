@@ -9,8 +9,6 @@
 #include "unsq_eve/transform.h"
 
 using T = int;
-using traits = unsq_eve::algorithm_traits<T, 256, 4>;
+using traits = unsq_eve::algorithm_traits<T, 256, 1>;
 
-bool any(const T* f, const T* l, T v) {
-  return unsq_eve::any_of_is<traits>(f, l, v);
-}
+bool any(T* f, T* l, T v) { return unsq_eve::remove<traits>(f, l, v); }

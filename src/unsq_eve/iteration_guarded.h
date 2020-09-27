@@ -95,7 +95,7 @@ EVE_FORCEINLINE Delegate iteration_aligned(T* f, T* l, Delegate delegate) {
 
   delegate.set_base(aligned_f.get());
 
-  eve::ignore_first_ ignore_first{static_cast<int>(f - aligned_f.get())};
+  eve::ignore_first_ ignore_first{f - aligned_f.get()};
 
   if (aligned_f.get() != aligned_l.get()) {
     // first chunk, maybe partial

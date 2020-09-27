@@ -25,8 +25,6 @@
 #include "unsq_eve/iteration_guarded.h"
 #include "unsq_eve/predicate_helpers.h"
 
-#include <iostream>
-
 namespace unsq_eve {
 namespace _remove {
 
