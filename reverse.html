@@ -1,0 +1,146 @@
+<!doctype html>
+<html>
+<meta charset='utf-8'>
+
+<title>reverse results</title>
+<script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
+<script type='text/javascript' src='scripts/bench.js'></script>
+
+</html>
+
+<body>
+  <h1> reverse </h1>
+
+  So far only have an inplace version. (no reverse_copy) <br />
+  Unrolling by hand does not do anything useful. <br />
+  I left all benchmarks for 128 registers but I'm not commenting on them. <br />
+
+  <h2> 40 bytes summary</h2>
+
+  I am not too sure if the slowest part is active in any of these cases but
+  <br />
+  Seems like for 10 integers we can't beat the scalar perfromace. <br />
+  I have no idea why the scalar is this fast though. <br />
+  For chars makes some sense - we get a two times speed up <br />
+
+  With code alignment - not as cool as other simd algorithms - <br />
+  there are a few close branches in the beginning. (especially for integers).
+  <br />
+  I can transform one of them in cmov but I don't care enough at the moment to
+  try. <br />
+
+  <h3> 40 bytes, data</h3>
+
+  <div id='40_bytes_data'></div>
+  <script>dynamicEntryPoint('40_bytes_data', {
+      name: 'inplace transform',
+      size: 40,
+      algorithm: 'selection',
+      type: 'x',
+      time: 'y',
+      padding: 'min',
+      group: 'intel_9700K',
+      percentage: 100,
+    }, ['reverse<128, 1>', 'reverse<256, 1>', 'std::reverse']);
+  </script>
+
+  <h3> 40 bytes, code alignment </h3>
+  <div id='40_bytes_data_code_alignment'></div>
+  <script>dynamicEntryPoint('40_bytes_data_code_alignment', {
+      name: 'inplace transform',
+      size: 40,
+      algorithm: 'selection',
+      type: 'selection',
+      time: 'y',
+      padding: 'minmax',
+      group: 'intel_9700K',
+      percentage: 100,
+    }, ['reverse<128, 1>', 'reverse<256, 1>', 'std::reverse']);
+  </script>
+
+  <h2> 1000 bytes summary</h2>
+
+  Nice results: 17.8 times faster for chars, 9.1 for shorts, 7.6 for ints.
+  <br />
+  Code alignment can decrease perf almost 1.75 times for integers - <br />
+  again blame those two branches. Not sure I care.
+
+  <h3> 1000 bytes, data</h3>
+
+  <div id='1000_bytes_data'></div>
+  <script>dynamicEntryPoint('1000_bytes_data', {
+      name: 'inplace transform',
+      size: 1000,
+      algorithm: 'selection',
+      type: 'x',
+      time: 'y',
+      padding: 'min',
+      group: 'intel_9700K',
+      percentage: 100,
+    }, ['reverse<128, 1>', 'reverse<256, 1>', 'std::reverse']);
+  </script>
+
+  <h3> 1000 bytes, code alignment </h3>
+  <div id='1000_bytes_data_code_alignment'></div>
+  <script>dynamicEntryPoint('1000_bytes_data_code_alignment', {
+      name: 'inplace transform',
+      size: 1000,
+      algorithm: 'selection',
+      type: 'selection',
+      time: 'y',
+      padding: 'minmax',
+      group: 'intel_9700K',
+      percentage: 100,
+    }, ['reverse<128, 1>', 'reverse<256, 1>', 'std::reverse']);
+  </script>
+
+  <h2> 10000 bytes summary</h2>
+
+  Nice results: 17.8 times faster for chars, 9 times for shorts, 6.5 for ints.
+  <br />
+  Code alignment impact is almost negligeable - about 10% for ints and nothing for others. <br />
+
+  <h3> 10000 bytes, data</h3>
+
+  <div id='10000_bytes_data'></div>
+  <script>dynamicEntryPoint('10000_bytes_data', {
+      name: 'inplace transform',
+      size: 10000,
+      algorithm: 'selection',
+      type: 'x',
+      time: 'y',
+      padding: 'min',
+      group: 'intel_9700K',
+      percentage: 100,
+    }, ['reverse<128, 1>', 'reverse<256, 1>', 'std::reverse']);
+  </script>
+
+  <h3> 10000 bytes, code alignment </h3>
+  <div id='10000_bytes_data_code_alignment'></div>
+  <script>dynamicEntryPoint('10000_bytes_data_code_alignment', {
+      name: 'inplace transform',
+      size: 10000,
+      algorithm: 'selection',
+      type: 'selection',
+      time: 'y',
+      padding: 'minmax',
+      group: 'intel_9700K',
+      percentage: 100,
+    }, ['reverse<128, 1>', 'reverse<256, 1>', 'std::reverse']);
+  </script>
+
+  <h2> Total benchmark </h2>
+  <div id='total_benchmark'></div>
+  <script>dynamicEntryPoint('total_benchmark', {
+      name: 'inplace transform',
+      size: 'x',
+      algorithm: 'selection',
+      type: 'selection',
+      time: 'y',
+      padding: 'min',
+      group: 'intel_9700K',
+      percentage: 100,
+    }, ['reverse']);
+  </script>
+
+</body>
