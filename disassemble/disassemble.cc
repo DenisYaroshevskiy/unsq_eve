@@ -6,9 +6,10 @@
 #include "unsq_eve/min_element.h"
 #include "unsq_eve/reduce.h"
 #include "unsq_eve/remove.h"
+#include "unsq_eve/reverse.h"
 #include "unsq_eve/transform.h"
 
 using T = int;
-using traits = unsq_eve::algorithm_traits<T, 256, 1>;
+using traits = unsq_eve::algorithm_traits<T, 256, 4>;
 
-bool any(T* f, T* l, T v) { return unsq_eve::remove<traits>(f, l, v); }
+void reverse(T* f, T* l) { return unsq_eve::reverse<traits>(f, l); }
