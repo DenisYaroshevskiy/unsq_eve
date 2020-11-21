@@ -43,20 +43,16 @@ int main(int argc, char** argv) {
   using char_bench =
       bench::inplace_transform_bench<char,
                                      unsq_eve_inclusive_scan_inplace<128, 1>,
-                                     unsq_eve_inclusive_scan_inplace<128, 2>,
                                      unsq_eve_inclusive_scan_inplace<256, 1>,
-                                     unsq_eve_inclusive_scan_inplace<256, 2>,
-                                     unsq_eve_inclusive_scan_inplace<256, 4>>;
+                                     unsq_eve_inclusive_scan_inplace<256, 2>>;
 
   using short_bench =
       bench::inplace_transform_bench<short,
-                                     unsq_eve_inclusive_scan_inplace<256, 1>,
-                                     unsq_eve_inclusive_scan_inplace<256, 2>>;
+                                     unsq_eve_inclusive_scan_inplace<256, 1>>;
 
   using int_bench =
       bench::inplace_transform_bench<int,
-                                     unsq_eve_inclusive_scan_inplace<256, 1>,
-                                     unsq_eve_inclusive_scan_inplace<256, 2>>;
+                                     unsq_eve_inclusive_scan_inplace<256, 1>>;
 
   bench::bench_main<char_bench, short_bench, int_bench>(argc, argv);
 }
