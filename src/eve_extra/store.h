@@ -45,12 +45,12 @@ T* raw_pointer(T* ptr) {
 }  // namespace _store
 
 template <eve_wide Wide, typename Ptr>
-void store(const Wide& wide, Ptr ptr, eve::ignore_none_) {
+EVE_FORCEINLINE void store(const Wide& wide, Ptr ptr, eve::ignore_none_) {
   eve::store(wide, ptr);
 }
 
 template <native_wide Wide, typename Ptr, typename Ignore>
-void store(const Wide& wide, Ptr ptr, Ignore ignore) {
+EVE_FORCEINLINE void store(const Wide& wide, Ptr ptr, Ignore ignore) {
   using T = typename Wide::value_type;
   static_assert(std::is_same_v<T, std::decay_t<decltype(*ptr)>>);
   T* raw_ptr = _store::raw_pointer(ptr);

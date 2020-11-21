@@ -9,7 +9,7 @@
 #include "unsq_eve/reverse.h"
 #include "unsq_eve/transform.h"
 
-using T = int;
-using traits = unsq_eve::algorithm_traits<T, 256, 4>;
+using T = char;
+using traits = unsq_eve::algorithm_traits<T, 256, 1>;
 
 void reverse(T* f, T* l) { return unsq_eve::reverse<traits>(f, l); }
