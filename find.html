@@ -1,0 +1,158 @@
+<!doctype html>
+<html>
+<meta charset='utf-8'>
+
+<title>find results</title>
+<script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
+<script type='text/javascript' src='scripts/bench.js'></script>
+
+</html>
+
+<body>
+  <h1> find/find_unguaraded/any </h1>
+
+  find and find_unguaraded <br />
+
+  <h2> 40 bytes summary</h2>
+
+  <h3> 40 bytes, data</h3>
+
+  <div id='40_bytes_data'></div>
+  <script>dynamicEntryPoint('40_bytes_data', {
+      name: 'find 0',
+      size: 40,
+      algorithm: 'selection',
+      type: 'x',
+      time: 'y',
+      padding: 'min',
+      group: 'intel_9700K',
+      percentage: 100,
+    }, ['strlen',
+        'std::find',
+        'std_::find_unguarded',
+        'unsq_eve::find<256, 4>',
+        'unsq_eve::find_unguarded<256, 4>',
+        'unsq_eve::any_of<256, 4>']);
+  </script>
+
+  <h3> 40 bytes, code alignment </h3>
+  <div id='40_bytes_data_code_alignment'></div>
+  <script>dynamicEntryPoint('40_bytes_data_code_alignment', {
+      name: 'find 0',
+      size: 40,
+      algorithm: 'selection',
+      type: 'selection',
+      time: 'y',
+      padding: 'minmax',
+      group: 'intel_9700K',
+      percentage: 100,
+    }, ['strlen',
+        'std::find',
+        'std_::find_unguarded',
+        'unsq_eve::find<256, 4>',
+        'unsq_eve::find_unguarded<256, 4>',
+        'unsq_eve::any_of<256, 4>']);
+  </script>
+
+  <h2> 1000 bytes summary</h2>
+
+  <h3> 1000 bytes, data</h3>
+
+  <div id='1000_bytes_data'></div>
+  <script>dynamicEntryPoint('1000_bytes_data', {
+      name: 'find 0',
+      size: 1000,
+      algorithm: 'selection',
+      type: 'x',
+      time: 'y',
+      padding: 'min',
+      group: 'intel_9700K',
+      percentage: 100,
+    }, ['strlen',
+        'std::find',
+        'std_::find_unguarded',
+        'unsq_eve::find<256, 4>',
+        'unsq_eve::find_unguarded<256, 4>',
+        'unsq_eve::any_of<256, 4>']);
+  </script>
+
+  <h3> 1000 bytes, code alignment </h3>
+  <div id='1000_bytes_data_code_alignment'></div>
+  <script>dynamicEntryPoint('1000_bytes_data_code_alignment', {
+      name: 'find 0',
+      size: 1000,
+      algorithm: 'selection',
+      type: 'selection',
+      time: 'y',
+      padding: 'minmax',
+      group: 'intel_9700K',
+      percentage: 100,
+    }, ['strlen',
+        'std::find',
+        'std_::find_unguarded',
+        'unsq_eve::find<256, 4>',
+        'unsq_eve::find_unguarded<256, 4>',
+        'unsq_eve::any_of<256, 4>']);
+  </script>
+
+  <h2> 10000 bytes summary</h2>
+
+  <h3> 10000 bytes, data</h3>
+
+  <div id='10000_bytes_data'></div>
+  <script>dynamicEntryPoint('10000_bytes_data', {
+      name: 'find 0',
+      size: 10000,
+      algorithm: 'selection',
+      type: 'x',
+      time: 'y',
+      padding: 'min',
+      group: 'intel_9700K',
+      percentage: 100,
+    }, ['strlen',
+        'std::find',
+        'std_::find_unguarded',
+        'unsq_eve::find<256, 4>',
+        'unsq_eve::find_unguarded<256, 4>',
+        'unsq_eve::any_of<256, 4>']);
+  </script>
+
+  <h3> 10000 bytes, code alignment </h3>
+  <div id='10000_bytes_data_code_alignment'></div>
+  <script>dynamicEntryPoint('10000_bytes_data_code_alignment', {
+      name: 'find 0',
+      size: 10000,
+      algorithm: 'selection',
+      type: 'selection',
+      time: 'y',
+      padding: 'minmax',
+      group: 'intel_9700K',
+      percentage: 100,
+    }, ['strlen',
+        'std::find',
+        'std_::find_unguarded',
+        'unsq_eve::find<256, 4>',
+        'unsq_eve::find_unguarded<256, 4>',
+        'unsq_eve::any_of<256, 4>']);
+  </script>
+
+  <h2> Total benchmark </h2>
+  <div id='total_benchmark'></div>
+  <script>dynamicEntryPoint('total_benchmark', {
+      name: 'find 0',
+      size: 'x',
+      algorithm: 'selection',
+      type: 'selection',
+      time: 'y',
+      padding: 'min',
+      group: 'intel_9700K',
+      percentage: 100,
+    }, ['strlen',
+        'std::find',
+        'std_::find_unguarded',
+        'unsq_eve::find<',
+        'unsq_eve::find_unguarded<',
+        'unsq_eve::any_of<']);
+  </script>
+
+</body>
