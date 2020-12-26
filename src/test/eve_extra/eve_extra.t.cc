@@ -40,7 +40,7 @@ TEST_CASE("previous_aligned_address", "[eve_extra]") {
 TEMPLATE_TEST_CASE("eve_extra.load_unsafe", "[eve_extra]", ALL_TEST_PACKS) {
   using wide = TestType;
   using scalar = typename wide::value_type;
-  constexpr std::ptrdiff_t size = wide::static_size;
+  using N = eve::fixed<wide::static_size>;
 
   scalar s{123};
 
@@ -48,10 +48,10 @@ TEMPLATE_TEST_CASE("eve_extra.load_unsafe", "[eve_extra]", ALL_TEST_PACKS) {
 
   auto* page_end = eve_extra::end_of_page(&s);
 
-  if (page_end - &s < size) {
-    actual = eve_extra::load_unsafe(page_end - size, eve::as_<wide>{});
+  if (page_end - &s < N{}()) {
+    actual = eve_extra::load_unsafe(page_end - N{}(), N{});
   } else {
-    actual = eve_extra::load_unsafe(&s, eve::as_<wide>{});
+    actual = eve_extra::load_unsafe(&s, N{});
   }
 
   wide expected{s};
@@ -60,7 +60,7 @@ TEMPLATE_TEST_CASE("eve_extra.load_unsafe", "[eve_extra]", ALL_TEST_PACKS) {
   actual = eve_extra::load_unsafe(
       eve_extra::previous_aligned_address<wide::static_size * sizeof(scalar)>(
           &s),
-      eve::as_<wide>{});
+      N{});
   REQUIRE(eve::any(expected == actual));
 }
 
@@ -70,7 +70,7 @@ TEST_CASE("eve_extra.load_const_aligned_ptr", "[eve_extra]") {
   data.fill(1);
 
   eve::aligned_ptr<char, 16> ptr{data.begin()};
-  wide loaded = eve::load(ptr, eve::as_<wide>{});
+  wide loaded = eve::load(ptr, eve::fixed<16>{});
 
   REQUIRE(eve::all(loaded == wide{1}));
 }

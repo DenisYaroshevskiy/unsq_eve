@@ -50,7 +50,7 @@ struct any_body {
     if constexpr (std::is_same_v<Ignore, eve::ignore_none_>) {
       regs[idx] = wide{ptr};
     } else {
-      regs[idx] = eve_extra::load_unsafe(ptr, eve::as_<wide>{});
+      regs[idx] = eve_extra::load_unsafe(ptr, width_t<Traits>{});
     }
 
     res = eve_extra::any(p(regs[idx]), ignore);

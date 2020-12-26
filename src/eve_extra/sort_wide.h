@@ -18,6 +18,7 @@
 #define EVE_EXTRA_SORT_WIDE_H_
 
 #include <eve/eve.hpp>
+#include <eve/function/max.hpp>
 #include <eve/function/min.hpp>
 
 #include "eve_extra/swap_adjacent_groups.h"

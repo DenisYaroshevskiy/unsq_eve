@@ -48,7 +48,7 @@ struct inplace_body {
     if constexpr (std::is_same_v<Ignore, eve::ignore_none_>) {
       read = wide{ptr};
     } else {
-      read = eve_extra::load_unsafe(ptr, eve::as_<wide>{});
+      read = eve_extra::load_unsafe(ptr, width_t<Traits>{});
     }
 
     wide xs = eve::convert(read, eve::as_<T>{});

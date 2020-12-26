@@ -20,7 +20,7 @@ struct body {
   template <typename Ptr>
   EVE_FORCEINLINE void small_array_step(Ptr from,
                                         eve::ignore_first_ ignore) const {
-    wide xs = eve_extra::load_unsafe(from, eve::as_<wide_read>{});
+    wide xs = eve_extra::load_unsafe(from, width_t<Traits>{});
     xs = eve_extra::reverse(xs);
 
     eve_extra::store(xs, from + ignore.count_,
@@ -30,7 +30,7 @@ struct body {
   template <typename Ptr>
   EVE_FORCEINLINE void small_array_step(Ptr from,
                                         eve::ignore_last_ ignore) const {
-    wide xs = eve_extra::load_unsafe(from, eve::as_<wide_read>{});
+    wide xs = eve_extra::load_unsafe(from, width_t<Traits>{});
     xs = eve_extra::reverse(xs);
 
     eve_extra::store(xs, from - ignore.count_,

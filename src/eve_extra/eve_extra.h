@@ -38,10 +38,9 @@
 
 namespace eve_extra {
 
-template <typename P, typename Tgt>
-__attribute__((no_sanitize_address)) auto load_unsafe(P p,
-                                                      const Tgt& tgt) noexcept {
-  return eve::load(p, tgt);
+template <typename P, typename N>
+__attribute__((no_sanitize_address)) auto load_unsafe(P p, N n) noexcept {
+  return eve::load(p, n);
 }
 
 constexpr std::ptrdiff_t page_size() { return 1 << 12; }

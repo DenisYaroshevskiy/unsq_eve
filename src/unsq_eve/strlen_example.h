@@ -26,20 +26,21 @@ namespace unsq_eve {
 // Simplified implementation of stlren - see find_unguarded for a proper one.
 std::size_t strlen_example(const char* s) {
   using wide = eve::wide<char>;
+  using N = typename wide::cardinal_type;
 
   const wide zeroes{0};
 
   eve::aligned_ptr aligned_s =
       eve_extra::previous_aligned_address<sizeof(wide)>(s);
 
-  wide cur = eve_extra::load_unsafe(aligned_s, eve::as_<wide>{});
+  wide cur = eve_extra::load_unsafe(aligned_s, N{});
   eve::ignore_first_ ignore(s - aligned_s.get());
 
   std::optional match = eve_extra::first_true(cur == zeroes, ignore);
 
   while (!match) {
     aligned_s += wide::static_size;
-    cur = eve_extra::load_unsafe(aligned_s, eve::as_<wide>{});
+    cur = eve_extra::load_unsafe(aligned_s, N{});
     match = eve_extra::first_true(cur == zeroes, eve::ignore_none);
   }
 
