@@ -17,8 +17,6 @@
 #ifndef EVE_EXTRA_REPLACE_IGNORED_H_
 #define EVE_EXTRA_REPLACE_IGNORED_H_
 
-#include "eve_extra/mmask_operations.h"
-
 #include <eve/function/if_else.hpp>
 
 namespace eve_extra {
@@ -30,7 +28,7 @@ Wide replace_ignored(Wide x, eve::ignore_none_, Wide) {
 
 template <eve_wide Wide, typename Ignore>
 Wide replace_ignored(Wide x, Ignore ignore, Wide with) {
-  return eve::if_else(ignore_broadcast<eve::logical<Wide>>(ignore), x, with);
+  return eve::if_else[ignore](x, with);
 }
 
 }  // namespace eve_extra

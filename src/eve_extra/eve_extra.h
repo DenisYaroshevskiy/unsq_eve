@@ -27,7 +27,6 @@
 #include "eve_extra/concepts.h"
 #include "eve_extra/constants.h"
 #include "eve_extra/first_true.h"
-#include "eve_extra/mmask_operations.h"
 #include "eve_extra/reduce_wide.h"
 #include "eve_extra/replace_ignored.h"
 #include "eve_extra/reverse.h"

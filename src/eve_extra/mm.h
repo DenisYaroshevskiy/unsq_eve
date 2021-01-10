@@ -147,15 +147,6 @@ void maskstore(T* to, Mask mask,
     _mm256_maskstore_pd(to, mask, reg);
 }
 
-template <mm::reg Register>
-std::uint32_t movemask(Register reg) {
-  if constexpr (sizeof(reg) == 16) {
-    return _mm_movemask_epi8(reg);
-  } else {
-    return _mm256_movemask_epi8(reg);
-  }
-}
-
 }  // namespace mm
 }  // namespace eve_extra
 

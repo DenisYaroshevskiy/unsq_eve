@@ -31,7 +31,7 @@ TEMPLATE_TEST_CASE("eve_extra.first_true", "[eve_extra]", ALL_TEST_PACKS) {
   REQUIRE(std::nullopt == eve_extra::first_true(x == y, eve::ignore_none));
 
   SECTION("ignore nothing") {
-    for (std::size_t i = size; i != 0; --i) {
+    for (int i = size; i != 0; --i) {
       x.set(i - 1, 2);
       auto found = eve_extra::first_true(x == y, eve::ignore_none);
       REQUIRE(found);

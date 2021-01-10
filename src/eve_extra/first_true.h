@@ -19,15 +19,14 @@
 
 #include <algorithm>
 #include <array>
-#include <bit>
 #include <optional>
 
+#include <eve/detail/top_bits.hpp>
 #include <eve/eve.hpp>
 #include <eve/function/any.hpp>
 #include <eve/function/logical_or.hpp>
 
 #include "eve_extra/concepts.h"
-#include "eve_extra/mmask_operations.h"
 
 namespace eve_extra {
 
@@ -72,55 +71,44 @@ bool any_array(const std::array<Logical, N>& xs) {
 namespace _first_true {
 
 template <eve_logical Logical, std::size_t N>
-std::array<std::uint32_t, N> move_masks(const std::array<Logical, N>& regs) {
-  std::array<std::uint32_t, N> mmasks;
+auto move_masks(const std::array<Logical, N>& regs) {
+  std::array<eve::detail::top_bits<Logical>, N> mmasks;
 
   std::transform(regs.begin(), regs.end(), mmasks.begin(),
-                 [](auto reg) { return extended_movemask(reg); });
+                 [](auto reg) { return eve::detail::top_bits(reg); });
 
   return mmasks;
-}
-
-template <eve_logical Logical>
-std::uint32_t first_true_pos(std::uint32_t offset, std::uint32_t mmask) {
-  using T = typename Logical::value_type;
-  offset = Logical::static_size * offset;
-  return offset + std::countr_zero(mmask) / sizeof(T);
 }
 
 }  // namespace _first_true
 
 template <eve_logical Logical, typename Ignore>
-bool any(const Logical& vbool, Ignore ignore) {
-  std::uint32_t mmask = extended_movemask(vbool);
-  mmask = eve_extra::clear_ignored<Logical>(mmask, ignore);
-  return mmask;
+bool any(const Logical& logical, Ignore ignore) {
+  eve::detail::top_bits mmask(logical, ignore);
+  return eve::detail::any(mmask);
 }
 
 template <eve_logical Logical, typename Ignore>
-std::optional<std::size_t> first_true(Logical logical, Ignore ignore) {
-  std::uint32_t mmask = extended_movemask(logical);
-  mmask = eve_extra::clear_ignored<Logical>(mmask, ignore);
-
-  if (!mmask) return {};
-  return _first_true::first_true_pos<Logical>(0, mmask);
+std::optional<std::ptrdiff_t> first_true(Logical logical, Ignore ignore) {
+  eve::detail::top_bits mmask(logical, ignore);
+  return eve::detail::first_true(mmask);
 }
 
 template <eve_logical Logical>
-std::optional<std::uint32_t> first_true_array(
+std::optional<std::ptrdiff_t> first_true_array(
     const std::array<Logical, 1>& xs) {
   return first_true(xs[0], eve::ignore_none);
 }
 
 template <eve_logical Logical, std::size_t N>
-std::optional<std::uint32_t> first_true_array(
+std::optional<std::ptrdiff_t> first_true_array(
     const std::array<Logical, N>& xs) {
   if (!any_array(xs)) return {};
 
   auto mmasks = _first_true::move_masks(xs);
 
   std::uint32_t offset;
-  std::uint32_t mmask;
+  eve::detail::top_bits<Logical> mmask;
 
   if constexpr (N == 2) {
     offset = 1;
@@ -144,7 +132,8 @@ std::optional<std::uint32_t> first_true_array(
     mmask = mmasks[0];
   }
 
-  return _first_true::first_true_pos<Logical>(offset, mmask);
+  offset = mmask.static_size * offset;
+  return *eve::detail::first_true(mmask) + offset;
 }
 
 }  // namespace eve_extra

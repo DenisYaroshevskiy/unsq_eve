@@ -24,7 +24,6 @@ target_sources(tests PRIVATE
                eve_extra/eve_extra.t.cc
                eve_extra/first_true_array.t.cc
                eve_extra/first_true.t.cc
-               eve_extra/mmask_operations.t.cc
                eve_extra/reduce_wide.t.cc
                eve_extra/replace_ignored.t.cc
                eve_extra/reverse.t.cc
@@ -48,7 +47,7 @@ target_sources(tests PRIVATE
                catch_main.cc)
 
 target_compile_options(tests PRIVATE
-                       -Werror -Wall -Wextra -Wpedantic -Og -g
+                       -Werror -Wall -Wextra -Wpedantic -Wno-unknown-warning-option -Og -g
                        -DEVE_DISABLE_ASSERTS
                         -fno-omit-frame-pointer
                        --std=c++20

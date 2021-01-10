@@ -27,7 +27,6 @@
 
 #include "eve_extra/concepts.h"
 #include "eve_extra/mm.h"
-#include "eve_extra/mmask_operations.h"
 
 namespace eve_extra {
 namespace _store {
@@ -56,7 +55,7 @@ EVE_FORCEINLINE void store(const Wide& wide, Ptr ptr, Ignore ignore) {
   T* raw_ptr = _store::raw_pointer(ptr);
 
   if constexpr (sizeof(T) >= 4) {
-    const auto mask = ignore_broadcast<eve::logical<Wide>>(ignore).storage();
+    const auto mask = ignore.mask(eve::as_<eve::logical<Wide>>{}).storage();
     const auto reg = wide.storage();
 
     mm::maskstore(raw_ptr, mask, reg);
