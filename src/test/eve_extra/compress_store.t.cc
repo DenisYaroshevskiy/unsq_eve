@@ -69,7 +69,7 @@ TEMPLATE_TEST_CASE("eve_extra.compress_store_main_logic", "[eve_extra]",
     std::ptrdiff_t even_end = std::min(wide::static_size, 8l);
 
     for (std::ptrdiff_t i = 0; i != even_end; i += 2) {
-      mask[i] = true;
+      mask.set(i, true);
     }
 
     run();

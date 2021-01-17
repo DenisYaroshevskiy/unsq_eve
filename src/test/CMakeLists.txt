@@ -47,7 +47,7 @@ target_sources(tests PRIVATE
                catch_main.cc)
 
 target_compile_options(tests PRIVATE
-                       -Werror -Wall -Wextra -Wpedantic -Wno-unknown-warning-option -Og -g
+                       -Werror -Wall -Wextra -Wpedantic -Wno-deprecated-copy -Og -g
                        -DEVE_DISABLE_ASSERTS
                         -fno-omit-frame-pointer
                        --std=c++20
