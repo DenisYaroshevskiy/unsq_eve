@@ -1,0 +1,79 @@
+<!doctype html>
+<html>
+<meta charset='utf-8'>
+
+<title>Intel 9700k vs AMD Ryzen 3600x std::find/strlend</title>
+<script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
+<script type='text/javascript' src='../scripts/bench.js'></script>
+<script> UNSQ_EVE_COMMIT = '5144a32b9476b727a744dd16d8eeb30cc8081e08' </script>
+
+</html>
+<body>
+
+<h1> std::find/std::strlen comparison </h1>
+
+strlen is roughly the same on both cpus. <br/>
+Nothing terribly interesting can be said about std::find as well: <br/>
+on 40 chars ryzen is faster, on 10'000 bytes intel seems a touch better <br/>
+but nothing to write home about. <br/> <br/>
+
+The only noticealbe thing is code alignment impact on ryzen for 10000 chars <br/>
+almost a third worse. But still - nothing too interesting. (put pudding: 'mimnax' to see). <br/>
+
+<h2> std::strlen (all sizes)</h2>
+
+<div id='std_strlen'></div>
+<script>dynamicEntryPoint('std_strlen', {
+    name: 'find 0',
+    size: 'x',
+    type: 'char',
+    algorithm: 'std::strlen',
+    time: 'y',
+    padding: 'min',
+    group: 'selection'
+  }, []);
+</script>
+
+<h2> std::find(40 bytes) </h2>
+
+<div id='std_find_40'></div>
+<script>dynamicEntryPoint('std_find_40', {
+    name: 'find 0',
+    size: 40,
+    type: 'x',
+    algorithm: 'std::find',
+    time: 'y',
+    padding: 'min',
+    group: 'selection'
+  }, []);
+</script>
+
+<h2> std::find(1000 bytes) </h2>
+
+<div id='std_find_1000'></div>
+<script>dynamicEntryPoint('std_find_1000', {
+    name: 'find 0',
+    size: 1000,
+    type: 'x',
+    algorithm: 'std::find',
+    time: 'y',
+    padding: 'min',
+    group: 'selection'
+  }, []);
+</script>
+
+<h2> std::find(10'000) </h2>
+
+<div id='std_find_10000'></div>
+<script>dynamicEntryPoint('std_find_10000', {
+    name: 'find 0',
+    size: 10000,
+    type: 'x',
+    algorithm: 'std::find',
+    time: 'y',
+    padding: 'min',
+    group: 'selection'
+  }, []);
+</script>
+
+</body>

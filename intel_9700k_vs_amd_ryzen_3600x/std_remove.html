@@ -1,0 +1,165 @@
+<!doctype html>
+<html>
+<meta charset='utf-8'>
+
+<title>Intel 9700k vs AMD Ryzen 3600x std::remove</title>
+<script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
+<script type='text/javascript' src='../scripts/bench.js'></script>
+<script> UNSQ_EVE_COMMIT = '5144a32b9476b727a744dd16d8eeb30cc8081e08' </script>
+
+</html>
+
+<body>
+
+  <h1> std::remove comparison </h1>
+
+  Benchmark - remove 0's. x - percentage of zeroes.
+
+  Seems like, when you get to big sizes (10000 bytes) - AMD is better. <br/>
+  We can also see that for 1000 chars AMD is better - which still is 'bigger size' - <br/>
+  It's scalar algorithm, it more depends on elements count rather than bytes. <br/>
+  For smaller sizes intel feels better. <br/>
+  Didn't look in detail on code alignment - just a lot. <br/>
+  I only know it's really really bad (about 5 times) on 10'000 int for intel. <br/>
+  For amd did't find quite like that but ~30% I saw. <br/>
+  Some people claim that my benchmarks are overlearned (just branch predictor can remember everything) <br/>
+  Not sure - since the difference between 5 and 50 percent of zeroes is big. <br/>
+  But - not that I know. <br/>
+
+  <h2> std::remove(char, 40)</h2>
+
+  <div id='remove_char_40'></div>
+  <script>dynamicEntryPoint('remove_char_40', {
+      name: 'remove 0',
+      size: 40,
+      algorithm: 'std::remove',
+      percentage: 'x',
+      type: 'char',
+      time: 'y',
+      padding: 'min',
+      group: 'selection'
+    }, []);
+  </script>
+
+<h2> std::remove (short, 40)</h2>
+
+<div id='remove_short_40'></div>
+<script>dynamicEntryPoint('remove_short_40', {
+    name: 'remove 0',
+    size: 40,
+    algorithm: 'std::remove',
+    percentage: 'x',
+    type: 'short',
+    time: 'y',
+    padding: 'min',
+    group: 'selection'
+  }, []);
+</script>
+
+<h2> std::remove (int, 40)</h2>
+
+<div id='remove_int_40'></div>
+<script>dynamicEntryPoint('remove_int_40', {
+    name: 'remove 0',
+    size: 40,
+    algorithm: 'std::remove',
+    percentage: 'x',
+    type: 'short',
+    time: 'y',
+    padding: 'min',
+    group: 'selection'
+  }, []);
+</script>
+
+<h2> std::remove (char, 1000)</h2>
+
+<div id='remove_char_1000'></div>
+<script>dynamicEntryPoint('remove_char_1000', {
+    name: 'remove 0',
+    size: 1000,
+    algorithm: 'std::remove',
+    percentage: 'x',
+    type: 'char',
+    time: 'y',
+    padding: 'min',
+    group: 'selection'
+  }, []);
+</script>
+
+<h2> std::remove (short, 1000)</h2>
+
+<div id='remove_short_1000'></div>
+<script>dynamicEntryPoint('remove_short_1000', {
+  name: 'remove 0',
+  size: 1000,
+  algorithm: 'std::remove',
+  percentage: 'x',
+  type: 'short',
+  time: 'y',
+  padding: 'min',
+  group: 'selection'
+}, []);
+</script>
+
+<h2> std::remove (int, 1000)</h2>
+
+<div id='remove_int_1000'></div>
+<script>dynamicEntryPoint('remove_int_1000', {
+  name: 'remove 0',
+  size: 1000,
+  algorithm: 'std::remove',
+  percentage: 'x',
+  type: 'short',
+  time: 'y',
+  padding: 'min',
+  group: 'selection'
+}, []);
+</script>
+
+<h2> std::remove (char, 10000)</h2>
+
+<div id='remove_char_10000'></div>
+<script>dynamicEntryPoint('remove_char_10000', {
+    name: 'remove 0',
+    size: 10000,
+    algorithm: 'std::remove',
+    percentage: 'x',
+    type: 'char',
+    time: 'y',
+    padding: 'min',
+    group: 'selection'
+  }, []);
+</script>
+
+<h2> std::remove (short, 10000)</h2>
+
+<div id='remove_short_10000'></div>
+<script>dynamicEntryPoint('remove_short_10000', {
+  name: 'remove 0',
+  size: 10000,
+  algorithm: 'std::remove',
+  percentage: 'x',
+  type: 'short',
+  time: 'y',
+  padding: 'min',
+  group: 'selection'
+}, []);
+</script>
+
+<h2> std::remove (int, 10000)</h2>
+
+<div id='remove_int_10000'></div>
+<script>dynamicEntryPoint('remove_int_10000', {
+  name: 'remove 0',
+  size: 10000,
+  algorithm: 'std::remove',
+  percentage: 'x',
+  type: 'short',
+  time: 'y',
+  padding: 'min',
+  group: 'selection'
+}, []);
+</script>
+
+
+</body>

@@ -1,0 +1,62 @@
+<!doctype html>
+<html>
+<meta charset='utf-8'>
+
+<title>Intel 9700k vs AMD Ryzen 3600x std::min_element</title>
+<script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
+<script type='text/javascript' src='../scripts/bench.js'></script>
+<script> UNSQ_EVE_COMMIT = '5144a32b9476b727a744dd16d8eeb30cc8081e08' </script>
+
+</html>
+
+<body>
+
+  <h1> std::min_element comparison </h1>
+
+  The ideal case scenario is roughly identical. <br/>
+  AMD suffers from code alignent issues more, <br/>
+  which is especially visible on 10'000 bytes. (put pudding: 'mimnax' to see) <br/>
+
+  <h3> std::min_element (40 bytes)</h3>
+
+  <div id='std_min_element_40'></div>
+  <script>dynamicEntryPoint('std_min_element_40', {
+      name: 'min',
+      size: 40,
+      algorithm: 'std::min_element',
+      type: 'x',
+      time: 'y',
+      padding: 'min',
+      group: 'selection'
+    }, []);
+  </script>
+
+<h3> std::min_element(1000 bytes)</h3>
+
+<div id='std_min_element_1000'></div>
+<script>dynamicEntryPoint('std_min_element_1000', {
+    name: 'min',
+    size: 1000,
+    algorithm: 'std::min_element',
+    type: 'x',
+    time: 'y',
+    padding: 'min',
+    group: 'selection'
+  }, []);
+</script>
+
+<h3> std::min_element (10000 bytes)</h3>
+
+<div id='std_min_element_10000'></div>
+<script>dynamicEntryPoint('std_min_element_10000', {
+    name: 'min',
+    size: 10000,
+    algorithm: 'std::min_element',
+    type: 'x',
+    time: 'y',
+    padding: 'min',
+    group: 'selection'
+  }, []);
+</script>
+
+</body>

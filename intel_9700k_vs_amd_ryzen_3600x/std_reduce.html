@@ -1,0 +1,118 @@
+<!doctype html>
+<html>
+<meta charset='utf-8'>
+
+<title>Intel 9700k vs AMD Ryzen 3600x std::reduce</title>
+<script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
+<script type='text/javascript' src='../scripts/bench.js'></script>
+<script> UNSQ_EVE_COMMIT = '5144a32b9476b727a744dd16d8eeb30cc8081e08' </script>
+
+</html>
+
+<body>
+
+  <h1> std::reduce comparison </h1>
+
+  std::reduce is one of the algorithms that can be autovectorized. <br/>
+
+  What we can see is that on small sizes intel is a bit better most of the time. <br/>
+  However when the SIMD code get's going, we are winning a lot. <br/>
+  From my point of view - <b> clear win for AMD</b><br/><br/>
+
+  Code alignment does not have a significant impact on `simd` code -<br/>
+  you can see the worst case by putting `minmax` instead of `min` in `padding` -<br/>
+  AMD is still better <br/>
+
+  <i> NOTE: if a few nanoseconds for a smaller size is a problem - see <a href='/reduce.html'> unsq_eve::reduce</a>. <br/>
+  since we are using `ignore` instead of scalar clean up, this issue goes away. </i>
+
+  <h3> std::reduce (char -> char)</h3>
+
+  <div id='std_reduce_char_char'></div>
+  <script>dynamicEntryPoint('std_reduce_char_char', {
+      name: 'sum',
+      size: 'x',
+      algorithm: 'std::reduce',
+      type: 'char',
+      sum_type: 'char',
+      time: 'y',
+      padding: 'min',
+      group: 'selection'
+    }, []);
+  </script>
+
+  <h3> std::reduce (char -> short)</h3>
+
+  <div id='std_reduce_char_short'></div>
+  <script>dynamicEntryPoint('std_reduce_char_short', {
+      name: 'sum',
+      size: 'x',
+      algorithm: 'std::reduce',
+      type: 'char',
+      sum_type: 'short',
+      time: 'y',
+      padding: 'min',
+      group: 'selection'
+    }, []);
+  </script>
+
+  <h3> std::reduce (char -> int)</h3>
+
+  <div id='std_reduce_char_int'></div>
+  <script>dynamicEntryPoint('std_reduce_char_int', {
+      name: 'sum',
+      size: 'x',
+      algorithm: 'std::reduce',
+      type: 'char',
+      sum_type: 'int',
+      time: 'y',
+      padding: 'min',
+      group: 'selection'
+    }, []);
+  </script>
+
+  <h3> std::reduce (short -> short)</h3>
+
+  <div id='std_reduce_short_short'></div>
+  <script>dynamicEntryPoint('std_reduce_short_short', {
+      name: 'sum',
+      size: 'x',
+      algorithm: 'std::reduce',
+      type: 'short',
+      sum_type: 'short',
+      time: 'y',
+      padding: 'min',
+      group: 'selection'
+    }, []);
+  </script>
+
+  <h3> std::reduce (short -> int)</h3>
+
+  <div id='std_reduce_short_int'></div>
+  <script>dynamicEntryPoint('std_reduce_short_int', {
+      name: 'sum',
+      size: 'x',
+      algorithm: 'std::reduce',
+      type: 'short',
+      sum_type: 'int',
+      time: 'y',
+      padding: 'min',
+      group: 'selection'
+    }, []);
+  </script>
+
+  <h3> std::reduce (int -> int)</h3>
+
+  <div id='std_reduce_int_int'></div>
+  <script>dynamicEntryPoint('std_reduce_int_int', {
+      name: 'sum',
+      size: 'x',
+      algorithm: 'std::reduce',
+      type: 'short',
+      sum_type: 'int',
+      time: 'y',
+      padding: 'min',
+      group: 'selection'
+    }, []);
+  </script>
+</body>

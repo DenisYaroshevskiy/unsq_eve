@@ -1,0 +1,67 @@
+<!doctype html>
+<html>
+<meta charset='utf-8'>
+
+<title>Intel 9700k vs AMD Ryzen 3600x std::transform</title>
+<script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
+<script type='text/javascript' src='../scripts/bench.js'></script>
+<script> UNSQ_EVE_COMMIT = '5144a32b9476b727a744dd16d8eeb30cc8081e08' </script>
+
+</html>
+
+<body>
+
+  <h1> std::transform comparison </h1>
+
+  Benchmark - x = x + x fo every element.
+
+  This get's autovectorized. <br />
+  More or less the same in a good case. <br />
+  AMD is more sensitive to code alignment. <br />
+
+  <h3> 40 bytes, data </h3>
+
+  <div id='40_bytes_data'></div>
+  <script>dynamicEntryPoint('40_bytes_data', {
+      name: 'inplace transform',
+      size: 40,
+      algorithm: 'std::transform',
+      type: 'x',
+      time: 'y',
+      padding: 'min',
+      group: 'selection',
+      percentage: 100,
+    }, []);
+  </script>
+
+  <h3> 1000 bytes </h3>
+
+  <div id='1000_bytes_data'></div>
+  <script>dynamicEntryPoint('1000_bytes_data', {
+      name: 'inplace transform',
+      size: 1000,
+      algorithm: 'std::transform',
+      type: 'x',
+      time: 'y',
+      padding: 'min',
+      group: 'selection',
+      percentage: 100,
+    }, []);
+  </script>
+
+  <h3> 10000 bytes </h3>
+
+  <div id='10000_bytes_data'></div>
+  <script>dynamicEntryPoint('10000_bytes_data', {
+      name: 'inplace transform',
+      size: 10000,
+      algorithm: 'std::transform',
+      type: 'x',
+      time: 'y',
+      padding: 'min',
+      group: 'selection',
+      percentage: 100,
+    }, []);
+  </script>
+
+</body>

@@ -1,0 +1,64 @@
+<!doctype html>
+<html>
+<meta charset='utf-8'>
+
+<title>Intel 9700k vs AMD Ryzen 3600x std::inclusive_scan</title>
+<script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
+<script type='text/javascript' src='../scripts/bench.js'></script>
+<script> UNSQ_EVE_COMMIT = '5144a32b9476b727a744dd16d8eeb30cc8081e08' </script>
+
+</html>
+
+<body>
+
+  <h1> std::inclusive_scan comparison </h1>
+
+  In a good case - intel is better for 40 bytes, amd for 10'000 bytes. <br/>
+  But nothing very interesting <br/>
+  AMD is more sensitive to code alignment but within 20% <br/>
+  Which is ~OK for code alignment. (put pudding: 'mimnax' to see). <br/>
+
+  <h2> std::inclusive_scan (40 bytes)</h2>
+
+  <div id='std_incusive_scan_40'></div>
+  <script>dynamicEntryPoint('std_incusive_scan_40', {
+      name: 'inplace transform',
+      size: 40,
+      algorithm: 'std::inclusive_scan',
+      type: 'x',
+      time: 'y',
+      padding: 'min',
+      group: 'selection'
+    }, []);
+  </script>
+
+<h2> std::inclusive_scan(1000 bytes)</h2>
+
+<div id='std_incusive_scan_1000'></div>
+<script>dynamicEntryPoint('std_incusive_scan_1000', {
+    name: 'inplace transform',
+    size: 1000,
+    algorithm: 'std::inclusive_scan',
+    type: 'x',
+    time: 'y',
+    padding: 'min',
+    group: 'selection'
+  }, []);
+</script>
+
+<h2> std::inclusive_scan(10'000 bytes)</h2>
+
+<div id='std_incusive_scan_10000'></div>
+<script>dynamicEntryPoint('std_incusive_scan_10000', {
+    name: 'inplace transform',
+    size: 10000,
+    algorithm: 'std::inclusive_scan',
+    type: 'x',
+    time: 'y',
+    padding: 'min',
+    group: 'selection'
+  }, []);
+</script>
+
+
+</body>
