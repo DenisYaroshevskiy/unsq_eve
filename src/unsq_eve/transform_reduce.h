@@ -53,7 +53,7 @@ struct unary_body {
     if constexpr (std::is_same_v<Ignore, eve::ignore_none_>) {
       read = wide_read{from};
     } else {
-      read = eve_extra::load_unsafe(from, width_t<Traits>{});
+      read = eve::unsafe(eve::load)(from, width_t<Traits>{});
     }
     wide xs = eve::convert(read, eve::as_<T>{});
 

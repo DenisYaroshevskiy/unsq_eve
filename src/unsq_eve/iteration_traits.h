@@ -60,7 +60,7 @@ struct iteration_traits {
 
   template <typename T>
   static auto previous_aligned_address(T* addr) {
-    return eve_extra::previous_aligned_address<sizeof(T) * chunk_size()>(addr);
+    return eve::previous_aligned_address(addr, eve::lane<chunk_size()>);
   }
 };
 

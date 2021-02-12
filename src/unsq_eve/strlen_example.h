@@ -19,7 +19,10 @@
 
 #include <cstdint>
 
-#include "eve_extra/eve_extra.h"
+#include <eve/eve.hpp>
+#include <eve/conditional.hpp>
+#include <eve/function/first_true.hpp>
+#include <eve/function/load.hpp>
 
 namespace unsq_eve {
 
@@ -30,18 +33,17 @@ std::size_t strlen_example(const char* s) {
 
   const wide zeroes{0};
 
-  eve::aligned_ptr aligned_s =
-      eve_extra::previous_aligned_address<sizeof(wide)>(s);
+  eve::aligned_ptr aligned_s = eve::previous_aligned_address(s);
 
-  wide cur = eve_extra::load_unsafe(aligned_s, N{});
+  wide cur = eve::unsafe(eve::load)(aligned_s, N{});
   eve::ignore_first_ ignore(s - aligned_s.get());
 
-  std::optional match = eve_extra::first_true(cur == zeroes, ignore);
+  std::optional match = eve::first_true[ignore](cur == zeroes);
 
   while (!match) {
     aligned_s += wide::static_size;
-    cur = eve_extra::load_unsafe(aligned_s, N{});
-    match = eve_extra::first_true(cur == zeroes, eve::ignore_none);
+    cur = eve::unsafe(eve::load)(aligned_s, N{});
+    match = eve::first_true(cur == zeroes);
   }
 
   return static_cast<std::size_t>(aligned_s.get() + *match - s);

@@ -26,7 +26,6 @@
 #include "eve_extra/compress_store.h"
 #include "eve_extra/concepts.h"
 #include "eve_extra/constants.h"
-#include "eve_extra/first_true.h"
 #include "eve_extra/reduce_wide.h"
 #include "eve_extra/replace_ignored.h"
 #include "eve_extra/reverse.h"
@@ -36,11 +35,6 @@
 #include "eve_extra/swap_adjacent_groups.h"
 
 namespace eve_extra {
-
-template <typename P, typename N>
-__attribute__((no_sanitize_address)) auto load_unsafe(P p, N n) noexcept {
-  return eve::load(p, n);
-}
 
 constexpr std::ptrdiff_t page_size() { return 1 << 12; }
 
@@ -52,10 +46,72 @@ T* end_of_page(T* addr) {
                               upage_size);
 }
 
-template <std::size_t alignment, typename T>
-auto previous_aligned_address(T* p) {
-  static constexpr eve::under A{alignment};
-  return eve::aligned_ptr<T, as_integer(A)>{eve::align(p, A)};
+/*
+Compiler does not generate this properly, instead of doing things one
+after another if you ask it.
+*/
+
+template <typename T, typename Op>
+T segment_reduction(const std::array<T, 1>& arr, Op) {
+  return arr[0];
+}
+
+template <typename T, typename Op>
+T segment_reduction(const std::array<T, 2>& arr, Op op) {
+  return op(arr[0], arr[1]);
+}
+
+template <typename T, typename Op>
+T segment_reduction(const std::array<T, 4>& arr, Op op) {
+  T x = op(arr[0], arr[2]);
+  T y = op(arr[1], arr[3]);
+  return op(x, y);
+}
+
+template <typename T, typename Op>
+T segment_reduction(const std::array<T, 8>& arr, Op op) {
+  T x1 = op(arr[0], arr[4]);
+  T x2 = op(arr[1], arr[5]);
+  T x3 = op(arr[2], arr[6]);
+  T x4 = op(arr[3], arr[7]);
+  x1 = op(x1, x2);
+  x3 = op(x3, x4);
+  return op(x1, x3);
+}
+
+namespace _eve_extra {
+
+template <std::size_t, typename>
+struct n_wide;
+
+template <std::size_t n, typename T, typename N, typename ABI>
+struct n_wide<n, eve::wide<T, N, ABI>> {
+  using type = eve::wide<T, eve::fixed<N() * n>>;
+};
+
+template <std::size_t n, eve_wide Wide>
+struct n_wide<n, eve::logical<Wide>> {
+  using type = eve::logical<typename n_wide<n, Wide>::type>;
+};
+
+template <std::size_t n, typename T>
+using n_wide_t = typename n_wide<n, T>::type;
+
+template <std::size_t f, std::size_t n, typename Wide, std::size_t N>
+auto aggregate_impl(const std::array<Wide, N>& xs) {
+  if constexpr (n == 1)
+    return xs[f];
+  else {
+    return n_wide_t<n, Wide>{aggregate_impl<f, n / 2>(xs),
+                           aggregate_impl<f + n / 2, n / 2>(xs)};
+  }
+}
+
+}  // namespace _eve_extra
+
+template <typename Wide, std::size_t N>
+auto aggregate(const std::array<Wide, N>& xs) {
+  return _eve_extra::aggregate_impl<0, N>(xs);
 }
 
 }  // namespace eve_extra

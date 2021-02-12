@@ -28,42 +28,6 @@
 
 namespace {
 
-TEST_CASE("previous_aligned_address", "[eve_extra]") {
-  using wide = eve::wide<char, eve::fixed<16>>;
-  const char str[] = "abc";
-  eve::aligned_ptr test =
-      eve_extra::previous_aligned_address<wide::static_size * sizeof(char)>(
-          str);
-  REQUIRE(test.get());
-};
-
-TEMPLATE_TEST_CASE("eve_extra.load_unsafe", "[eve_extra]", ALL_TEST_PACKS) {
-  using wide = TestType;
-  using scalar = typename wide::value_type;
-  using N = eve::fixed<wide::static_size>;
-
-  scalar s{123};
-
-  wide actual{};
-
-  auto* page_end = eve_extra::end_of_page(&s);
-
-  if (page_end - &s < N{}()) {
-    actual = eve_extra::load_unsafe(page_end - N{}(), N{});
-  } else {
-    actual = eve_extra::load_unsafe(&s, N{});
-  }
-
-  wide expected{s};
-  REQUIRE(eve::any(expected == actual));
-
-  actual = eve_extra::load_unsafe(
-      eve_extra::previous_aligned_address<wide::static_size * sizeof(scalar)>(
-          &s),
-      N{});
-  REQUIRE(eve::any(expected == actual));
-}
-
 TEST_CASE("eve_extra.load_const_aligned_ptr", "[eve_extra]") {
   using wide = eve::wide<char, eve::fixed<16>>;
   alignas(wide) std::array<char, 16> data;

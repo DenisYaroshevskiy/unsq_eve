@@ -20,6 +20,8 @@
 #include <algorithm>
 #include <array>
 
+#include <eve/function/any.hpp>
+
 #include "eve_extra/eve_extra.h"
 
 #include "unsq_eve/concepts.h"
@@ -50,10 +52,10 @@ struct any_body {
     if constexpr (std::is_same_v<Ignore, eve::ignore_none_>) {
       regs[idx] = wide{ptr};
     } else {
-      regs[idx] = eve_extra::load_unsafe(ptr, width_t<Traits>{});
+      regs[idx] = eve::unsafe(eve::load)(ptr, width_t<Traits>{});
     }
 
-    res = eve_extra::any(p(regs[idx]), ignore);
+    res = eve::any[ignore](p(regs[idx]));
 
     return res;
   }
@@ -79,7 +81,7 @@ struct any_body {
     std::array<eve::logical<wide>, Traits::unroll()> tests;
     std::transform(regs.begin(), regs.end(), tests.begin(), p);
 
-    res = eve_extra::any_array(tests);
+    res = eve::any(eve_extra::aggregate(tests));
     return res;
   }
 

@@ -20,6 +20,9 @@
 #include <algorithm>
 #include <array>
 
+#include <eve/eve.hpp>
+#include <eve/function/first_true.hpp>
+
 #include "eve_extra/eve_extra.h"
 
 #include "unsq_eve/concepts.h"
@@ -49,9 +52,9 @@ struct body {
   template <typename Ptr, std::size_t idx, typename Ignore>
   bool small_step(Ptr from, indx_c<idx>, Ignore ignore) {
     // For unguarded we never know if we are complete in the data
-    regs[idx] = eve_extra::load_unsafe(from, width_t<Traits>{});
+    regs[idx] = eve::unsafe(eve::load)(from, width_t<Traits>{});
 
-    const std::optional match = eve_extra::first_true(p(regs[idx]), ignore);
+    const std::optional match = eve::first_true[ignore](p(regs[idx]));
     if (!match) return false;
 
     found = &*from + *match;
@@ -70,7 +73,7 @@ struct body {
   template <typename Ptr, std::size_t idx>
   bool big_step(Ptr ptr, indx_c<idx>) {
     // For unguarded we never know if we are complete in the data
-    regs[idx] = eve_extra::load_unsafe(ptr, width_t<Traits>{});
+    regs[idx] = eve::unsafe(eve::load)(ptr, width_t<Traits>{});
     return false;
   }
 
@@ -80,7 +83,7 @@ struct body {
     std::array<eve::logical<wide>, Traits::unroll()> tests;
     std::transform(regs.begin(), regs.end(), tests.begin(), p);
 
-    const std::optional match = eve_extra::first_true_array(tests);
+    const std::optional match = eve::first_true(eve_extra::aggregate(tests));
     if (!match) return false;
 
     found = &*from + *match;

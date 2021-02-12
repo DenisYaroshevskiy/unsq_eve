@@ -17,13 +17,10 @@
 add_executable(tests)
 
 target_sources(tests PRIVATE
-               eve_extra/any.t.cc
                eve_extra/compress_mask.t.cc
                eve_extra/compress_store.t.cc
                eve_extra/concepts.t.cc
                eve_extra/eve_extra.t.cc
-               eve_extra/first_true_array.t.cc
-               eve_extra/first_true.t.cc
                eve_extra/reduce_wide.t.cc
                eve_extra/replace_ignored.t.cc
                eve_extra/reverse.t.cc
