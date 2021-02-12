@@ -27,8 +27,9 @@
 namespace unsq_eve {
 
 // Simplified implementation of stlren - see find_unguarded for a proper one.
-std::size_t strlen_example(const char* s) {
-  using wide = eve::wide<char>;
+inline std::size_t strlen_example(const char* s_) {
+  auto* s = reinterpret_cast<const std::uint8_t*>(s_);
+  using wide = eve::wide<unsigned char>;
   using N = typename wide::cardinal_type;
 
   const wide zeroes{0};

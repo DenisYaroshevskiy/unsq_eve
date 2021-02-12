@@ -1,15 +1,6 @@
-#include <algorithm>
-#include <numeric>
 
-#include "unsq_eve/all_any_none.h"
-#include "unsq_eve/inclusive_scan.h"
-#include "unsq_eve/min_element.h"
-#include "unsq_eve/reduce.h"
-#include "unsq_eve/remove.h"
-#include "unsq_eve/reverse.h"
-#include "unsq_eve/transform.h"
+#include "unsq_eve/strlen_example.h"
 
-using T = char;
-using traits = unsq_eve::algorithm_traits<T, 256, 1>;
-
-void reverse(T* f, T* l) { return unsq_eve::reverse<traits>(f, l); }
+std::size_t call_strlen(const char* s) {
+  return unsq_eve::strlen_example(s);
+}
