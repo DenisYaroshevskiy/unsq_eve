@@ -49,8 +49,8 @@ void test_impl(TestType element_idxs) {
 
     std::uint8_t o = 0;
     for (std::uint8_t i = 0; i != wide::static_size; ++i) {
-      if (!mask[i]) continue;
-      expected.set(o++, element_idxs[i]);
+      if (!mask.get(i)) continue;
+      expected.set(o++, element_idxs.get(i));
     }
 
     auto res = run_compress();

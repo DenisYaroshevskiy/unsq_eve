@@ -55,7 +55,7 @@ struct inplace_body {
     xs = eve_extra::replace_ignored(xs, ignore, zeroes);
     xs = eve_extra::inclusive_scan_wide(xs, op, zeroes);
     xs = op(running_sum, xs);
-    running_sum = wide(xs.back());
+    running_sum = wide(xs.get(wide::static_size - 1));
 
     wide_read ys = eve::convert(xs, eve::as_<value_type<I>>{});
     eve_extra::store(ys, ptr, ignore);

@@ -54,7 +54,7 @@ Wide inclusive_scan_wide(Wide x, Op op, Wide zero) {
 template <wide_32_bytes Wide, typename Op>
 Wide inclusive_scan_wide(Wide x, Op op, Wide zero) {
   x = _scan_wide::inclusive_impl<Wide::static_size / 2>(x, op, zero);
-  Wide left_sum_broadcasted{x[Wide::static_size / 2 - 1]};
+  Wide left_sum_broadcasted{x.get(Wide::static_size / 2 - 1)};
 
   return op(
       x, shift_pair_right<Wide::static_size / 2>(zero, left_sum_broadcasted));

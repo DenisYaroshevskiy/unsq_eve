@@ -119,7 +119,7 @@ struct min_body {
   EVE_FORCEINLINE I compute_result() {
     index_overflow();
     best_idx = eve_extra::reduce_wide(best_idx, eve::min);
-    return best_base + best_idx.front();
+    return best_base + best_idx.get(0);
   }
 };
 

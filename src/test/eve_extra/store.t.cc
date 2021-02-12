@@ -36,7 +36,7 @@ TEMPLATE_TEST_CASE("eve_extra.store", "[eve_extra]", ALL_TEST_PACKS) {
     expected.fill(0);
 
     for (std::size_t i = no_first; i != wide::static_size - no_last; ++i) {
-      expected[i] = x[i];
+      expected[i] = x.get(i);
     }
     REQUIRE(expected == actual);
   };
@@ -80,7 +80,7 @@ TEMPLATE_TEST_CASE("eve_extra.store", "[eve_extra]", ALL_TEST_PACKS) {
                                   static_cast<int>(wide::static_size - i - 1)};
 
       store(x, &where - i, ignore);
-      REQUIRE(where == x[i]);
+      REQUIRE(where == x.get(i));
     }
   }
 }

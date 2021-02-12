@@ -40,10 +40,10 @@ TEMPLATE_TEST_CASE("eve_extra.replace_ignored", "[eve_extra][replace_ignored]",
       REQUIRE(eve::all(actual == actual2));
 
       for (int j = 0; j != i; ++j) {
-        REQUIRE(actual[j] == 1);
+        REQUIRE(actual.get(j) == 1);
       }
       for (int j = i; j != wide::static_size; ++j) {
-        REQUIRE(actual[j] == 0);
+        REQUIRE(actual.get(j) == 0);
       }
     }
   }
@@ -61,11 +61,11 @@ TEMPLATE_TEST_CASE("eve_extra.replace_ignored", "[eve_extra][replace_ignored]",
       int border = wide::static_size - i;
 
       for (int j = 0; j != border; ++j) {
-        REQUIRE(actual[j] == 0);
+        REQUIRE(actual.get(j) == 0);
       }
       for (int j = border; j != wide::static_size; ++j) {
         INFO("i: " << i << " j: " << j);
-        REQUIRE(actual[j] == 1);
+        REQUIRE(actual.get(j) == 1);
       }
     }
   }
@@ -75,9 +75,9 @@ TEMPLATE_TEST_CASE("eve_extra.replace_ignored", "[eve_extra][replace_ignored]",
     eve::ignore_last_ last{1};
 
     wide actual = eve_extra::replace_ignored(x, first && last, y);
-    REQUIRE(actual[0] == 1);
-    REQUIRE(actual[1] == 1);
-    REQUIRE(actual.back() == 1);
+    REQUIRE(actual.get(0) == 1);
+    REQUIRE(actual.get(1) == 1);
+    REQUIRE(actual.get(wide::static_size - 1) == 1);
 
     actual.set(0, 0);
     actual.set(1, 0);

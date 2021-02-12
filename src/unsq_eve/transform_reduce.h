@@ -83,7 +83,7 @@ struct unary_body {
   T final_reduction() const {
     auto combined = eve_extra::segment_reduction(regs, reduce);
     combined = eve_extra::reduce_wide(combined, reduce);
-    return combined[0];
+    return combined.get(0);
   }
 };
 

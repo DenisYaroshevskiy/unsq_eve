@@ -39,8 +39,8 @@ TEMPLATE_TEST_CASE("eve_extra.compress_store_main_logic", "[eve_extra]",
 
     std::uint8_t o = 0;
     for (std::uint8_t i = 0; i != wide::static_size; ++i) {
-      if (!mask[i]) continue;
-      expected.set(o++, x[i]);
+      if (!mask.get(i)) continue;
+      expected.set(o++, x.get(i));
     }
 
     wide actual;
