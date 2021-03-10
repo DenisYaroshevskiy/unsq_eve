@@ -27,7 +27,6 @@
 #include "eve_extra/concepts.h"
 #include "eve_extra/constants.h"
 #include "eve_extra/reduce_wide.h"
-#include "eve_extra/replace_ignored.h"
 #include "eve_extra/reverse.h"
 #include "eve_extra/scan_wide.h"
 #include "eve_extra/shift_pair.h"

@@ -20,6 +20,7 @@
 #include <array>
 
 #include <eve/function/convert.hpp>
+#include <eve/function/replace.hpp>
 
 #include "eve_extra/eve_extra.h"
 #include "unsq_eve/concepts.h"
@@ -57,7 +58,7 @@ struct unary_body {
     }
     wide xs = eve::convert(read, eve::as_<T>{});
 
-    xs = eve_extra::replace_ignored(xs, ignore, zeroes);
+    xs = eve::replace_ignored(xs, ignore, zeroes);
 
     regs[idx] = reduce(regs[idx], map(xs));
     return false;

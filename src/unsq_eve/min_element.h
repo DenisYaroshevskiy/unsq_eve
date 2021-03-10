@@ -22,6 +22,7 @@
 #include <eve/function/all.hpp>
 #include <eve/function/convert.hpp>
 #include <eve/function/min.hpp>
+#include <eve/function/replace.hpp>
 
 #include "eve_extra/eve_extra.h"
 #include "unsq_eve/concepts.h"
@@ -70,7 +71,7 @@ struct min_body {
     }
 
     wide xs = eve::convert(read, eve::as_<T>{});
-    xs = eve_extra::replace_ignored(xs, ignore, regs[reg_idx]);
+    xs = eve::replace_ignored(xs, ignore, regs[reg_idx]);
 
     wide mins = sel(regs[reg_idx], xs);
 

@@ -19,6 +19,7 @@
 
 #include <eve/function/add.hpp>
 #include <eve/function/convert.hpp>
+#include <eve/function/replace.hpp>
 
 #include "eve_extra/eve_extra.h"
 #include "unsq_eve/concepts.h"
@@ -52,7 +53,7 @@ struct inplace_body {
     }
 
     wide xs = eve::convert(read, eve::as_<T>{});
-    xs = eve_extra::replace_ignored(xs, ignore, zeroes);
+    xs = eve::replace_ignored(xs, ignore, zeroes);
     xs = eve_extra::inclusive_scan_wide(xs, op, zeroes);
     xs = op(running_sum, xs);
     running_sum = wide(xs.get(wide::static_size - 1));
