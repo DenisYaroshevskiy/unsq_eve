@@ -95,13 +95,13 @@ EVE_FORCEINLINE Delegate iteration_aligned(T* f, T* l, Delegate delegate) {
 
   delegate.set_base(aligned_f.get());
 
-  eve::ignore_first_ ignore_first{f - aligned_f.get()};
+  eve::ignore_first ignore_first{f - aligned_f.get()};
 
   if (aligned_f.get() != aligned_l.get()) {
     // first chunk, maybe partial
     if (delegate.small_step(aligned_f, indx_c<0>{}, ignore_first))
       return delegate;
-    ignore_first = eve::ignore_first_{0};
+    ignore_first = eve::ignore_first{0};
     aligned_f += Traits::chunk_size();
 
     StopReason stop =
@@ -112,7 +112,7 @@ EVE_FORCEINLINE Delegate iteration_aligned(T* f, T* l, Delegate delegate) {
 
   const int last_offset = aligned_l.get() + Traits::chunk_size() - l;
 
-  eve::ignore_last_ ignore_last{last_offset};
+  eve::ignore_last ignore_last{last_offset};
   delegate.small_step(aligned_l, indx_c<0>{}, ignore_first && ignore_last);
   return delegate;
 }

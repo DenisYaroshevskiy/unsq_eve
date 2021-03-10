@@ -18,6 +18,8 @@
 
 #include <algorithm>
 
+#include <eve/function/all.hpp>
+
 #include "test/catch.h"
 #include "test/eve_extra/common.h"
 
@@ -90,11 +92,11 @@ TEMPLATE_TEST_CASE("eve_extra.compress_store_ignore", "[eve_extra]",
     const auto* f = x.begin();
     const auto* l = x.end();
 
-    if constexpr (std::same_as<decltype(ignore), eve::ignore_first_>) {
+    if constexpr (std::same_as<decltype(ignore), eve::ignore_first>) {
       f += static_cast<std::ptrdiff_t>(ignore.count_);
-    } else if constexpr (std::same_as<decltype(ignore), eve::ignore_last_>) {
+    } else if constexpr (std::same_as<decltype(ignore), eve::ignore_last>) {
       l -= static_cast<std::ptrdiff_t>(ignore.count_);
-    } else if constexpr (std::same_as<decltype(ignore), eve::ignore_extrema_>) {
+    } else if constexpr (std::same_as<decltype(ignore), eve::ignore_extrema>) {
       f += static_cast<std::ptrdiff_t>(ignore.first_count_);
       l -= static_cast<std::ptrdiff_t>(ignore.last_count_);
     }
@@ -121,10 +123,10 @@ TEMPLATE_TEST_CASE("eve_extra.compress_store_ignore", "[eve_extra]",
   };
 
   for (int i = 0; i != wide::static_size + 1; ++i) {
-    run(eve::ignore_first_{i});
-    run(eve::ignore_last_{i});
+    run(eve::ignore_first{i});
+    run(eve::ignore_last{i});
     for (int j = 0; j != wide::static_size - i; ++j) {
-      run(eve::ignore_extrema_{i, j});
+      run(eve::ignore_extrema{i, j});
     }
   }
 
@@ -139,7 +141,7 @@ TEMPLATE_TEST_CASE("eve_extra.compress_store_ignore", "[eve_extra]",
 
     out = scalar{5};
 
-    compress_store_unsafe(x, &out, mask, eve::ignore_last_{0});
+    compress_store_unsafe(x, &out, mask, eve::ignore_last{0});
     REQUIRE(out == 1);
   }
 }

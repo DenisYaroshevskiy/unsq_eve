@@ -44,10 +44,10 @@ template <typename Traits, typename T, typename Delegate>
 EVE_FORCEINLINE Delegate less_then_chunk(T* f, T* l, Delegate& delegate) {
   if (eve_extra::end_of_page(f) - f < static_cast<int>(Traits::chunk_size())) {
     T* read_from = l - Traits::chunk_size();
-    delegate.small_array_step(read_from, eve::ignore_first_{f - read_from});
+    delegate.small_array_step(read_from, eve::ignore_first{f - read_from});
     return delegate;
   }
-  delegate.small_array_step(f, eve::ignore_last_{f + Traits::chunk_size() - l});
+  delegate.small_array_step(f, eve::ignore_last{f + Traits::chunk_size() - l});
   return delegate;
 }
 

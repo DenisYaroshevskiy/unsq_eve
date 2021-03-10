@@ -20,6 +20,7 @@
 #include <numeric>
 
 #include <eve/function/any.hpp>
+#include <eve/function/all.hpp>
 #include <eve/function/load.hpp>
 #include <eve/function/store.hpp>
 

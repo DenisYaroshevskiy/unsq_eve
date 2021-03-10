@@ -18,6 +18,8 @@
 
 #include <numeric>
 
+#include <eve/function/all.hpp>
+
 #include "test/catch.h"
 #include "test/eve_extra/common.h"
 

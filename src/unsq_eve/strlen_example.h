@@ -37,7 +37,7 @@ inline std::size_t strlen_example(const char* s_) {
   eve::aligned_ptr aligned_s = eve::previous_aligned_address(s);
 
   wide cur = eve::unsafe(eve::load)(aligned_s, N{});
-  eve::ignore_first_ ignore(s - aligned_s.get());
+  eve::ignore_first ignore(s - aligned_s.get());
 
   std::optional match = eve::first_true[ignore](cur == zeroes);
 

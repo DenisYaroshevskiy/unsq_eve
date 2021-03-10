@@ -16,6 +16,8 @@
 
 #include "eve_extra/eve_extra.h"
 
+#include <eve/function/all.hpp>
+
 #include "test/catch.h"
 #include "test/eve_extra/common.h"
 
@@ -34,9 +36,9 @@ TEMPLATE_TEST_CASE("eve_extra.replace_ignored", "[eve_extra][replace_ignored]",
 
   SECTION("ignore_first") {
     for (int i = 0; i <= wide::static_size; ++i) {
-      wide actual = eve_extra::replace_ignored(x, eve::ignore_first_{i}, y);
+      wide actual = eve_extra::replace_ignored(x, eve::ignore_first{i}, y);
       wide actual2 =
-          eve_extra::replace_ignored(x, eve::ignore_extrema_{i, 0}, y);
+          eve_extra::replace_ignored(x, eve::ignore_extrema{i, 0}, y);
       REQUIRE(eve::all(actual == actual2));
 
       for (int j = 0; j != i; ++j) {
@@ -50,12 +52,12 @@ TEMPLATE_TEST_CASE("eve_extra.replace_ignored", "[eve_extra][replace_ignored]",
 
   SECTION("ignore_last") {
     for (int i = 0; i <= wide::static_size; ++i) {
-      wide actual = eve_extra::replace_ignored(x, eve::ignore_last_{i}, y);
+      wide actual = eve_extra::replace_ignored(x, eve::ignore_last{i}, y);
       wide actual2 =
-          eve_extra::replace_ignored(x, eve::ignore_extrema_{0, i}, y);
+          eve_extra::replace_ignored(x, eve::ignore_extrema{0, i}, y);
 
       INFO("i: " << i << " ignore_last: " << actual
-                 << " ignore_extrema_: " << actual2);
+                 << " ignore_extrema: " << actual2);
       REQUIRE(eve::all(actual == actual2));
 
       int border = wide::static_size - i;
@@ -70,9 +72,9 @@ TEMPLATE_TEST_CASE("eve_extra.replace_ignored", "[eve_extra][replace_ignored]",
     }
   }
 
-  SECTION("ignore_extrema_") {
-    eve::ignore_first_ first{2};
-    eve::ignore_last_ last{1};
+  SECTION("ignore_extrema") {
+    eve::ignore_first first{2};
+    eve::ignore_last last{1};
 
     wide actual = eve_extra::replace_ignored(x, first && last, y);
     REQUIRE(actual.get(0) == 1);

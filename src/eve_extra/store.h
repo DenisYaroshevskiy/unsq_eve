@@ -63,13 +63,13 @@ EVE_FORCEINLINE void store(const Wide& wide, Ptr ptr, Ignore ignore) {
   }
 
   std::size_t start = 0, n = Wide::static_size;
-  if constexpr (std::is_same_v<Ignore, eve::ignore_first_>) {
+  if constexpr (std::is_same_v<Ignore, eve::ignore_first>) {
     start += ignore.count_;
     n -= ignore.count_;
-  } else if constexpr (std::is_same_v<Ignore, eve::ignore_last_>) {
+  } else if constexpr (std::is_same_v<Ignore, eve::ignore_last>) {
     n -= ignore.count_;
   } else {
-    static_assert(std::is_same_v<Ignore, eve::ignore_extrema_>);
+    static_assert(std::is_same_v<Ignore, eve::ignore_extrema>);
     start += ignore.first_count_;
     n -= ignore.first_count_ + ignore.last_count_;
   }

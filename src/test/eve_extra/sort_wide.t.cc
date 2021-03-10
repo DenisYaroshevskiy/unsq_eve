@@ -20,6 +20,8 @@
 
 #include "eve_extra/eve_extra.h"
 
+#include <eve/function/all.hpp>
+
 #include "test/catch.h"
 #include "test/eve_extra/common.h"
 

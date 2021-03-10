@@ -73,9 +73,9 @@ T* compress_store_precise(const Wide& wide, T* out, const Mask& wide_mask,
 
   eve::detail::top_bits mmask(wide_mask, ignore);
 
-  if constexpr (std::same_as<Ignore, eve::ignore_first_>) {
+  if constexpr (std::same_as<Ignore, eve::ignore_first>) {
     out += ignore.count_;
-  } else if constexpr (std::same_as<Ignore, eve::ignore_extrema_>) {
+  } else if constexpr (std::same_as<Ignore, eve::ignore_extrema>) {
     out += ignore.first_count_;
   }
 
@@ -86,7 +86,7 @@ T* compress_store_precise(const Wide& wide, T* out, const Mask& wide_mask,
   int n = up_to - buffer.begin();
 
   eve_extra::store(buffer, out,
-                   eve::ignore_last_{static_cast<int>(Wide::static_size - n)});
+                   eve::ignore_last{static_cast<int>(Wide::static_size - n)});
   return out + n;
 }
 
