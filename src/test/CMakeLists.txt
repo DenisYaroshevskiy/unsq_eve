@@ -27,7 +27,6 @@ target_sources(tests PRIVATE
                eve_extra/shift_pair.t.cpp
                eve_extra/sort_wide.t.cc
                eve_extra/store.t.cc
-               eve_extra/swap_adjacent_groups.t.cc
                unsq_eve/all_any_none.t.cc
                unsq_eve/concepts.t.cc
                unsq_eve/find_common.t.cc

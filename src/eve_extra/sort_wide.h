@@ -20,8 +20,8 @@
 #include <eve/eve.hpp>
 #include <eve/function/max.hpp>
 #include <eve/function/min.hpp>
+#include <eve/function/swap_adjacent_group.hpp>
 
-#include "eve_extra/swap_adjacent_groups.h"
 #include "eve_extra/mm.h"
 #include "eve_extra/reverse.h"
 
@@ -32,7 +32,7 @@ namespace eve_extra {
 template <eve::simd_value Wide>
 Wide sort_2_adjacent(const Wide& abcd)
 {
-  Wide badc = swap_adjacent_groups<1>(abcd);
+  Wide badc = eve::swap_adjacent_group(abcd, eve::lane<1>);
   Wide mins = eve::min(abcd, badc);
   Wide maxs = eve::max(abcd, badc);
   return eve::if_else(eve::logical<Wide>([](int i, int) {

@@ -31,7 +31,6 @@
 #include "eve_extra/scan_wide.h"
 #include "eve_extra/shift_pair.h"
 #include "eve_extra/store.h"
-#include "eve_extra/swap_adjacent_groups.h"
 
 namespace eve_extra {
 
