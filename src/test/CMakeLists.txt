@@ -32,6 +32,7 @@ target_sources(tests PRIVATE
                unsq_eve/find_common.t.cc
                unsq_eve/inclusive_scan_inplace.t.cc
                unsq_eve/min_element.t.cc
+               unsq_eve/type_list.t.cc
                unsq_eve/reduce.t.cc
                unsq_eve/remove.t.cc
                unsq_eve/reverse.t.cc
