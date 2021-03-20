@@ -23,21 +23,24 @@ void is_same_test(T, T) {}
 
 namespace unsq_eve {
 
-TEST_CASE("type_list, concat", "[meta]")
-{
+TEST_CASE("type_list, concat", "[meta]") {
   is_same_test(concatenate(), type_list<>{});
-  is_same_test(concatenate(type_list<int>{}, type_list<char, double>{}), type_list<int, char, double>{});
-  is_same_test(concatenate(type_list<int>{}, type_list<char, double>{}, type_list<float, short>{}),
-                           type_list<int, char, double, float, short>{});
+  is_same_test(concatenate(type_list<int>{}, type_list<char, double>{}),
+               type_list<int, char, double>{});
+  is_same_test(concatenate(type_list<int>{}, type_list<char, double>{},
+                           type_list<float, short>{}),
+               type_list<int, char, double, float, short>{});
 }
 
-TEST_CASE("type_list, flatten", "[meta]")
-{
+TEST_CASE("type_list, flatten", "[meta]") {
   is_same_test(flatten(type_list<>{}), type_list<>{});
   is_same_test(flatten(type_list<int, char>{}), type_list<int, char>{});
-  is_same_test(flatten(type_list<type_list<int, char>>{}), type_list<int, char>{});
-  is_same_test(flatten(type_list<float, type_list<int>, type_list<char, float, double>>{}),
-                       type_list<float, int, char, float, double>{});
+  is_same_test(flatten(type_list<type_list<int, char>>{}),
+               type_list<int, char>{});
+  is_same_test(
+      flatten(
+          type_list<float, type_list<int>, type_list<char, float, double>>{}),
+      type_list<float, int, char, float, double>{});
 }
 
 }  // namespace unsq_eve

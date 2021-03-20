@@ -23,36 +23,41 @@
 
 namespace unsq_eve {
 
-template <typename ...Ts>
-struct type_list
-{
-  template <typename ... Us>
-  constexpr friend type_list<Ts..., Us...> operator+(type_list<Ts...>, type_list<Us...>) { return {}; }
+template <typename... Ts>
+struct type_list {
+
+  static constexpr std::ptrdiff_t size() { return sizeof...(Ts); }
+
+  template <typename... Us>
+  constexpr friend type_list<Ts..., Us...> operator+(type_list<Ts...>,
+                                                     type_list<Us...>) {
+    return {};
+  }
 };
 
 template <typename T>
 struct is_type_list : std::false_type {};
 
-template <typename ... Ts>
+template <typename... Ts>
 struct is_type_list<type_list<Ts...>> : std::true_type {};
 
 template <typename T>
 concept any_type_list = is_type_list<T>::value;
 
-template <any_type_list ...Ts>
-constexpr auto concatenate(Ts... type_lists)
-{
+template <any_type_list... Ts>
+constexpr auto concatenate(Ts... type_lists) {
   return (type_list<>{} + ... + type_lists);
 }
 
-template <typename ...Ts>
-constexpr auto flatten(type_list<Ts...>)
-{
-  auto impl = []<typename T> (std::type_identity<T>) {
-    if constexpr (any_type_list<T>) return flatten(T{});
-    else                            return type_list<T>{};
+template <typename... Ts>
+constexpr auto flatten(type_list<Ts...>) {
+  auto impl = []<typename T>(std::type_identity<T>) {
+    if constexpr (any_type_list<T>)
+      return flatten(T{});
+    else
+      return type_list<T>{};
   };
-  return concatenate(impl(std::type_identity<Ts>{}) ... );
+  return concatenate(impl(std::type_identity<Ts>{})...);
 }
 
 }  // namespace unsq_eve
