@@ -70,7 +70,7 @@ TEST_CASE("tuple: tuple cat", "[meta]") {
   }
 }
 
-TEST_CASE("tuple: tuple flatten", "[meta]") {
+TEST_CASE("tuple: tuple_flatten", "[meta]") {
   {
     constexpr unsq_eve::tuple<int, char> x =
         tuple_flatten(unsq_eve::tuple{1, 'a'});
@@ -90,6 +90,104 @@ TEST_CASE("tuple: tuple flatten", "[meta]") {
     static_assert(get<1>(x) == 'a');
     static_assert(get<2>(x) == 0.3);
   }
+}
+
+TEST_CASE("tuple: tuple_extract", "[meta]") {
+  {
+    constexpr unsq_eve::tuple<int, char> x =
+        tuple_extract<1, 3>(unsq_eve::tuple{0.3, 1, 'a', 0.5});
+    static_assert(get<0>(x) == 1);
+    static_assert(get<1>(x) == 'a');
+  }
+  {
+    constexpr unsq_eve::tuple<> x =
+        tuple_extract<0, 0>(unsq_eve::tuple{0.3, 1, 'a', 0.5});
+    (void)x;
+  }
+}
+
+TEST_CASE("tuple: flat_tuple_size", "[meta]") {
+  static_assert(unsq_eve::flat_tuple_size_v<int> == 1);
+  static_assert(unsq_eve::flat_tuple_size_v<unsq_eve::tuple<int, char>> == 2);
+  static_assert(unsq_eve::flat_tuple_size_v<
+                    unsq_eve::tuple<int, unsq_eve::tuple<int, char>>> == 3);
+}
+
+TEST_CASE("tuple: tuple_flat_ref", "[meta]") {
+  {
+    constexpr auto impl_mutable = [] {
+      unsq_eve::tuple x{1, 'a'};
+      unsq_eve::tuple<int&, char&> res = tuple_flat_ref(x);
+      bool first_test = (get<0>(res) == 1 && get<1>(res) == 'a');
+
+      get<1>(res) = 'b';
+      bool second_test = (get<1>(x) == 'b');
+
+      return first_test && second_test;
+    };
+    static_assert(impl_mutable());
+
+    constexpr auto impl_const = [] {
+      const unsq_eve::tuple x{1, 'a'};
+      unsq_eve::tuple<const int&, const char&> res = tuple_flat_ref(x);
+      return (get<0>(res) == 1 && get<1>(res) == 'a');
+    };
+    static_assert(impl_const());
+  }
+  // flattening
+  {
+    constexpr auto impl = [] {
+      unsq_eve::tuple x{ unsq_eve::tuple{1, 'a'}, unsq_eve::tuple{'a', 1}};
+      unsq_eve::tuple<int&, char&, char&, int&> ref = tuple_flat_ref(x);
+      get<0>(ref) = 2;
+      get<2>(ref) = 'b';
+
+      return get<0>(x) == unsq_eve::tuple{2, 'a'} &&
+             get<1>(x) == unsq_eve::tuple{'b', 1};
+    };
+    static_assert(impl());
+  }
+}
+
+TEST_CASE("tuple: tuple_cast", "[meta]") {
+  using t1 = unsq_eve::tuple<int, char, double>;
+  using t2 = unsq_eve::tuple<unsq_eve::tuple<int, char>, double>;
+  using t3 = unsq_eve::tuple<t1>;
+  using t4 = unsq_eve::tuple<unsq_eve::tuple<t3>>;
+
+  auto impl = [](auto in) {
+    constexpr auto values_test = [](auto converted) {
+      auto flat = unsq_eve::tuple_flatten(converted);
+      return (flat == unsq_eve::tuple{1, 'a' , 0.5});
+    };
+
+    return values_test(tuple_cast<t1>(in)) &&
+           values_test(tuple_cast<t2>(in)) &&
+           values_test(tuple_cast<t3>(in)) &&
+           values_test(tuple_cast<t4>(in));
+  };
+
+  constexpr t1 x1{1, 'a', 0.5};
+  static_assert(impl(x1));
+
+  constexpr t2 x2{unsq_eve::tuple{1, 'a'}, 0.5};
+  static_assert(impl(x2));
+
+  constexpr t3 x3{x1};
+  static_assert(impl(x3));
+
+  constexpr t4 x4{unsq_eve::tuple<unsq_eve::tuple<t3>>{unsq_eve::tuple<t3>{x3}}};
+  static_assert(impl(x4));
+}
+
+TEST_CASE("tuple: tuple_cast_to", "[meta]") {
+   constexpr auto impl = [] {
+     unsq_eve::tuple x{ unsq_eve::tuple{1, 'a'}, 0.5, 1};
+     unsq_eve::tuple<unsq_eve::tuple<int, char, double>, int> y;
+     unsq_eve::tuple_cast_to(y, x);
+     return get<0>(y) == unsq_eve::tuple{1, 'a', 0.5} && get<1>(y) == 1;
+   };
+   static_assert(impl());
 }
 
 }  // namespace
