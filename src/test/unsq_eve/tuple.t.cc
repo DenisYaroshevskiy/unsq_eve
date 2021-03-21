@@ -52,13 +52,9 @@ TEST_CASE("tuple: is lexicographical", "[meta]") {
 TEST_CASE("tuple: tuple cat", "[meta]") {
   // basic pairs
   {
-    constexpr auto test = [](unsq_eve::tuple<int, char> res) {
-      return
-    };
-
-    constexpr basic = tuple_cat(unsq_eve::tuple{1}, unsq_eve::tuple{'a'})));
-    static_assert(get<0>(res) == 1);
-    static_assert(get<1>(res) == 'a');
+    constexpr auto basic = tuple_cat(unsq_eve::tuple{1}, unsq_eve::tuple{'a'});
+    static_assert(get<0>(basic) == 1);
+    static_assert(get<1>(basic) == 'a');
   }
   // cat multiple
   {

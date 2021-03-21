@@ -17,8 +17,6 @@
 #ifndef UNSQ_EVE_TUPLE_H_
 #define UNSQ_EVE_TUPLE_H_
 
-#include "unsq_eve/type_list.h"
-
 #include <compare>
 #include <concepts>
 #include <cstddef>
@@ -73,7 +71,7 @@ template <typename... Ts>
 struct is_tuple<tuple<Ts...>> : std::true_type {};
 
 template <typename T>
-constexpr bool is_tuple_v = is_tuple<T>::value;
+concept unsq_eve_tuple = is_tuple<T>::value;
 
 struct none_t {};
 
@@ -83,9 +81,10 @@ struct tuple_cat_impl {
 
   constexpr explicit tuple_cat_impl(T x) : x(x) {}
 
-  template <typename U>
+  template <unsq_eve_tuple U>
   constexpr auto operator+(U y) {
-    if constexpr (std::same_as<T, none_t>) return tuple_cat_impl<U>(y);
+    if constexpr (std::same_as<T, none_t>)
+      return tuple_cat_impl<U>(y);
     else {
       auto res = tuple_cat(x, y);
       return tuple_cat_impl<decltype(res)>(res);
@@ -126,7 +125,7 @@ constexpr tuple<Ts..., Us...> tuple_cat(tuple<Ts...> x, tuple<Us...> y) {
   (std::index_sequence_for<Ts...>{}, std::index_sequence_for<Us...>{});
 }
 
-template <typename... Ts>
+template <_tuple::unsq_eve_tuple... Ts>
 constexpr auto tuple_cat(Ts... xs) {
   return (_tuple::tuple_cat_impl{_tuple::none_t{}} + ... + xs).x;
 }
@@ -138,7 +137,7 @@ constexpr auto tuple_cat(Ts... xs) {
 template <typename... Ts>
 constexpr auto tuple_flatten(tuple<Ts...> x) {
   auto recurse = []<typename T>(const T& elem) {
-    if constexpr (_tuple::is_tuple_v<T>) {
+    if constexpr (_tuple::unsq_eve_tuple<T>) {
       return tuple_flatten(elem);
     } else {
       return tuple{elem};
@@ -153,34 +152,20 @@ constexpr auto tuple_flatten(tuple<Ts...> x) {
 // -------------------------------------------
 // tuple_flat_ref - tuple of references to every element
 
-template <typename... Ts>
-constexpr auto tuple_flat_ref(tuple<Ts...>& x) {
-  auto recurse = []<typename T>(T& elem) {
-    if constexpr (_tuple::is_tuple_v<T>) {
+template <typename Tuple>
+requires _tuple::unsq_eve_tuple<std::remove_cvref_t<Tuple>>
+constexpr auto tuple_flat_ref(Tuple&& x) {
+  auto recurse = []<typename T>(T&& elem) {
+    if constexpr (_tuple::unsq_eve_tuple<std::remove_cvref_t<T>>) {
       return tuple_flat_ref(elem);
     } else {
-      return tuple<T&>(elem);
+      return tuple<decltype(elem)>(elem);
     }
   };
   return [&]<std::size_t... idxs>(std::index_sequence<idxs...>) {
     return tuple_cat(recurse(get<idxs>(x))...);
   }
-  (std::index_sequence_for<Ts...>{});
-}
-
-template <typename... Ts>
-constexpr auto tuple_flat_ref(const tuple<Ts...>& x) {
-  auto recurse = []<typename T>(const T& elem) {
-    if constexpr (_tuple::is_tuple_v<T>) {
-      return tuple_flat_ref(elem);
-    } else {
-      return tuple<const T&>(elem);
-    }
-  };
-  return [&]<std::size_t... idxs>(std::index_sequence<idxs...>) {
-    return tuple_cat(recurse(get<idxs>(x))...);
-  }
-  (std::index_sequence_for<Ts...>{});
+  (std::make_index_sequence<std::tuple_size_v<std::remove_cvref_t<Tuple>>>{});
 }
 
 // ----------------------------------
@@ -188,7 +173,8 @@ constexpr auto tuple_flat_ref(const tuple<Ts...>& x) {
 // flatten structure.
 
 template <typename T, typename U>
-concept same_flat_tuple = _tuple::is_tuple_v<T> && _tuple::is_tuple_v<U> &&
+concept same_flat_tuple =
+    _tuple::unsq_eve_tuple<T> && _tuple::unsq_eve_tuple<U> &&
     std::same_as<decltype(tuple_flatten(T{})), decltype(tuple_flatten(U{}))>;
 
 // ----------------------------------
@@ -203,10 +189,10 @@ constexpr U tuple_cast(T x) {
   auto in = tuple_flat_ref(x);
   auto out = tuple_flat_ref(u);
 
-  [&]<std::size_t... idxs>(std::integer_sequence<std::size_t, idxs...>) {
+  [&]<std::size_t... idxs>(std::index_sequence<idxs...>) {
     ((get<idxs>(out) = get<idxs>(in)), ...);
   }
-  (std::make_integer_sequence<std::size_t, std::tuple_size_v<decltype(in)>>{});
+  (std::make_index_sequence<std::tuple_size_v<decltype(in)>>{});
 
   return u;
 }
