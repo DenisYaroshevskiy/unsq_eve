@@ -164,4 +164,13 @@ TEST_CASE("tuple: tuple_cast_to", "[meta]") {
    static_assert(impl());
 }
 
+TEST_CASE("tuple: structure bindings", "[meta]") {
+  constexpr auto impl = [] {
+    unsq_eve::tuple x{1, 'a', 0.5};
+    const auto[a, b, c] = x;
+    return (a == 1 && b == 'a' && c == 0.5);
+  };
+  static_assert(impl());
+}
+
 }  // namespace
