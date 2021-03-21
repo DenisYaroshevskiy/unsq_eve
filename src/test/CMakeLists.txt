@@ -39,7 +39,6 @@ target_sources(tests PRIVATE
                unsq_eve/transform_inplace.t.cc
                unsq_eve/transform_reduce.types.t.cc
                unsq_eve/tuple.t.cc
-               unsq_eve/type_list.t.cc
                unsq_eve/unroll.t.cc
                catch_main.cc)
 
