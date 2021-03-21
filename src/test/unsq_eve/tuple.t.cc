@@ -53,19 +53,18 @@ TEST_CASE("tuple: tuple cat", "[meta]") {
   // basic pairs
   {
     constexpr auto test = [](unsq_eve::tuple<int, char> res) {
-      return (get<0>(res) == 1) && (get<1>(res) == 'a');
+      return
     };
 
-    static_assert(test(tuple_cat(unsq_eve::tuple{1}, unsq_eve::tuple{'a'})));
-    static_assert(test(tuple_cat(unsq_eve::tuple{1}, 'a')));
-    static_assert(test(tuple_cat(1, unsq_eve::tuple{'a'})));
-    static_assert(test(unsq_eve::tuple_cat(1, 'a')));
+    constexpr basic = tuple_cat(unsq_eve::tuple{1}, unsq_eve::tuple{'a'})));
+    static_assert(get<0>(res) == 1);
+    static_assert(get<1>(res) == 'a');
   }
   // cat multiple
   {
     unsq_eve::tuple<int, char, short, double> res = tuple_cat(
-        unsq_eve::tuple<int, char>(1, 'a'), short(3), unsq_eve::tuple{1.0});
-    res = tuple_cat(1, unsq_eve::tuple('a', short(3)), unsq_eve::tuple{1.0});
+        unsq_eve::tuple{1, 'a'}, unsq_eve::tuple{short(3)}, unsq_eve::tuple{1.0});
+    res = tuple_cat(unsq_eve::tuple{1}, unsq_eve::tuple('a', short(3)), unsq_eve::tuple{1.0});
     (void)res;
   }
 }
@@ -90,27 +89,6 @@ TEST_CASE("tuple: tuple_flatten", "[meta]") {
     static_assert(get<1>(x) == 'a');
     static_assert(get<2>(x) == 0.3);
   }
-}
-
-TEST_CASE("tuple: tuple_extract", "[meta]") {
-  {
-    constexpr unsq_eve::tuple<int, char> x =
-        tuple_extract<1, 3>(unsq_eve::tuple{0.3, 1, 'a', 0.5});
-    static_assert(get<0>(x) == 1);
-    static_assert(get<1>(x) == 'a');
-  }
-  {
-    constexpr unsq_eve::tuple<> x =
-        tuple_extract<0, 0>(unsq_eve::tuple{0.3, 1, 'a', 0.5});
-    (void)x;
-  }
-}
-
-TEST_CASE("tuple: flat_tuple_size", "[meta]") {
-  static_assert(unsq_eve::flat_tuple_size_v<int> == 1);
-  static_assert(unsq_eve::flat_tuple_size_v<unsq_eve::tuple<int, char>> == 2);
-  static_assert(unsq_eve::flat_tuple_size_v<
-                    unsq_eve::tuple<int, unsq_eve::tuple<int, char>>> == 3);
 }
 
 TEST_CASE("tuple: tuple_flat_ref", "[meta]") {
