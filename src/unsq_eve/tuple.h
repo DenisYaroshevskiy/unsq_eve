@@ -228,6 +228,15 @@ struct tuple : _tuple::impl_t<Ts...> {
 template <typename... Ts>
 tuple(Ts... xs) -> tuple<Ts...>;
 
+template <typename Tuple, typename Op>
+requires _tuple::unsq_eve_tuple<std::remove_cvref_t<Tuple>>
+constexpr auto tuple_map(Tuple&& in, Op op) {
+  return [&]<std::size_t... idxs>(std::index_sequence<idxs...>) {
+    return tuple{op(get<idxs>(in))...};
+  }
+  (std::make_index_sequence<std::tuple_size_v<std::remove_cvref_t<Tuple>>>{});
+}
+
 }  // namespace unsq_eve
 
 #endif  // UNSQ_EVE_TUPLE_H_
