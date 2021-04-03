@@ -188,4 +188,19 @@ TEST_CASE("tuple: tuple map", "[meta]") {
   static_assert(impl());
 }
 
+TEST_CASE("tuple: tuple map flat", "[meta]") {
+  constexpr auto impl = [] {
+    unsq_eve::tuple x{unsq_eve::tuple{1, 'a'}, 0.5};
+
+    unsq_eve::tuple mapped =
+        tuple_map_flat(x, [](auto y) -> decltype(y) { return y + 1; });
+
+    auto [ab, c] = mapped;
+    auto [a, b] = ab;
+
+    return a == 2 && b == 'b' && c == 1.5;
+  };
+  static_assert(impl());
+}
+
 }  // namespace

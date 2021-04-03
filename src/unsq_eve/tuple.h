@@ -43,7 +43,17 @@ constexpr T& get(_tuple::indexed_element_t<I, T>& x) {
 }
 
 template <std::size_t I, typename T>
+constexpr T get(_tuple::indexed_element_t<I, T>&& x) {
+  return x.body;
+}
+
+template <std::size_t I, typename T>
 constexpr const T& get(const _tuple::indexed_element_t<I, T>& x) {
+  return x.body;
+}
+
+template <std::size_t I, typename T>
+constexpr T get(const _tuple::indexed_element_t<I, T>&& x) {
   return x.body;
 }
 
@@ -105,6 +115,12 @@ struct tuple_size<unsq_eve::tuple<Ts...>>
 template <std::size_t idx, typename... Ts>
 struct tuple_element<idx, unsq_eve::tuple<Ts...>> {
   using type = std::remove_cvref_t<decltype(get<idx>(tuple<Ts...>{}))>;
+};
+
+template <std::size_t idx, typename... Ts>
+struct tuple_element<idx, const unsq_eve::tuple<Ts...>> {
+  using type =
+      std::add_const_t<std::remove_cvref_t<decltype(get<idx>(tuple<Ts...>{}))>>;
 };
 
 }  // namespace std
@@ -235,6 +251,18 @@ constexpr auto tuple_map(Tuple&& in, Op op) {
     return tuple{op(get<idxs>(in))...};
   }
   (std::make_index_sequence<std::tuple_size_v<std::remove_cvref_t<Tuple>>>{});
+}
+
+template <typename Tuple, typename Op>
+requires _tuple::unsq_eve_tuple<std::remove_cvref_t<Tuple>>
+constexpr auto tuple_map_flat(Tuple&& in, Op op) {
+  return tuple_map(in, [&](auto&& e) {
+    if constexpr (_tuple::unsq_eve_tuple<std::remove_cvref_t<decltype(e)>>) {
+      return tuple_map_flat(e, op);
+    } else {
+      return op(e);
+    }
+  });
 }
 
 }  // namespace unsq_eve
