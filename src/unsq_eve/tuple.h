@@ -21,6 +21,7 @@
 #include <concepts>
 #include <cstddef>
 #include <ostream>
+#include <utility>
 #include <type_traits>
 
 namespace unsq_eve {
@@ -34,7 +35,7 @@ template <std::size_t I, typename T>
 struct indexed_element_t {
   T body;
 
-  constexpr auto operator<=>(const indexed_element_t&) const = default;
+  auto operator<=>(const indexed_element_t&) const = default;
 };
 
 template <std::size_t I, typename T>
@@ -68,7 +69,7 @@ struct impl<std::integer_sequence<std::size_t, from0_n...>, Ts...>
   constexpr explicit impl(Ts... xs) requires(sizeof...(Ts) > 0)
       : indexed_element_t<from0_n, Ts>{xs}... {}
 
-  constexpr auto operator<=>(const impl&) const = default;
+  auto operator<=>(const impl&) const = default;
 };
 
 template <typename... Ts>
@@ -238,7 +239,7 @@ struct tuple : _tuple::impl_t<Ts...> {
     return out;
   }
 
-  constexpr auto operator<=>(const tuple&) const = default;
+  auto operator<=>(const tuple&) const = default;
 };
 
 template <typename... Ts>
@@ -264,6 +265,13 @@ constexpr auto tuple_map_flat(Tuple&& in, Op op) {
     }
   });
 }
+
+template <typename Tuple, typename Op>
+requires _tuple::unsq_eve_tuple<std::remove_cvref_t<Tuple>>
+constexpr void tuple_iter_flat(Tuple&& in, Op op) {
+  tuple_map_flat(in, [&](auto&& e) { op(e); return 1; });
+}
+
 
 }  // namespace unsq_eve
 
