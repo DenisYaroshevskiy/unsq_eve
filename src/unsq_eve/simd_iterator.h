@@ -20,10 +20,14 @@
 #include "eve_extra/eve_extra.h"
 #include "unsq_eve/tuple.h"
 
+#include <algorithm>
 #include <eve/eve.hpp>
 #include <eve/function/load.hpp>
 
 namespace unsq_eve {
+
+template <typename, typename>
+struct simd_iterator;
 
 namespace _simd_iterator {
 
@@ -41,15 +45,48 @@ auto do_load(eve::relative_conditional_expr auto cond, auto x, auto N) {
   return load(cond, x, N);
 }
 
+template <typename T>
+struct is_simd_iterator_impl : std::false_type {};
+
+template <typename T, typename U>
+struct is_simd_iterator_impl<simd_iterator<T, U>> : std::true_type {};
+
+template <typename T>
+concept is_simd_iterator = is_simd_iterator_impl<T>::value;
+
 }  // namespace _simd_iterator
 
 template <typename... Ts>
-struct simd_iterator {
+constexpr auto common_cardinality() {
+  auto cardinalities =
+      tuple_map(unsq_eve::tuple<std::type_identity<Ts>...>{},
+                []<typename T>(std::type_identity<T>) {
+                  if constexpr (_simd_iterator::is_simd_iterator<T>)
+                    return typename T::cardinality{};
+                  else
+                    return eve::expected_cardinal_t<std::remove_cvref_t<decltype(*std::declval<T>())>>{};
+                });
+
+  std::ptrdiff_t res = get<0>(cardinalities)();
+
+  tuple_iter_flat(cardinalities, [&](auto n) { res = std::min(res, n()); });
+  return res;
+}
+
+template <typename... Ts, typename N>
+struct simd_iterator<unsq_eve::tuple<Ts...>, N> {
   unsq_eve::tuple<Ts...> components;
+  using cardinality = N;
 
   simd_iterator() = default;
 
   simd_iterator(Ts... xs) : components(xs...) {}
+
+  friend auto load(simd_iterator it) { return load(eve::ignore_none, it, N{}); }
+
+  friend auto load(eve::relative_conditional_expr auto cond, simd_iterator it) {
+    return load(cond, it, N{});
+  }
 
   friend auto load(simd_iterator it, auto n) {
     return load(eve::ignore_none, it, n);
@@ -80,6 +117,10 @@ struct simd_iterator {
     return x + n;
   }
 };
+
+template <typename... Ts>
+simd_iterator(Ts...) -> simd_iterator<unsq_eve::tuple<Ts...>,
+                                      eve::fixed<common_cardinality<Ts...>()>>;
 
 }  // namespace unsq_eve
 

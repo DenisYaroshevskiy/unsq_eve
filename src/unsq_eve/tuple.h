@@ -272,7 +272,6 @@ constexpr void tuple_iter_flat(Tuple&& in, Op op) {
   tuple_map_flat(in, [&](auto&& e) { op(e); return 1; });
 }
 
-
 }  // namespace unsq_eve
 
 #endif  // UNSQ_EVE_TUPLE_H_

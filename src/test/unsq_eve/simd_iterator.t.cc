@@ -25,6 +25,13 @@
 
 namespace {
 
+TEST_CASE("simd_iterator.common_cordinality", "[unsq_eve]") {
+  static_assert(unsq_eve::common_cardinality<char*>() == 32);
+  static_assert(unsq_eve::common_cardinality<char*, char*>() == 32);
+  static_assert(unsq_eve::common_cardinality<char*, eve::aligned_ptr<short>>() == 16);
+  static_assert(unsq_eve::common_cardinality<eve::aligned_ptr<short>, eve::aligned_ptr<char>>() == 16);
+}
+
 TEST_CASE("simd_iterator.basic", "[unsq_eve]") {
   std::vector<int> ints(16u, 0);
   alignas(32u) std::array<char, 32u> aligned_chars;
@@ -32,51 +39,51 @@ TEST_CASE("simd_iterator.basic", "[unsq_eve]") {
   std::iota(ints.begin(), ints.end(), 0);
   std::iota(aligned_chars.begin(), aligned_chars.end(), 0);
 
-  auto load_test = [](auto n, auto... ptrs) {
+  auto load_test = [](auto... ptrs) {
     unsq_eve::simd_iterator it{ptrs...};
+    using N = typename decltype(it)::cardinality;
+
+    static_assert(N{}() == 8);
 
     {
-      unsq_eve::tuple loaded = load(it, n);
-
-      tuple_iter_flat(loaded, []<typename Wide>(Wide e) {
-        REQUIRE(eve::all(e == Wide([](int i, int) { return i; })));
-      });
-    }
-    {
-      unsq_eve::tuple loaded = load(eve::ignore_none, it, n);
+      unsq_eve::tuple loaded = load(it);
 
       tuple_iter_flat(loaded, []<typename Wide>(Wide e) {
         REQUIRE(eve::all(e == Wide([](int i, int) { return i; })));
       });
     }
     {
-      unsq_eve::tuple loaded = load(eve::ignore_first(3).else_(-1), it, n);
+      unsq_eve::tuple loaded = load(eve::ignore_none, it);
+
+      tuple_iter_flat(loaded, []<typename Wide>(Wide e) {
+        REQUIRE(eve::all(e == Wide([](int i, int) { return i; })));
+      });
+    }
+    {
+      unsq_eve::tuple loaded = load(eve::ignore_first(3).else_(-1), it);
 
       tuple_iter_flat(loaded, []<typename Wide>(Wide e) {
         REQUIRE(eve::all(e == Wide([](int i, int) { return i < 3 ? -1 : i; })));
       });
     }
 
-    // +
     {
-      unsq_eve::tuple loaded = load(it + n, n);
+      unsq_eve::tuple loaded = load(it + 8, eve::lane<8>);
 
       tuple_iter_flat(loaded, [&]<typename Wide>(Wide e) {
-        e -= static_cast<typename Wide::value_type>(n);
+        e -= static_cast<typename Wide::value_type>(N());
         REQUIRE(eve::all(e == Wide([](int i, int) { return i; })));
       });
     }
   };
 
-  load_test(eve::lane<8>, ints.data(), aligned_chars.begin());
-  load_test(eve::lane<8>, ints.data(),
-            eve::aligned_ptr<char, 16>{aligned_chars.begin()});
-  load_test(eve::lane<8>, ints.data(),
-            eve::aligned_ptr<char, 8>{aligned_chars.begin()});
-  load_test(eve::lane<8>,
-            unsq_eve::simd_iterator{
-                ints.data(), eve::aligned_ptr<char, 8>{aligned_chars.begin()}},
-            ints.data());
+  load_test(ints.data(), aligned_chars.begin());
+  load_test(ints.data(), eve::aligned_ptr<char, 16>{aligned_chars.begin()});
+  load_test(ints.data(), eve::aligned_ptr<char, 8>{aligned_chars.begin()});
+  load_test(
+      unsq_eve::simd_iterator{ints.data(),
+                              eve::aligned_ptr<char, 8>{aligned_chars.begin()}},
+      ints.data());
 }
 
 }  // namespace
