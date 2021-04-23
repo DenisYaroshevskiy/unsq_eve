@@ -23,7 +23,7 @@
 
 #include "eve_extra/concepts.h"
 #include "eve_extra/mm.h"
-#include <eve/function/swap_adjacent_group.hpp>
+#include <eve/function/swap_adjacent_groups.hpp>
 
 namespace eve_extra {
 namespace _reverse {
@@ -67,7 +67,7 @@ Wide reverse(const Wide& wide) requires(element_size_v<Wide> < 4) {
   const Wide each_half{
       mm::cast<typename Wide::storage_type>(_mm256_shuffle_epi8(raw, mask))};
 
-  return eve::swap_adjacent_group(each_half, eve::lane<Wide::static_size / 2>);
+  return eve::swap_adjacent_groups(each_half, eve::lane<Wide::static_size / 2>);
 }
 
 template <wide_16_bytes Wide>

@@ -19,14 +19,14 @@
 
 #include "eve_extra/concepts.h"
 
-#include <eve/function/swap_adjacent_group.hpp>
+#include <eve/function/swap_adjacent_groups.hpp>
 
 namespace eve_extra {
 namespace _reduce_wide {
 
 template <std::ptrdiff_t current_group_size, typename Wide, typename Op>
 Wide do_reduce_wide(Wide x, Op op) {
-  Wide y = eve::swap_adjacent_group(x, eve::lane<current_group_size>);
+  Wide y = eve::swap_adjacent_groups(x, eve::lane<current_group_size>);
   x = op(x, y);
   if constexpr (current_group_size == 1) {
     return x;
