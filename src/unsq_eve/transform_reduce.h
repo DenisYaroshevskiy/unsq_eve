@@ -20,6 +20,7 @@
 #include <array>
 
 #include <eve/function/convert.hpp>
+#include <eve/function/reduce.hpp>
 #include <eve/function/replace.hpp>
 
 #include "eve_extra/eve_extra.h"
@@ -83,7 +84,7 @@ struct unary_body {
 
   T final_reduction() const {
     auto combined = eve_extra::segment_reduction(regs, reduce);
-    combined = eve_extra::reduce_wide(combined, reduce);
+    combined = eve::reduce(combined, reduce);
     return combined.get(0);
   }
 };

@@ -21,7 +21,6 @@ target_sources(tests PRIVATE
                eve_extra/compress_store.t.cc
                eve_extra/concepts.t.cc
                eve_extra/eve_extra.t.cc
-               eve_extra/reduce_wide.t.cc
                eve_extra/reverse.t.cc
                eve_extra/scan_wide.t.cc
                eve_extra/shift_pair.t.cpp

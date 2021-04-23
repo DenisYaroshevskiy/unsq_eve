@@ -22,6 +22,7 @@
 #include <eve/function/all.hpp>
 #include <eve/function/convert.hpp>
 #include <eve/function/min.hpp>
+#include <eve/function/reduce.hpp>
 #include <eve/function/replace.hpp>
 
 #include "eve_extra/eve_extra.h"
@@ -87,7 +88,7 @@ struct min_body {
 
     if (eve::all(combined == best)) return;
 
-    best = eve_extra::reduce_wide(combined, sel);
+    best = eve::reduce(combined, sel);
 
     const wide_idx max_idx{std::numeric_limits<index_t<Traits>>::max()};
 
@@ -119,7 +120,7 @@ struct min_body {
 
   EVE_FORCEINLINE I compute_result() {
     index_overflow();
-    best_idx = eve_extra::reduce_wide(best_idx, eve::min);
+    best_idx = eve::minimum(best_idx);
     return best_base + best_idx.get(0);
   }
 };
