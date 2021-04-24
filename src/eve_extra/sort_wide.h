@@ -20,10 +20,10 @@
 #include <eve/eve.hpp>
 #include <eve/function/max.hpp>
 #include <eve/function/min.hpp>
+#include <eve/function/reverse.hpp>
 #include <eve/function/swap_adjacent_groups.hpp>
 
 #include "eve_extra/mm.h"
-#include "eve_extra/reverse.h"
 
 /* Work in progress */
 
@@ -51,7 +51,7 @@ template <eve::simd_value Wide>
 Wide sort_4(Wide x) {
   x = sort_2_adjacent(x);
 
-  Wide y = eve_extra::reverse(x);
+  Wide y = eve::reverse(x);
 
   Wide mins = eve::min(x, y);
   Wide maxs = eve::max(x, y);

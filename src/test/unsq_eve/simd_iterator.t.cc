@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "unsq_eve/simd_base.h"
+#include "unsq_eve/simd_iterator.h"
 
 #include <eve/conditional.hpp>
 #include <eve/function/all.hpp>
@@ -25,14 +25,16 @@
 
 namespace {
 
-TEST_CASE("simd_base.common_cordinality", "[unsq_eve]") {
+TEST_CASE("simd_iterator.common_cordinality", "[unsq_eve]") {
   static_assert(unsq_eve::common_cardinality<char*>() == 32);
   static_assert(unsq_eve::common_cardinality<char*, char*>() == 32);
-  static_assert(unsq_eve::common_cardinality<char*, eve::aligned_ptr<short>>() == 16);
-  static_assert(unsq_eve::common_cardinality<eve::aligned_ptr<short>, eve::aligned_ptr<char>>() == 16);
+  static_assert(
+      unsq_eve::common_cardinality<char*, eve::aligned_ptr<short>>() == 16);
+  static_assert(unsq_eve::common_cardinality<eve::aligned_ptr<short>,
+                                             eve::aligned_ptr<char>>() == 16);
 }
 
-TEST_CASE("simd_base.basic", "[unsq_eve]") {
+TEST_CASE("simd_iterator.basic", "[unsq_eve]") {
   std::vector<int> ints(16u, 0);
   alignas(32u) std::array<char, 32u> aligned_chars;
 
@@ -40,7 +42,7 @@ TEST_CASE("simd_base.basic", "[unsq_eve]") {
   std::iota(aligned_chars.begin(), aligned_chars.end(), 0);
 
   auto load_test = [](auto... ptrs) {
-    unsq_eve::simd_base it{ptrs...};
+    unsq_eve::simd_iterator it{ptrs...};
     using N = typename decltype(it)::cardinality;
 
     static_assert(N{}() == 8);
@@ -68,9 +70,28 @@ TEST_CASE("simd_base.basic", "[unsq_eve]") {
     }
 
     {
-      unsq_eve::tuple loaded = load(it + 8, eve::lane<8>);
+      unsq_eve::tuple loaded = load(it + N(), eve::lane<8>);
 
       tuple_iter_flat(loaded, [&]<typename Wide>(Wide e) {
+        e -= static_cast<typename Wide::value_type>(N());
+        REQUIRE(eve::all(e == Wide([](int i, int) { return i; })));
+      });
+    }
+
+    {
+      REQUIRE(it < it + 8);
+      REQUIRE(it <= it);
+      REQUIRE(it == it);
+      REQUIRE(it != it + 8);
+    }
+
+    {
+      auto it1 = it + 2 * N();
+      it1 = it1 - N();
+
+      unsq_eve::tuple loaded = load(it1);
+
+      tuple_iter_flat(loaded, []<typename Wide>(Wide e) {
         e -= static_cast<typename Wide::value_type>(N());
         REQUIRE(eve::all(e == Wide([](int i, int) { return i; })));
       });
@@ -81,7 +102,7 @@ TEST_CASE("simd_base.basic", "[unsq_eve]") {
   load_test(ints.data(), eve::aligned_ptr<char, 16>{aligned_chars.begin()});
   load_test(ints.data(), eve::aligned_ptr<char, 8>{aligned_chars.begin()});
   load_test(
-      unsq_eve::simd_base{ints.data(),
+      unsq_eve::simd_iterator{ints.data(),
                               eve::aligned_ptr<char, 8>{aligned_chars.begin()}},
       ints.data());
 }

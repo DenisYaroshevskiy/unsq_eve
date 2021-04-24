@@ -2,9 +2,10 @@
 #define UNSQ_EVE_REVERSE_H_
 
 #include "eve_extra/eve_extra.h"
-#include "unsq_eve/iteration_two_sides_parallel.h"
 
-#include <iostream>
+#include <eve/function/reverse.hpp>
+
+#include "unsq_eve/iteration_two_sides_parallel.h"
 
 namespace unsq_eve {
 namespace _reverse {
@@ -21,7 +22,7 @@ struct body {
   EVE_FORCEINLINE void small_array_step(Ptr from,
                                         eve::ignore_first ignore) const {
     wide xs = eve::unsafe(eve::load)(from, width_t<Traits>{});
-    xs = eve_extra::reverse(xs);
+    xs = eve::reverse(xs);
 
     eve_extra::store(xs, from + ignore.count_,
                      eve::ignore_last(ignore.count_));
@@ -31,7 +32,7 @@ struct body {
   EVE_FORCEINLINE void small_array_step(Ptr from,
                                         eve::ignore_last ignore) const {
     wide xs = eve::unsafe(eve::load)(from, width_t<Traits>{});
-    xs = eve_extra::reverse(xs);
+    xs = eve::reverse(xs);
 
     eve_extra::store(xs, from - ignore.count_,
                      eve::ignore_first(ignore.count_));
@@ -40,8 +41,8 @@ struct body {
   template <typename Ptr>
   EVE_FORCEINLINE void small_step(Ptr lhs, Ptr rhs) const {
     wide xs{lhs}, ys{rhs};
-    xs = eve_extra::reverse(xs);
-    ys = eve_extra::reverse(ys);
+    xs = eve::reverse(xs);
+    ys = eve::reverse(ys);
     eve::store(xs, rhs);
     eve::store(ys, lhs);
   }

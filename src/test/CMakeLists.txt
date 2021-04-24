@@ -21,7 +21,6 @@ target_sources(tests PRIVATE
                eve_extra/compress_store.t.cc
                eve_extra/concepts.t.cc
                eve_extra/eve_extra.t.cc
-               eve_extra/reverse.t.cc
                eve_extra/scan_wide.t.cc
                eve_extra/shift_pair.t.cpp
                eve_extra/sort_wide.t.cc
@@ -34,7 +33,7 @@ target_sources(tests PRIVATE
                unsq_eve/reduce.t.cc
                unsq_eve/remove.t.cc
                unsq_eve/reverse.t.cc
-               unsq_eve/simd_base.t.cc
+               unsq_eve/simd_iterator.t.cc
                unsq_eve/strlen_example.t.cc
                unsq_eve/transform_inplace.t.cc
                unsq_eve/transform_reduce.types.t.cc
