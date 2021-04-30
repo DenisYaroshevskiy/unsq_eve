@@ -26,6 +26,23 @@
 #include <eve/eve.hpp>
 #include <eve/function/load.hpp>
 
+/*
+  eve::load or eve::store
+  eve::cardinality_v
+  eve::cardinality_cast<N>
+  operator+/+=/-/-=
+  operator-
+
+  // aligneable (optional)
+  eve::previous_aligned_address -> aligned_iter
+  iter_cast<iter>(aligned_iter)
+  iter_cast<aligned_iter>(iter)
+
+  // tests
+  is_aligned -> traits
+  aligneable_iterator -> supports previous_aligned_address and iter_cast
+*/
+
 namespace unsq_eve {
 
 template <typename, typename>
@@ -76,6 +93,15 @@ struct is_simd_iterator_impl<simd_iterator<T, U>> : std::true_type {};
 
 template <typename T>
 concept is_simd_iterator = is_simd_iterator_impl<T>::value;
+
+template <typename T>
+struct is_aligned_ptr_impl : std::false_type {};
+
+template <typename T, std::size_t alignment>
+struct is_aligned_ptr_impl<eve::aligned_ptr<T, alignment>> : std::true_type {};
+
+template <typename T>
+concept is_aligned_ptr = is_aligned_ptr_impl<T>::value;
 
 }  // namespace _simd_iterator
 

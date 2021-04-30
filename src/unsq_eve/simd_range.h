@@ -21,13 +21,19 @@
 
 namespace unsq_eve {
 
-template <typename Traits, typename ...Is>
+template <typename .... Ts>
 struct simd_range {
-  using traits = Traits;
-  using base_t = simd_base<Is..., typename Traits::cardinality>;
+  using iterator = simd_iterator<Ts...>;
 
-  base_t base;
-  std::ptrdiff_t n;
+  simd_range() = default;
+  simd_range(iterator f, iterator l) : begin_(f), end_(l) {}
+
+  iterator begin() const { return begin_; }
+  iterator end() const { return end_; }
+
+ private:
+  iterator begin_;
+  iterator end_;
 };
 
 
