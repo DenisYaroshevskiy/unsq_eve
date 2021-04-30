@@ -24,6 +24,9 @@
 #include <utility>
 #include <type_traits>
 
+#include "eve_extra/concepts.h"
+#include "unsq_eve/concepts.h"
+
 namespace unsq_eve {
 
 template <typename... Ts>
@@ -75,15 +78,6 @@ struct impl<std::integer_sequence<std::size_t, from0_n...>, Ts...>
 template <typename... Ts>
 using impl_t = impl<std::index_sequence_for<Ts...>, Ts...>;
 
-template <typename T>
-struct is_tuple : std::false_type {};
-
-template <typename... Ts>
-struct is_tuple<tuple<Ts...>> : std::true_type {};
-
-template <typename T>
-concept unsq_eve_tuple = is_tuple<T>::value;
-
 struct none_t {};
 
 template <typename T>
@@ -92,7 +86,7 @@ struct tuple_cat_impl {
 
   constexpr explicit tuple_cat_impl(T x) : x(x) {}
 
-  template <unsq_eve_tuple U>
+  template <typename U>
   constexpr auto operator+(U y) {
     if constexpr (std::same_as<T, none_t>)
       return tuple_cat_impl<U>(y);
@@ -142,7 +136,7 @@ constexpr tuple<Ts..., Us...> tuple_cat(tuple<Ts...> x, tuple<Us...> y) {
   (std::index_sequence_for<Ts...>{}, std::index_sequence_for<Us...>{});
 }
 
-template <_tuple::unsq_eve_tuple... Ts>
+template <eve_extra::specialization<tuple>... Ts>
 constexpr auto tuple_cat(Ts... xs) {
   return (_tuple::tuple_cat_impl{_tuple::none_t{}} + ... + xs).x;
 }
@@ -154,7 +148,7 @@ constexpr auto tuple_cat(Ts... xs) {
 template <typename... Ts>
 constexpr auto tuple_flatten(tuple<Ts...> x) {
   auto recurse = []<typename T>(const T& elem) {
-    if constexpr (_tuple::unsq_eve_tuple<T>) {
+    if constexpr (eve_extra::specialization<T, tuple>) {
       return tuple_flatten(elem);
     } else {
       return tuple{elem};
@@ -170,10 +164,10 @@ constexpr auto tuple_flatten(tuple<Ts...> x) {
 // tuple_flat_ref - tuple of references to every element
 
 template <typename Tuple>
-requires _tuple::unsq_eve_tuple<std::remove_cvref_t<Tuple>>
+requires eve_extra::specialization<std::remove_cvref_t<Tuple>, tuple>
 constexpr auto tuple_flat_ref(Tuple&& x) {
   auto recurse = []<typename T>(T&& elem) {
-    if constexpr (_tuple::unsq_eve_tuple<std::remove_cvref_t<T>>) {
+    if constexpr (eve_extra::specialization<std::remove_cvref_t<T>, tuple>) {
       return tuple_flat_ref(elem);
     } else {
       return tuple<decltype(elem)>(elem);
@@ -191,7 +185,7 @@ constexpr auto tuple_flat_ref(Tuple&& x) {
 
 template <typename T, typename U>
 concept same_flat_tuple =
-    _tuple::unsq_eve_tuple<T> && _tuple::unsq_eve_tuple<U> &&
+    eve_extra::specialization<T, tuple> && eve_extra::specialization<U, tuple> &&
     std::same_as<decltype(tuple_flatten(T{})), decltype(tuple_flatten(U{}))>;
 
 // ----------------------------------
@@ -246,7 +240,7 @@ template <typename... Ts>
 tuple(Ts... xs) -> tuple<Ts...>;
 
 template <typename Tuple, typename Op>
-requires _tuple::unsq_eve_tuple<std::remove_cvref_t<Tuple>>
+requires eve_extra::specialization<std::remove_cvref_t<Tuple>, tuple>
 constexpr auto tuple_map(Tuple&& in, Op op) {
   return [&]<std::size_t... idxs>(std::index_sequence<idxs...>) {
     return tuple{op(get<idxs>(in))...};
@@ -255,10 +249,10 @@ constexpr auto tuple_map(Tuple&& in, Op op) {
 }
 
 template <typename Tuple, typename Op>
-requires _tuple::unsq_eve_tuple<std::remove_cvref_t<Tuple>>
+requires eve_extra::specialization<std::remove_cvref_t<Tuple>, tuple>
 constexpr auto tuple_map_flat(Tuple&& in, Op op) {
   return tuple_map(in, [&](auto&& e) {
-    if constexpr (_tuple::unsq_eve_tuple<std::remove_cvref_t<decltype(e)>>) {
+    if constexpr (eve_extra::specialization<std::remove_cvref_t<decltype(e)>, tuple>) {
       return tuple_map_flat(e, op);
     } else {
       return op(e);
@@ -267,7 +261,7 @@ constexpr auto tuple_map_flat(Tuple&& in, Op op) {
 }
 
 template <typename Tuple, typename Op>
-requires _tuple::unsq_eve_tuple<std::remove_cvref_t<Tuple>>
+requires eve_extra::specialization<std::remove_cvref_t<Tuple>, tuple>
 constexpr void tuple_iter_flat(Tuple&& in, Op op) {
   tuple_map_flat(in, [&](auto&& e) { op(e); return 1; });
 }

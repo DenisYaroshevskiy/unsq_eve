@@ -23,40 +23,21 @@
 
 namespace eve_extra {
 
-template <typename>
-struct is_wide : std::false_type {};
+template <typename, template <typename ...> typename>
+struct specialization_impl : std::false_type {};
 
-template <typename T, typename N, typename ABI>
-struct is_wide<eve::wide<T, N, ABI>> : std::true_type {};
+template <template <typename ...> typename Template, typename ... Args>
+struct specialization_impl<Template<Args...>, Template> : std::true_type {};
 
-template <typename>
-struct is_logical : std::false_type {};
+template <typename T, template <typename ...> typename Template>
+concept specialization = specialization_impl<T, Template>::value;
 
-template <typename T>
-struct is_logical<eve::logical<T>> : std::true_type {};
 
 template <typename T>
-constexpr bool is_wide_v = is_wide<T>::value;
+concept eve_wide = specialization<T, eve::wide>;
 
 template <typename T>
-constexpr bool is_logical_v = is_logical<T>::value;
-
-template <typename T>
-concept eve_wide = is_wide_v<T>;
-
-template <typename T>
-concept eve_logical = is_logical<T>::value;
-
-template <typename>
-struct wide_for_logical;
-
-template <typename T, typename N, typename ABI>
-struct wide_for_logical<eve::logical<eve::wide<T, N, ABI>>> {
-  using type = eve::wide<T, N, ABI>;
-};
-
-template <eve_logical Logical>
-using wide_for_logical_t = typename wide_for_logical<Logical>::type;
+concept eve_logical = specialization<T, eve::logical>;
 
 template <typename Wide>
 concept composite_wide = eve_wide<Wide>&& requires(const Wide& x) {

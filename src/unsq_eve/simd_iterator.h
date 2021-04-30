@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef UNSQ_EVE_simd_iterator_H_
-#define UNSQ_EVE_simd_iterator_H_
+#ifndef UNSQ_EVE_SIMD_ITERATOR_H_
+#define UNSQ_EVE_SIMD_ITERATOR_H_
 
 #include "eve_extra/eve_extra.h"
 #include "unsq_eve/tuple.h"
@@ -86,15 +86,6 @@ auto do_load(eve::relative_conditional_expr auto cond, auto x, auto N) {
 }
 
 template <typename T>
-struct is_simd_iterator_impl : std::false_type {};
-
-template <typename T, typename U>
-struct is_simd_iterator_impl<simd_iterator<T, U>> : std::true_type {};
-
-template <typename T>
-concept is_simd_iterator = is_simd_iterator_impl<T>::value;
-
-template <typename T>
 struct is_aligned_ptr_impl : std::false_type {};
 
 template <typename T, std::size_t alignment>
@@ -106,7 +97,7 @@ concept is_aligned_ptr = is_aligned_ptr_impl<T>::value;
 }  // namespace _simd_iterator
 
 template <std::size_t I, typename T>
-requires _simd_iterator::is_simd_iterator<std::remove_cvref_t<T>>
+requires eve_extra::specialization<std::remove_cvref_t<T>, simd_iterator>
 decltype(auto) get(T&& x) { return get<I>(std::forward<T>(x).components); }
 
 template <typename... Ts>
@@ -114,7 +105,7 @@ constexpr auto common_cardinality() {
   auto cardinalities =
       tuple_map(unsq_eve::tuple<std::type_identity<Ts>...>{},
                 []<typename T>(std::type_identity<T>) {
-                  if constexpr (_simd_iterator::is_simd_iterator<T>)
+                  if constexpr (eve_extra::specialization<T, simd_iterator>)
                     return typename T::cardinality{};
                   else
                     return eve::expected_cardinal_t<
@@ -207,4 +198,4 @@ simd_iterator(Ts...) -> simd_iterator<unsq_eve::tuple<Ts...>,
 
 }  // namespace unsq_eve
 
-#endif  // UNSQ_EVE_simd_iterator_H_
+#endif  // UNSQ_EVE_SIMD_ITERATOR_H_
