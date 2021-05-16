@@ -1,6 +1,8 @@
 
-#include "unsq_eve/strlen_example.h"
+#include "unsq_eve/all_any_none.h"
 
-std::size_t call_strlen(const char* s) {
-  return unsq_eve::strlen_example(s);
+using traits = unsq_eve::algorithm_traits<int, 32, 4>;
+
+bool any_zeroes(const int* f, const int* l) {
+  return unsq_eve::any_of<traits>(f, l, [](auto x) { return x == 0; });
 }
