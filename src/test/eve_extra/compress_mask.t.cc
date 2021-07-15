@@ -49,7 +49,7 @@ void test_impl(TestType element_idxs) {
     wide expected{0};
 
     std::uint8_t o = 0;
-    for (std::uint8_t i = 0; i != wide::static_size; ++i) {
+    for (std::uint8_t i = 0; i != wide::size(); ++i) {
       if (!mask.get(i)) continue;
       expected.set(o++, element_idxs.get(i));
     }
@@ -64,7 +64,7 @@ void test_impl(TestType element_idxs) {
   };
 
   auto test = [&](auto& self, std::size_t i) mutable {
-    if (i == wide::static_size) {
+    if (i == wide::size()) {
       run();
       return;
     };
@@ -83,7 +83,7 @@ TEMPLATE_TEST_CASE("simd.pack.compress_mask2", "[simd]",
   using wide = TestType;
   using scalar = typename wide::value_type;
 
-  auto element_idxs = eve_extra::iota(eve::as_<wide>{});
+  auto element_idxs = eve_extra::iota(eve::as<wide>{});
 
   if constexpr (sizeof(scalar) == 2) {
     element_idxs = {0x0100, 0x0302, 0x0504, 0x0706,
@@ -107,7 +107,7 @@ TEMPLATE_TEST_CASE("simd.pack.compress_mask2", "[simd]",
   using wide = TestType;
   using scalar = typename wide::value_type;
 
-  auto element_idxs = eve_extra::iota(eve::as_<wide>{});
+  auto element_idxs = eve_extra::iota(eve::as<wide>{});
 
   if constexpr (sizeof(scalar) == 8) {
     element_idxs = {0x0000'0000'10000'0000, 0x0000'0003'0000'0002,

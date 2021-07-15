@@ -57,7 +57,7 @@ struct unary_body {
     } else {
       read = eve::unsafe(eve::load)(from, width_t<Traits>{});
     }
-    wide xs = eve::convert(read, eve::as_<T>{});
+    wide xs = eve::convert(read, eve::as<T>{});
 
     xs = eve::replace_ignored(xs, ignore, zeroes);
 

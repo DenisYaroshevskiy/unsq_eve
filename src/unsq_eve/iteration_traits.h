@@ -77,7 +77,7 @@ struct algorithm_traits {
   using wide = eve::wide<T, width_type>;
   using index_type = index_t<type>;
   using iteration_traits =
-      unsq_eve::iteration_traits<index_type, wide::static_size, unroll()>;
+      unsq_eve::iteration_traits<index_type, wide::size(), unroll()>;
 };
 
 template <typename ATraits>

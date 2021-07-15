@@ -68,7 +68,7 @@ void common_min_test_impl(Alg alg) {
   specific_tests<Variation>(alg);
 
   using T = typename Variation::type;
-  std::vector<T, eve::aligned_allocator<T, 4096>> page(4096 / sizeof(T), T{1});
+  std::vector<T, eve::aligned_allocator<T, eve::fixed<4096 / sizeof(T)>>> page(4096 / sizeof(T), T{1});
 
   // 300 from the beginning for chars
 

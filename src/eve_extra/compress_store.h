@@ -86,7 +86,7 @@ T* compress_store_precise(const Wide& wide, T* out, const Mask& wide_mask,
   int n = up_to - buffer.begin();
 
   eve_extra::store(buffer, out,
-                   eve::ignore_last{static_cast<int>(Wide::static_size - n)});
+                   eve::ignore_last{static_cast<int>(Wide::size() - n)});
   return out + n;
 }
 

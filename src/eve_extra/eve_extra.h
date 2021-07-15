@@ -80,8 +80,8 @@ namespace _eve_extra {
 template <std::size_t, typename>
 struct n_wide;
 
-template <std::size_t n, typename T, typename N, typename ABI>
-struct n_wide<n, eve::wide<T, N, ABI>> {
+template <std::size_t n, typename T, typename N>
+struct n_wide<n, eve::wide<T, N>> {
   using type = eve::wide<T, eve::fixed<N() * n>>;
 };
 

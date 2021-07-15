@@ -52,13 +52,13 @@ struct inplace_body {
       read = eve::unsafe(eve::load)(ptr, width_t<Traits>{});
     }
 
-    wide xs = eve::convert(read, eve::as_<T>{});
+    wide xs = eve::convert(read, eve::as<T>{});
     xs = eve::replace_ignored(xs, ignore, zeroes);
     xs = eve_extra::inclusive_scan_wide(xs, op, zeroes);
     xs = op(running_sum, xs);
-    running_sum = wide(xs.get(wide::static_size - 1));
+    running_sum = wide(xs.get(wide::size() - 1));
 
-    wide_read ys = eve::convert(xs, eve::as_<value_type<I>>{});
+    wide_read ys = eve::convert(xs, eve::as<value_type<I>>{});
     eve_extra::store(ys, ptr, ignore);
 
     return false;

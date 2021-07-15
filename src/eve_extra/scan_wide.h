@@ -48,16 +48,16 @@ Wide inclusive_impl(Wide x, Op op, Wide zero) {
 
 template <wide_16_bytes Wide, typename Op>
 Wide inclusive_scan_wide(Wide x, Op op, Wide zero) {
-  return _scan_wide::inclusive_impl<Wide::static_size>(x, op, zero);
+  return _scan_wide::inclusive_impl<Wide::size()>(x, op, zero);
 }
 
 template <wide_32_bytes Wide, typename Op>
 Wide inclusive_scan_wide(Wide x, Op op, Wide zero) {
-  x = _scan_wide::inclusive_impl<Wide::static_size / 2>(x, op, zero);
-  Wide left_sum_broadcasted{x.get(Wide::static_size / 2 - 1)};
+  x = _scan_wide::inclusive_impl<Wide::size() / 2>(x, op, zero);
+  Wide left_sum_broadcasted{x.get(Wide::size() / 2 - 1)};
 
   return op(
-      x, shift_pair_right<Wide::static_size / 2>(zero, left_sum_broadcasted));
+      x, shift_pair_right<Wide::size() / 2>(zero, left_sum_broadcasted));
 }
 
 }  // namespace eve_extra

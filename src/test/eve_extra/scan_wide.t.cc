@@ -28,7 +28,7 @@ namespace {
 TEMPLATE_TEST_CASE("eve_extra.inclusive_scan", "[eve_extra]", ALL_TEST_PACKS) {
   using wide = TestType;
 
-  const wide in = eve_extra::iota(eve::as_<wide>()) + wide{1};
+  const wide in = eve_extra::iota(eve::as<wide>()) + wide{1};
   const wide zero{0};
 
   wide expected;

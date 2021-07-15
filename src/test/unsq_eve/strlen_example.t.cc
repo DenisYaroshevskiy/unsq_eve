@@ -24,7 +24,7 @@ namespace unsq_eve {
 namespace {
 
 TEST_CASE("unsq_eve.strlen_example", "[unsq_eve]") {
-  std::vector<char, eve::aligned_allocator<char, 4096>> page(4096, 'a');
+  std::vector<char, eve::aligned_allocator<char, eve::fixed<4096>>> page(4096, 'a');
 
   // 50 from the beginning
   auto* f = page.data();

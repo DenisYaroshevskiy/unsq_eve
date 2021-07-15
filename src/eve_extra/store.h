@@ -31,7 +31,7 @@
 namespace eve_extra {
 namespace _store {
 
-template <typename T, std::size_t A>
+template <typename T, typename A>
 T* raw_pointer(eve::aligned_ptr<T, A> ptr) {
   return ptr.get();
 }
@@ -55,14 +55,14 @@ EVE_FORCEINLINE void store(const Wide& wide, Ptr ptr, Ignore ignore) {
   T* raw_ptr = _store::raw_pointer(ptr);
 
   if constexpr (sizeof(T) >= 4) {
-    const auto mask = ignore.mask(eve::as_<eve::logical<Wide>>{}).storage();
+    const auto mask = ignore.mask(eve::as<eve::logical<Wide>>{}).storage();
     const auto reg = wide.storage();
 
     mm::maskstore(raw_ptr, mask, reg);
     return;
   }
 
-  std::size_t start = 0, n = Wide::static_size;
+  std::size_t start = 0, n = Wide::size();
   if constexpr (std::is_same_v<Ignore, eve::ignore_first>) {
     start += ignore.count_;
     n -= ignore.count_;

@@ -40,8 +40,8 @@ template <typename TestType, typename Op>
 void shift_pair_right_test(Op op) {
   using wide = TestType;
 
-  const wide lhs = eve_extra::iota(eve::as_<wide>{});
-  const wide rhs = eve_extra::iota(eve::as_<wide>{}) + wide{20};
+  const wide lhs = eve_extra::iota(eve::as<wide>{});
+  const wide rhs = eve_extra::iota(eve::as<wide>{}) + wide{20};
 
   auto run = [&]<std::size_t shift>(indx_c<shift> wrapped_shift) {
     const wide actual = op(wrapped_shift, lhs, rhs);
@@ -56,7 +56,7 @@ void shift_pair_right_test(Op op) {
     REQUIRE(eve::all(expected == actual));
   };
 
-  unroll<wide::static_size>(run);
+  unroll<wide::size()>(run);
 }
 
 TEMPLATE_TEST_CASE("eve_extra.shift_pair_right", "[eve_extra]",
@@ -70,8 +70,8 @@ TEMPLATE_TEST_CASE("eve_extra.shift_pair_right", "[eve_extra]",
 TEST_CASE("trying shifts (left for reference)", "[eve_extra]") {
   using wide = eve::wide<std::int64_t, eve::fixed<4>>;
 
-  wide x_wide = eve_extra::iota(eve::as_<wide>{}) + wide{10};
-  wide filler_wide = eve_extra::iota(eve::as_<wide>{});
+  wide x_wide = eve_extra::iota(eve::as<wide>{}) + wide{10};
+  wide filler_wide = eve_extra::iota(eve::as<wide>{});
 
   INFO("x: " << x_wide << " filler: " << filler_wide);
 
@@ -125,9 +125,9 @@ TEST_CASE("eve_extra.shift_pair_right_in_groups", "[eve_extra]") {
     return;
   }
 
-  const wide lhs = eve_extra::iota(eve::as_<wide>{});
-  const wide rhs = eve_extra::iota(eve::as_<wide>{}) + wide{20};
-  static constexpr std::ptrdiff_t half_size = wide::static_size / 2;
+  const wide lhs = eve_extra::iota(eve::as<wide>{});
+  const wide rhs = eve_extra::iota(eve::as<wide>{}) + wide{20};
+  static constexpr std::ptrdiff_t half_size = wide::size() / 2;
 
   auto run = [&]<std::size_t shift>(indx_c<shift>) {
     const wide actual = eve_extra::shift_pair_right_in_groups<shift>(lhs, rhs);

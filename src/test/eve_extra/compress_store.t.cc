@@ -32,7 +32,7 @@ TEMPLATE_TEST_CASE("eve_extra.compress_store_main_logic", "[eve_extra]",
   using logical = eve::logical<wide>;
   using scalar = typename wide::value_type;
 
-  const wide x = eve_extra::iota(eve::as_<wide>{}) + wide{5};
+  const wide x = eve_extra::iota(eve::as<wide>{}) + wide{5};
 
   logical mask{false};
 
@@ -40,7 +40,7 @@ TEMPLATE_TEST_CASE("eve_extra.compress_store_main_logic", "[eve_extra]",
     wide expected{0};
 
     std::uint8_t o = 0;
-    for (std::uint8_t i = 0; i != wide::static_size; ++i) {
+    for (std::uint8_t i = 0; i != wide::size(); ++i) {
       if (!mask.get(i)) continue;
       expected.set(o++, x.get(i));
     }
@@ -68,7 +68,7 @@ TEMPLATE_TEST_CASE("eve_extra.compress_store_main_logic", "[eve_extra]",
   };
 
   SECTION("Up to first 4 even elements") {
-    std::ptrdiff_t even_end = std::min(wide::static_size, 8l);
+    std::ptrdiff_t even_end = std::min(wide::size(), 8l);
 
     for (std::ptrdiff_t i = 0; i != even_end; i += 2) {
       mask.set(i, true);
@@ -84,7 +84,7 @@ TEMPLATE_TEST_CASE("eve_extra.compress_store_ignore", "[eve_extra]",
   using logical = eve::logical<wide>;
   using scalar = typename wide::value_type;
 
-  const wide x = eve_extra::iota(eve::as_<wide>{}) + wide{5};
+  const wide x = eve_extra::iota(eve::as<wide>{}) + wide{5};
 
   auto run = [&](auto ignore) {
     logical mask{true};
@@ -122,10 +122,10 @@ TEMPLATE_TEST_CASE("eve_extra.compress_store_ignore", "[eve_extra]",
     REQUIRE(expected == actual);
   };
 
-  for (int i = 0; i != wide::static_size + 1; ++i) {
+  for (int i = 0; i != wide::size() + 1; ++i) {
     run(eve::ignore_first{i});
     run(eve::ignore_last{i});
-    for (int j = 0; j != wide::static_size - i; ++j) {
+    for (int j = 0; j != wide::size() - i; ++j) {
       run(eve::ignore_extrema{i, j});
     }
   }
@@ -134,7 +134,7 @@ TEMPLATE_TEST_CASE("eve_extra.compress_store_ignore", "[eve_extra]",
     logical mask{[](int i, int) { return i == 1; }};
     scalar out{0};
 
-    const wide x = eve_extra::iota(eve::as_<wide>{});
+    const wide x = eve_extra::iota(eve::as<wide>{});
 
     compress_store_precise(x, &out, mask, eve::ignore_none);
     REQUIRE(out == 1);

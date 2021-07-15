@@ -31,7 +31,7 @@ namespace {
 TEST_CASE("eve_extra.sort_wide", "[eve_extra]") {
   using wide = eve::wide<std::int64_t, eve::fixed<4>>;
 
-  const wide expected = eve_extra::iota(eve::as_<wide>{}) + wide{5};
+  const wide expected = eve_extra::iota(eve::as<wide>{}) + wide{5};
   wide input = expected;
 
   do {

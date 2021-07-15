@@ -34,7 +34,7 @@ TEST_CASE("eve_extra.load_const_aligned_ptr", "[eve_extra]") {
   alignas(wide) std::array<char, 16> data;
   data.fill(1);
 
-  eve::aligned_ptr<char, 16> ptr{data.begin()};
+  eve::aligned_ptr<char, eve::fixed<16>> ptr{data.begin()};
   wide loaded = eve::load(ptr, eve::fixed<16>{});
 
   REQUIRE(eve::all(loaded == wide{1}));
@@ -46,7 +46,7 @@ TEMPLATE_TEST_CASE("eve_extra.constatns", "[eve_extra]", ALL_TEST_PACKS) {
   SECTION("iota") {
     wide x;
     std::iota(x.begin(), x.end(), 0);
-    auto actual = eve_extra::iota(eve::as_<wide>{});
+    auto actual = eve_extra::iota(eve::as<wide>{});
     REQUIRE(eve::all(x == actual));
   }
 }

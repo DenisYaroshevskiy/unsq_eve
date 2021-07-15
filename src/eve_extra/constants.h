@@ -22,9 +22,9 @@
 namespace eve_extra {
 
 // Should dissapear
-template <typename T, typename N, typename ABI>
-auto iota(const eve::as_<eve::wide<T, N, ABI>>&) {
-  return eve::wide<T, N, ABI>([](int i, int) { return i; });
+template <typename T, typename N>
+auto iota(const eve::as<eve::wide<T, N>>&) {
+  return eve::wide<T, N>([](int i, int) { return i; });
 }
 
 }  // namespace eve_extra

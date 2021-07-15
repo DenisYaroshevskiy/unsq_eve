@@ -50,9 +50,9 @@ struct inplace_body {
       read = eve::unsafe(eve::load)(ptr, width_t<Traits>{});
     }
 
-    wide xs = eve::convert(read, eve::as_<T>{});
+    wide xs = eve::convert(read, eve::as<T>{});
     wide transfromed = op(xs);
-    wide_read ys = eve::convert(transfromed, eve::as_<value_type<I>>{});
+    wide_read ys = eve::convert(transfromed, eve::as<value_type<I>>{});
     eve_extra::store(ys, ptr, ignore);
     return false;
   }
@@ -64,7 +64,7 @@ struct inplace_body {
 
   template <typename Ptr, std::size_t idx>
   bool big_step(Ptr ptr, indx_c<idx>) {
-    regs[idx] = eve::convert(wide_read{ptr}, eve::as_<T>{});
+    regs[idx] = eve::convert(wide_read{ptr}, eve::as<T>{});
     return false;
   }
 
@@ -75,9 +75,9 @@ struct inplace_body {
     }
 
     for (Ptr it = ptr; auto& reg : regs) {
-      wide_read ys = eve::convert(reg, eve::as_<value_type<I>>{});
+      wide_read ys = eve::convert(reg, eve::as<value_type<I>>{});
       eve::store(ys, it);
-      it += wide_read::static_size;
+      it += wide_read::size();
     }
 
     return false;

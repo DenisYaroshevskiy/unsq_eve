@@ -55,10 +55,10 @@ struct body {
       read = eve::unsafe(eve::load)(ptr, width_t<Traits>{});
     }
 
-    wide xs = eve::convert(read, eve::as_<T>{});
+    wide xs = eve::convert(read, eve::as<T>{});
     const eve::logical<wide> mask = p(xs);
     const eve::logical<wide_read> read_mask =
-        eve::convert(mask, eve::as_<typename logical_wide_read::value_type>{});
+        eve::convert(mask, eve::as<typename logical_wide_read::value_type>{});
 
     out = eve_extra::compress_store_unsafe(read, out, !read_mask, ignore);
 

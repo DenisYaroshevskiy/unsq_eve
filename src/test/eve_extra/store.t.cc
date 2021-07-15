@@ -26,16 +26,16 @@ TEMPLATE_TEST_CASE("eve_extra.store", "[eve_extra]", ALL_TEST_PACKS) {
   using wide = TestType;
   using scalar = typename wide::value_type;
 
-  const wide x = eve_extra::iota(eve::as_<wide>{}) + wide{5};
+  const wide x = eve_extra::iota(eve::as<wide>{}) + wide{5};
 
-  std::array<scalar, wide::static_size> actual;
+  std::array<scalar, wide::size()> actual;
   actual.fill(0);
 
   auto values_test = [&](std::size_t no_first, std::size_t no_last) {
-    std::array<scalar, wide::static_size> expected;
+    std::array<scalar, wide::size()> expected;
     expected.fill(0);
 
-    for (std::size_t i = no_first; i != wide::static_size - no_last; ++i) {
+    for (std::size_t i = no_first; i != wide::size() - no_last; ++i) {
       expected[i] = x.get(i);
     }
     REQUIRE(expected == actual);
@@ -47,7 +47,7 @@ TEMPLATE_TEST_CASE("eve_extra.store", "[eve_extra]", ALL_TEST_PACKS) {
   }
 
   SECTION("ignore_first") {
-    for (int i = 0; i != wide::static_size + 1; ++i) {
+    for (int i = 0; i != wide::size() + 1; ++i) {
       INFO("i: " << i);
       actual.fill(0);
       eve_extra::store(x, actual.data(), eve::ignore_first{i});
@@ -60,7 +60,7 @@ TEMPLATE_TEST_CASE("eve_extra.store", "[eve_extra]", ALL_TEST_PACKS) {
   }
 
   SECTION("ignore_last") {
-    for (int i = 0; i != wide::static_size + 1; ++i) {
+    for (int i = 0; i != wide::size() + 1; ++i) {
       INFO("i: " << i);
       actual.fill(0);
       eve_extra::store(x, actual.data(), eve::ignore_last{i});
@@ -75,9 +75,9 @@ TEMPLATE_TEST_CASE("eve_extra.store", "[eve_extra]", ALL_TEST_PACKS) {
   SECTION("masks_work") {
     scalar where{1};
 
-    for (int i = 0; i != wide::static_size; ++i) {
+    for (int i = 0; i != wide::size(); ++i) {
       eve::ignore_extrema ignore{i,
-                                  static_cast<int>(wide::static_size - i - 1)};
+                                  static_cast<int>(wide::size() - i - 1)};
 
       store(x, &where - i, ignore);
       REQUIRE(where == x.get(i));

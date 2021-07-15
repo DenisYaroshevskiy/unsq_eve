@@ -29,7 +29,7 @@ TEMPLATE_TEST_CASE("eve_extra.concepts", "[eve_extra]", ALL_TEST_PACKS) {
   STATIC_REQUIRE(eve_extra::native_logical<logical>);
 
   using T = typename wide::value_type;
-  constexpr std::ptrdiff_t size = wide::static_size;
+  constexpr std::ptrdiff_t size = wide::size();
   using extra_wide = eve::wide<T, eve::fixed<size * 4>>;
   using extra_logical = eve::logical<logical>;
 

@@ -71,7 +71,7 @@ struct min_body {
       read = eve::unsafe(eve::load)(from, width_t<Traits>{});
     }
 
-    wide xs = eve::convert(read, eve::as_<T>{});
+    wide xs = eve::convert(read, eve::as<T>{});
     xs = eve::replace_ignored(xs, ignore, regs[reg_idx]);
 
     wide mins = sel(regs[reg_idx], xs);
