@@ -1,8 +1,8 @@
+#include <eve/algo/remove.hpp>
+#include <eve/algo/as_range.hpp>
 
-#include "unsq_eve/find.h"
+using T = double;
 
-using traits = unsq_eve::algorithm_traits<int, 32, 4>;
-
-const int* find_0(const int* f, const int* l) {
-  return unsq_eve::find_if<traits>(f, l, [](auto x) { return x == 0; });
+T* remove(T* f, T* l, T v) {
+  return eve::algo::remove(eve::algo::as_range(f, l), v);
 }

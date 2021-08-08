@@ -1,172 +1,172 @@
 	.text
 	.intel_syntax noprefix
 	.file	"disassemble.cc"
-	.globl	_Z6find_0PKiS0_                 # -- Begin function _Z6find_0PKiS0_
+	.section	.rodata.cst32,"aM",@progbits,32
+	.p2align	5                               # -- Begin function _Z6removePdS_d
+.LCPI0_0:
+	.quad	0                               # 0x0
+	.quad	1                               # 0x1
+	.quad	2                               # 0x2
+	.quad	3                               # 0x3
+	.text
+	.globl	_Z6removePdS_d
 	.p2align	4, 0x90
-	.type	_Z6find_0PKiS0_,@function
-_Z6find_0PKiS0_:                        # @_Z6find_0PKiS0_
+	.type	_Z6removePdS_d,@function
+_Z6removePdS_d:                         # @_Z6removePdS_d
 	.cfi_startproc
 # %bb.0:
-	mov	rax, rsi
-	and	rdi, -4
-	mov	rcx, rsi
-	and	rcx, -4
-	cmp	rdi, rcx
-	je	.LBB0_21
+	mov	rax, rdi
+	xor	r8d, r8d
+	cmp	rdi, rsi
+	cmove	rsi, r8
+	cmovne	r8, rdi
+	cmp	r8, rsi
+	je	.LBB0_10
 # %bb.1:
-	vpxor	xmm0, xmm0, xmm0
-	vmovdqa	xmmword ptr [rsp - 24], xmm0
-	mov	edx, dword ptr [rdi]
-	mov	dword ptr [rsp - 24], edx
-	vpcmpeqd	xmm0, xmm0, xmmword ptr [rsp - 24]
-	vmovmskps	edx, xmm0
-	and	dl, 1
-	jne	.LBB0_2
+	push	rbp
+	.cfi_def_cfa_offset 16
+	.cfi_offset rbp, -16
+	mov	rbp, rsp
+	.cfi_def_cfa_register rbp
+	and	rsp, -32
+	sub	rsp, 96
+	mov	rdx, r8
+	and	rdx, -32
+	mov	r11, rsi
+	and	r11, -32
+	mov	r9d, r8d
+	shr	r9d, 3
+	and	r9d, 3
+	cmp	rdx, r11
+	je	.LBB0_2
 # %bb.3:
-	add	rdi, 4
-	cmp	rdi, rcx
-	je	.LBB0_20
-# %bb.4:
-	vpxor	xmm0, xmm0, xmm0
-	jmp	.LBB0_5
+	vmovapd	ymm1, ymmword ptr [rdx]
+	vbroadcastsd	ymm0, xmm0
+	vcmpneqpd	ymm2, ymm0, ymm1
+	vmovmskpd	ecx, ymm2
+	shrx	ecx, ecx, r9d
+	shlx	ecx, ecx, r9d
+	popcnt	r10d, ecx
+	and	ecx, 7
+	shl	rcx, 5
+	vmovapd	ymm2, ymmword ptr [rcx + .L__const._ZN3eve6detail20compress_store_impl_INS_14ignore_extremaEdNS_5fixedILl4EEEPdEEPT0_RKNS0_7delay_tERKNS_6ssse3_ET_NS_10avx_abi_v04wideIS6_T1_EENS_7logicalISI_EET2_.patterns]
+	vpermps	ymm1, ymm2, ymm1
+	vmovq	xmm2, r10
+	vpbroadcastq	ymm2, xmm2
+	vpcmpgtq	ymm2, ymm2, ymmword ptr [rip + .LCPI0_0]
+	lea	rcx, [rdx + 8*r9]
+	vmaskmovpd	ymmword ptr [rdx + 8*r9], ymm2, ymm1
+	lea	rcx, [rcx + 8*r10]
+	add	rdx, 32
+	cmp	rdx, r11
+	je	.LBB0_6
 	.p2align	4, 0x90
-.LBB0_19:                               #   in Loop: Header=BB0_5 Depth=1
-	cmp	rdi, rcx
-	je	.LBB0_20
-.LBB0_5:                                # =>This Loop Header: Depth=1
-                                        #     Child Loop BB0_15 Depth 2
-	vmovdqa	xmmword ptr [rsp - 24], xmm0
-	mov	edx, dword ptr [rdi]
-	mov	dword ptr [rsp - 24], edx
-	vpcmpeqd	xmm1, xmm0, xmmword ptr [rsp - 24]
-	vmovmskps	edx, xmm1
-	and	dl, 1
-	jne	.LBB0_2
-# %bb.6:                                #   in Loop: Header=BB0_5 Depth=1
-	lea	rdx, [rdi + 4]
-	cmp	rdx, rcx
-	je	.LBB0_20
-# %bb.7:                                #   in Loop: Header=BB0_5 Depth=1
-	vmovdqa	xmmword ptr [rsp - 24], xmm0
-	mov	esi, dword ptr [rdx]
-	mov	dword ptr [rsp - 24], esi
-	vpcmpeqd	xmm1, xmm0, xmmword ptr [rsp - 24]
-	vmovmskps	esi, xmm1
-	and	sil, 1
-	jne	.LBB0_8
-# %bb.9:                                #   in Loop: Header=BB0_5 Depth=1
-	lea	rdx, [rdi + 8]
-	cmp	rdx, rcx
-	je	.LBB0_20
-# %bb.10:                               #   in Loop: Header=BB0_5 Depth=1
-	vmovdqa	xmmword ptr [rsp - 24], xmm0
-	mov	esi, dword ptr [rdx]
-	mov	dword ptr [rsp - 24], esi
-	vpcmpeqd	xmm1, xmm0, xmmword ptr [rsp - 24]
-	vmovmskps	esi, xmm1
-	and	sil, 1
-	jne	.LBB0_8
-# %bb.11:                               #   in Loop: Header=BB0_5 Depth=1
-	lea	rdx, [rdi + 12]
-	cmp	rdx, rcx
-	je	.LBB0_20
-# %bb.12:                               #   in Loop: Header=BB0_5 Depth=1
-	vmovdqa	xmmword ptr [rsp - 24], xmm0
-	mov	esi, dword ptr [rdx]
-	mov	dword ptr [rsp - 24], esi
-	vpcmpeqd	xmm1, xmm0, xmmword ptr [rsp - 24]
-	vmovmskps	esi, xmm1
-	and	sil, 1
-	jne	.LBB0_8
-# %bb.13:                               #   in Loop: Header=BB0_5 Depth=1
-	add	rdi, 16
-	mov	rsi, rcx
-	sub	rsi, rdi
-	sar	rsi, 2
-	lea	rdx, [rsi + 3]
-	cmp	rdx, 7
-	jb	.LBB0_19
-# %bb.14:                               #   in Loop: Header=BB0_5 Depth=1
-	test	rsi, rsi
-	cmovns	rdx, rsi
-	sar	rdx, 2
-	.p2align	4, 0x90
-.LBB0_15:                               #   Parent Loop BB0_5 Depth=1
-                                        # =>  This Inner Loop Header: Depth=2
-	vmovdqa	xmmword ptr [rsp - 24], xmm0
-	mov	esi, dword ptr [rdi]
-	mov	dword ptr [rsp - 24], esi
-	vpcmpeqd	xmm1, xmm0, xmmword ptr [rsp - 24]
-	vmovdqa	xmmword ptr [rsp - 24], xmm0
-	mov	esi, dword ptr [rdi + 4]
-	mov	dword ptr [rsp - 24], esi
-	vpcmpeqd	xmm2, xmm0, xmmword ptr [rsp - 24]
-	vpunpcklqdq	xmm1, xmm1, xmm2        # xmm1 = xmm1[0],xmm2[0]
-	vmovdqa	xmmword ptr [rsp - 24], xmm0
-	mov	esi, dword ptr [rdi + 8]
-	mov	dword ptr [rsp - 24], esi
-	vpcmpeqd	xmm2, xmm0, xmmword ptr [rsp - 24]
-	vmovdqa	xmmword ptr [rsp - 24], xmm0
-	mov	esi, dword ptr [rdi + 12]
-	mov	dword ptr [rsp - 24], esi
-	vpcmpeqd	xmm3, xmm0, xmmword ptr [rsp - 24]
-	vpunpckldq	xmm2, xmm2, xmm3        # xmm2 = xmm2[0],xmm3[0],xmm2[1],xmm3[1]
-	vshufps	xmm1, xmm1, xmm2, 72            # xmm1 = xmm1[0,2],xmm2[0,1]
-	vmovmskps	esi, xmm1
-	test	sil, sil
-	jne	.LBB0_16
-# %bb.18:                               #   in Loop: Header=BB0_15 Depth=2
-	add	rdi, 16
-	dec	rdx
-	jne	.LBB0_15
-	jmp	.LBB0_19
+.LBB0_4:                                # =>This Inner Loop Header: Depth=1
+	vmovapd	ymm1, ymmword ptr [rdx]
+	vcmpneqpd	ymm2, ymm0, ymm1
+	vmovmskpd	edi, ymm2
+	xor	r9d, r9d
+	popcnt	r9d, edi
+	and	edi, 7
+	shl	rdi, 5
+	vmovapd	ymm2, ymmword ptr [rdi + .L__const._ZN3eve6detail20compress_store_impl_INS_14ignore_extremaEdNS_5fixedILl4EEEPdEEPT0_RKNS0_7delay_tERKNS_6ssse3_ET_NS_10avx_abi_v04wideIS6_T1_EENS_7logicalISI_EET2_.patterns]
+	vpermps	ymm1, ymm2, ymm1
+	vmovupd	ymmword ptr [rcx], ymm1
+	lea	rcx, [rcx + 8*r9]
+	add	rdx, 32
+	cmp	rdx, r11
+	jne	.LBB0_4
+.LBB0_6:
+	cmp	rsi, r11
+	je	.LBB0_9
+# %bb.7:
+	xor	r9d, r9d
+	jmp	.LBB0_8
 .LBB0_2:
-	movzx	eax, dl
-	and	eax, 15
-	tzcnt	eax, eax
-	lea	rax, [rdi + 4*rax]
-	ret
-.LBB0_20:
-	cmp	rcx, rax
-	je	.LBB0_22
-.LBB0_21:
-	mov	edx, ecx
-	sub	edx, eax
-	add	edx, 4
-	shr	edx, 2
-	vpxor	xmm0, xmm0, xmm0
-	vmovdqa	xmmword ptr [rsp - 24], xmm0
-	mov	esi, dword ptr [rcx]
-	mov	dword ptr [rsp - 24], esi
-	vpcmpeqd	xmm0, xmm0, xmmword ptr [rsp - 24]
-	vmovmskps	esi, xmm0
-	mov	dil, 1
-	sub	dil, dl
-	bzhi	edx, esi, edi
-	and	edx, 1
-	tzcnt	esi, edx
-	test	dx, dx
-	lea	rcx, [rcx + 4*rsi]
-	cmovne	rax, rcx
-.LBB0_22:
-	ret
-.LBB0_16:
-	movzx	eax, sil
-	tzcnt	eax, eax
-	lea	rax, [rdi + 4*rax]
-	ret
+	vbroadcastsd	ymm0, xmm0
+	mov	rcx, rdx
 .LBB0_8:
-	movzx	eax, sil
-	and	eax, 15
-	tzcnt	eax, eax
-	lea	rax, [rdx + 4*rax]
+	mov	edx, r11d
+	sub	edx, esi
+	add	edx, 32
+	shr	edx, 3
+	vmovapd	ymm1, ymmword ptr [r11]
+	vcmpneqpd	ymm0, ymm0, ymm1
+	vmovmskpd	esi, ymm0
+	mov	dil, 4
+	sub	dil, dl
+	mov	rdx, -1
+	shlx	rdx, rdx, rdi
+	not	edx
+	shrx	edx, edx, r9d
+	shlx	edx, edx, r9d
+	and	edx, esi
+	xor	esi, esi
+	popcnt	esi, edx
+	and	edx, 7
+	shl	rdx, 5
+	vmovapd	ymm0, ymmword ptr [rdx + .L__const._ZN3eve6detail20compress_store_impl_INS_14ignore_extremaEdNS_5fixedILl4EEEPdEEPT0_RKNS0_7delay_tERKNS_6ssse3_ET_NS_10avx_abi_v04wideIS6_T1_EENS_7logicalISI_EET2_.patterns]
+	vpermps	ymm0, ymm0, ymm1
+	lea	rdx, [rcx + 8*r9]
+	vmovq	xmm1, rsi
+	vpbroadcastq	ymm1, xmm1
+	vpcmpgtq	ymm1, ymm1, ymmword ptr [rip + .LCPI0_0]
+	vmaskmovpd	ymmword ptr [rcx + 8*r9], ymm1, ymm0
+	lea	rcx, [rdx + 8*rsi]
+.LBB0_9:
+	sub	rcx, r8
+	add	rax, rcx
+	mov	rsp, rbp
+	pop	rbp
+	.cfi_def_cfa rsp, 8
+	.cfi_restore rbp
+.LBB0_10:
+	vzeroupper
 	ret
 .Lfunc_end0:
-	.size	_Z6find_0PKiS0_, .Lfunc_end0-_Z6find_0PKiS0_
+	.size	_Z6removePdS_d, .Lfunc_end0-_Z6removePdS_d
 	.cfi_endproc
                                         # -- End function
+	.type	.L__const._ZN3eve6detail20compress_store_impl_INS_14ignore_extremaEdNS_5fixedILl4EEEPdEEPT0_RKNS0_7delay_tERKNS_6ssse3_ET_NS_10avx_abi_v04wideIS6_T1_EENS_7logicalISI_EET2_.patterns,@object # @__const._ZN3eve6detail20compress_store_impl_INS_14ignore_extremaEdNS_5fixedILl4EEEPdEEPT0_RKNS0_7delay_tERKNS_6ssse3_ET_NS_10avx_abi_v04wideIS6_T1_EENS_7logicalISI_EET2_.patterns
+	.section	.rodata,"a",@progbits
+	.p2align	5
+.L__const._ZN3eve6detail20compress_store_impl_INS_14ignore_extremaEdNS_5fixedILl4EEEPdEEPT0_RKNS0_7delay_tERKNS_6ssse3_ET_NS_10avx_abi_v04wideIS6_T1_EENS_7logicalISI_EET2_.patterns:
+	.quad	30064771078                     # 0x700000006
+	.quad	0                               # 0x0
+	.quad	0                               # 0x0
+	.quad	0                               # 0x0
+	.quad	4294967296                      # 0x100000000
+	.quad	30064771078                     # 0x700000006
+	.quad	0                               # 0x0
+	.quad	0                               # 0x0
+	.quad	12884901890                     # 0x300000002
+	.quad	30064771078                     # 0x700000006
+	.quad	0                               # 0x0
+	.quad	0                               # 0x0
+	.quad	4294967296                      # 0x100000000
+	.quad	12884901890                     # 0x300000002
+	.quad	30064771078                     # 0x700000006
+	.quad	0                               # 0x0
+	.quad	21474836484                     # 0x500000004
+	.quad	30064771078                     # 0x700000006
+	.quad	0                               # 0x0
+	.quad	0                               # 0x0
+	.quad	4294967296                      # 0x100000000
+	.quad	21474836484                     # 0x500000004
+	.quad	30064771078                     # 0x700000006
+	.quad	0                               # 0x0
+	.quad	12884901890                     # 0x300000002
+	.quad	21474836484                     # 0x500000004
+	.quad	30064771078                     # 0x700000006
+	.quad	0                               # 0x0
+	.quad	4294967296                      # 0x100000000
+	.quad	12884901890                     # 0x300000002
+	.quad	21474836484                     # 0x500000004
+	.quad	30064771078                     # 0x700000006
+	.size	.L__const._ZN3eve6detail20compress_store_impl_INS_14ignore_extremaEdNS_5fixedILl4EEEPdEEPT0_RKNS0_7delay_tERKNS_6ssse3_ET_NS_10avx_abi_v04wideIS6_T1_EENS_7logicalISI_EET2_.patterns, 256
+
 	.section	".linker-options","e",@llvm_linker_options
-	.ident	"clang version 12.0.0 (https://github.com/llvm/llvm-project.git 02bc320545deb0212a43acae24fcf2383755d383)"
+	.ident	"clang version 13.0.0 (https://github.com/llvm/llvm-project.git e3251f2ec44bd65f440d215517f135c39f22d1b9)"
 	.section	".note.GNU-stack","",@progbits
 	.addrsig
 	.addrsig_sym __gxx_personality_v0

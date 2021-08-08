@@ -32,6 +32,9 @@ add_benchmark(std_reduce std_reduce.cc)
 add_benchmark(std_remove std_remove.cc)
 add_benchmark(std_reverse std_reverse.cc)
 add_benchmark(std_transform std_transform.cc)
+
+add_benchmark(eve_remove eve_remove.cc)
+
 add_benchmark(unsq_eve_any_of unsq_eve_any_of.cc)
 add_benchmark(unsq_eve_find_guarded unsq_eve_find_guarded.cc)
 add_benchmark(unsq_eve_find_unguarded unsq_eve_find_unguarded.cc)
