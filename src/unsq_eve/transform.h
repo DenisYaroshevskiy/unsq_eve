@@ -53,7 +53,7 @@ struct inplace_body {
     wide xs = eve::convert(read, eve::as<T>{});
     wide transfromed = op(xs);
     wide_read ys = eve::convert(transfromed, eve::as<value_type<I>>{});
-    eve_extra::store(ys, ptr, ignore);
+    eve::store[ignore](ys, ptr);
     return false;
   }
 

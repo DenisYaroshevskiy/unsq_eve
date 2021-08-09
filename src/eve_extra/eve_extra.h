@@ -28,7 +28,6 @@
 #include "eve_extra/constants.h"
 #include "eve_extra/scan_wide.h"
 #include "eve_extra/shift_pair.h"
-#include "eve_extra/store.h"
 
 namespace eve_extra {
 

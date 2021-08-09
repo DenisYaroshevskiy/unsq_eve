@@ -22,11 +22,11 @@
 #include <eve/conditional.hpp>
 #include <eve/eve.hpp>
 #include <eve/detail/top_bits.hpp>
+#include <eve/function/store.hpp>
 
 #include "eve_extra/compress_mask.h"
 #include "eve_extra/concepts.h"
 #include "eve_extra/mm.h"
-#include "eve_extra/store.h"
 
 namespace eve_extra {
 namespace _compress_store {
@@ -85,8 +85,7 @@ T* compress_store_precise(const Wide& wide, T* out, const Mask& wide_mask,
   // std::copy but memcpy instead of memmove
   int n = up_to - buffer.begin();
 
-  eve_extra::store(buffer, out,
-                   eve::ignore_last{static_cast<int>(Wide::size() - n)});
+  eve::store[eve::keep_first(n)](buffer, out);
   return out + n;
 }
 

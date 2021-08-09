@@ -24,8 +24,8 @@ struct body {
     wide xs = eve::unsafe(eve::load)(from, width_t<Traits>{});
     xs = eve::reverse(xs);
 
-    eve_extra::store(xs, from + ignore.count_,
-                     eve::ignore_last(ignore.count_));
+    auto offset = ignore.offset(eve::as(xs));
+    eve::store[eve::ignore_last(offset)](xs, from + offset);
   }
 
   template <typename Ptr>
@@ -34,8 +34,8 @@ struct body {
     wide xs = eve::unsafe(eve::load)(from, width_t<Traits>{});
     xs = eve::reverse(xs);
 
-    eve_extra::store(xs, from - ignore.count_,
-                     eve::ignore_first(ignore.count_));
+    auto roffset = ignore.roffset(eve::as(xs));
+    eve::store[eve::ignore_first(roffset)](xs, from - roffset);
   }
 
   template <typename Ptr>
