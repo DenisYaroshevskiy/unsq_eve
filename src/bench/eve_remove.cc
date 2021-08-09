@@ -23,32 +23,23 @@
 
 namespace {
 
-template <std::ptrdiff_t width, std::ptrdiff_t unroll>
 struct eve_remove {
   std::string name() const {
-    return "eve::remove<" + std::to_string(width) + ", " +
-           std::to_string(unroll) + ">";
+    return "eve::algo::remove";
   }
 
   template <typename I, typename T>
   BENCH_ALWAYS_INLINE I operator()(I f, I l, const T& v) const {
-    auto select_width =
-        eve::algo::remove[eve::algo::force_cardinal<width / sizeof(T)>];
-    auto alg = select_width[eve::algo::unroll<unroll>];
-    return alg(eve::algo::as_range(f, l), v);
+    return eve::algo::remove(eve::algo::as_range(f, l), v);
   }
 };
 
 }  // namespace
 
 int main(int argc, char** argv) {
-  using char_bench =
-      bench::remove_bench<char, eve_remove<128, 1>, eve_remove<256, 1>,
-                          eve_remove<256, 2>>;
-
-  using short_bench = bench::remove_bench<short, eve_remove<256, 1>>;
-
-  using int_bench = bench::remove_bench<int, eve_remove<256, 1>>;
+  using char_bench = bench::remove_bench<char, eve_remove>;
+  using short_bench = bench::remove_bench<short, eve_remove>;
+  using int_bench = bench::remove_bench<int, eve_remove>;
 
   bench::bench_main<char_bench, short_bench, int_bench>(argc, argv);
 }
