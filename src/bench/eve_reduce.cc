@@ -14,36 +14,31 @@
  * limitations under the License.
  */
 
-#include "bench/min.h"
+#include "bench/sum.h"
 
-#include "unsq_eve/min_element.h"
+#include <eve/algo/reduce.hpp>
+
+#include <eve/algo/as_range.hpp>
 
 namespace {
 
-template <std::size_t width, std::size_t unroll>
-struct unsq_eve_min_element {
+template <typename SumType>
+struct eve_reduce {
   std::string name() const {
-    return "unsq_eve::min_element<" + std::to_string(width) + ", " +
-           std::to_string(unroll) + ">";
+    return std::string("eve::algo::reduce/sum_type:") + bench::type_name<SumType>{}();
   }
 
   template <typename I>
-  BENCH_ALWAYS_INLINE I operator()(I f, I l) {
-    using traits =
-        unsq_eve::algorithm_traits<unsq_eve::value_type<I>, width, unroll>;
-
-    return unsq_eve::min_element<traits>(f, l);
+  BENCH_ALWAYS_INLINE SumType operator()(I f, I l) const {
+    return eve::algo::reduce(eve::algo::as_range(f, l), SumType{0});
   }
 };
 
 }  // namespace
 
 int main(int argc, char** argv) {
-  using char_bench = bench::min_bench<char, unsq_eve_min_element<256, 1>>;
-
-  using short_bench = bench::min_bench<short, unsq_eve_min_element<256, 1>>;
-
-  using int_bench = bench::min_bench<int, unsq_eve_min_element<256, 1>>;
-
-  bench::bench_main<char_bench, short_bench, int_bench>(argc, argv);
+  bench::bench_main<bench::sum_bench<char, eve_reduce<char>, eve_reduce<short>,
+                                     eve_reduce<int>>,
+                    bench::sum_bench<short, eve_reduce<short>, eve_reduce<int>>,
+                    bench::sum_bench<int, eve_reduce<int>>>(argc, argv);
 }

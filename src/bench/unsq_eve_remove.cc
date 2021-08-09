@@ -40,9 +40,7 @@ struct unsq_eve_remove {
 }  // namespace
 
 int main(int argc, char** argv) {
-  using char_bench =
-      bench::remove_bench<char, unsq_eve_remove<128, 1>,
-                          unsq_eve_remove<256, 1>, unsq_eve_remove<256, 2>>;
+  using char_bench = bench::remove_bench<char, unsq_eve_remove<256, 1>>;
 
   using short_bench = bench::remove_bench<short, unsq_eve_remove<256, 1>>;
 

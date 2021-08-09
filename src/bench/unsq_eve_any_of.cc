@@ -39,9 +39,7 @@ struct unsq_eve_any_of {
 }  // namespace
 
 int main(int argc, char** argv) {
-  using char_bench =
-      bench::find_0_bench<char, unsq_eve_any_of<128, 4>,
-                          unsq_eve_any_of<256, 1>, unsq_eve_any_of<256, 4>>;
+  using char_bench = bench::find_0_bench<char, unsq_eve_any_of<256, 4>>;
 
   using short_bench = bench::find_0_bench<short, unsq_eve_any_of<256, 4>>;
   using int_bench = bench::find_0_bench<int, unsq_eve_any_of<256, 4>>;

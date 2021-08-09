@@ -16,33 +16,28 @@
 
 #include "bench/find_0.h"
 
-#include "unsq_eve/find.h"
+#include <eve/algo/find.hpp>
+
+#include <eve/algo/as_range.hpp>
 
 namespace {
 
-template <std::size_t width, std::size_t unroll>
-struct unsq_eve_find {
-  std::string name() const {
-    return "unsq_eve::find<" + std::to_string(width) + ", " +
-           std::to_string(unroll) + '>';
-  }
+struct eve_find_if {
+  std::string name() const { return "eve::algo::find_if"; }
 
   template <typename I, typename T>
-  BENCH_ALWAYS_INLINE I operator()(I f, I l, const T& x) const {
-    using traits =
-        unsq_eve::algorithm_traits<unsq_eve::value_type<I>, width, unroll>;
-
-    return unsq_eve::find<traits>(f, l, x);
+  BENCH_ALWAYS_INLINE auto operator()(I f, I l, const T& v) const {
+    return eve::algo::find_if(eve::algo::as_range(f, l),
+                             [v](auto x) { return x == v; });
   }
 };
 
 }  // namespace
 
 int main(int argc, char** argv) {
-  using char_bench = bench::find_0_bench<char, unsq_eve_find<256, 4>>;
-
-  using short_bench = bench::find_0_bench<short, unsq_eve_find<256, 4>>;
-  using int_bench = bench::find_0_bench<int, unsq_eve_find<256, 4>>;
+  using char_bench = bench::find_0_bench<char, eve_find_if>;
+  using short_bench = bench::find_0_bench<short, eve_find_if>;
+  using int_bench = bench::find_0_bench<int, eve_find_if>;
 
   bench::bench_main<char_bench, short_bench, int_bench>(argc, argv);
 }

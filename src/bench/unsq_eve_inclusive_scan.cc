@@ -42,9 +42,7 @@ struct unsq_eve_inclusive_scan_inplace {
 int main(int argc, char** argv) {
   using char_bench =
       bench::inplace_transform_bench<char,
-                                     unsq_eve_inclusive_scan_inplace<128, 1>,
-                                     unsq_eve_inclusive_scan_inplace<256, 1>,
-                                     unsq_eve_inclusive_scan_inplace<256, 2>>;
+                                     unsq_eve_inclusive_scan_inplace<256, 1>>;
 
   using short_bench =
       bench::inplace_transform_bench<short,

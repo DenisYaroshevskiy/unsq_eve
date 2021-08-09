@@ -41,16 +41,13 @@ struct unsq_eve_reduce {
 
 int main(int argc, char** argv) {
   using char_2_char_benchmarks =
-      bench::sum_bench<char, unsq_eve_reduce<char, 128, 4>,
-                       unsq_eve_reduce<char, 256, 1>,
+      bench::sum_bench<char,
                        unsq_eve_reduce<char, 256, 4>>;
   using char_2_short_benchmarks =
-      bench::sum_bench<char, unsq_eve_reduce<short, 128, 4>,
-                       unsq_eve_reduce<short, 256, 1>,
+      bench::sum_bench<char,
                        unsq_eve_reduce<short, 256, 4>>;
   using char_2_int_benchmarks =
-      bench::sum_bench<char, unsq_eve_reduce<short, 128, 4>,
-                       unsq_eve_reduce<int, 256, 1>,
+      bench::sum_bench<char,
                        unsq_eve_reduce<int, 256, 4>>;
 
   using short_benchmars =

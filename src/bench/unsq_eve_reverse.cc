@@ -41,9 +41,7 @@ struct unsq_eve_reverse {
 
 int main(int argc, char** argv) {
   using char_bench =
-      bench::inplace_transform_bench<char, unsq_eve_reverse<128, 1>,
-                                     unsq_eve_reverse<256, 1>,
-                                     unsq_eve_reverse<256, 2>>;
+      bench::inplace_transform_bench<char, unsq_eve_reverse<256, 1>>;
   using short_bench =
       bench::inplace_transform_bench<short, unsq_eve_reverse<256, 1>>;
 
