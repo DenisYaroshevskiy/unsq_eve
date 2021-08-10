@@ -37,6 +37,7 @@ add_benchmark(eve_any_of eve_any_of.cc)
 add_benchmark(eve_find eve_find.cc)
 add_benchmark(eve_reduce eve_reduce.cc)
 add_benchmark(eve_remove eve_remove.cc)
+add_benchmark(eve_remove_unroll eve_remove_unroll.cc)
 
 add_benchmark(unsq_eve_any_of unsq_eve_any_of.cc)
 add_benchmark(unsq_eve_find_guarded unsq_eve_find_guarded.cc)
