@@ -79,13 +79,13 @@ T* compress_store_precise(const Wide& wide, T* out, const Mask& wide_mask,
     out += ignore.first_count_;
   }
 
-  Wide buffer;
+  alignas(sizeof(Wide)) std::array<eve::element_type_t<Wide>, Wide::size()> buffer;
   T* up_to = _compress_store::compress_store_impl(reg, buffer.begin(), mmask.storage);
 
   // std::copy but memcpy instead of memmove
   int n = up_to - buffer.begin();
 
-  eve::store[eve::keep_first(n)](buffer, out);
+  eve::store[eve::keep_first(n)](Wide{buffer.data()}, out);
   return out + n;
 }
 

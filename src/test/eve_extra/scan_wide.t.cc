@@ -32,7 +32,12 @@ TEMPLATE_TEST_CASE("eve_extra.inclusive_scan", "[eve_extra]", ALL_TEST_PACKS) {
   const wide zero{0};
 
   wide expected;
-  std::inclusive_scan(in.begin(), in.end(), expected.begin());
+  auto sum = zero.get(0);
+
+  for (int i = 0; i != wide::size(); ++i) {
+    sum += in.get(i);
+    expected.set(i, sum);
+  }
 
   const wide actual = eve_extra::inclusive_scan_wide(
       in, [](wide x, wide y) { return x + y; }, zero);

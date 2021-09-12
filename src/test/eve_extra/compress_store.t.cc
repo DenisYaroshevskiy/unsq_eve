@@ -31,21 +31,23 @@ TEMPLATE_TEST_CASE("eve_extra.compress_store_main_logic", "[eve_extra]",
   using wide = TestType;
   using logical = eve::logical<wide>;
   using scalar = typename wide::value_type;
+  using arr_t = std::array<scalar, wide::size()>;
 
   const wide x = eve_extra::iota(eve::as<wide>{}) + wide{5};
 
   logical mask{false};
 
   auto run = [&] {
-    wide expected{0};
+    arr_t expected;
+    expected.fill(0);
 
     std::uint8_t o = 0;
     for (std::uint8_t i = 0; i != wide::size(); ++i) {
       if (!mask.get(i)) continue;
-      expected.set(o++, x.get(i));
+      expected[o++] = x.get(i);
     }
 
-    wide actual;
+    arr_t actual;
     scalar* out =
         compress_store_unsafe(x, actual.begin(), mask, eve::ignore_none);
 
@@ -53,8 +55,9 @@ TEMPLATE_TEST_CASE("eve_extra.compress_store_main_logic", "[eve_extra]",
 
     // No guarnaties past actual
     std::copy(out, actual.end(), expected.begin() + o);
-    INFO("expected: " << expected << " actual: " << actual);
-    REQUIRE(eve::all(expected == actual));
+    //INFO("expected: " << expected << " actual: " << actual);
+    bool test = expected == actual;
+    REQUIRE(test);
 
     // For precise we guarantee an exact match
     std::vector<scalar> precise_expected(expected.begin(),
@@ -89,8 +92,8 @@ TEMPLATE_TEST_CASE("eve_extra.compress_store_ignore", "[eve_extra]",
   auto run = [&](auto ignore) {
     logical mask{true};
 
-    const auto* f = x.begin();
-    const auto* l = x.end();
+    int f = 0;
+    int l = wide::size();
 
     if constexpr (std::same_as<decltype(ignore), eve::ignore_first>) {
       f += static_cast<std::ptrdiff_t>(ignore.count_);
@@ -101,10 +104,14 @@ TEMPLATE_TEST_CASE("eve_extra.compress_store_ignore", "[eve_extra]",
       l -= static_cast<std::ptrdiff_t>(ignore.last_count_);
     }
 
-    std::ptrdiff_t ignored_from_the_beginning = f - x.begin();
+    std::ptrdiff_t ignored_from_the_beginning = f;
 
-    std::vector<scalar> expected(f, l);
-    std::vector<scalar> actual(l - x.begin(), 0);
+    std::vector<scalar> expected(l - f, 0);
+    for (int i = 0; i != (l - f); ++i) {
+      expected[i] = x.get(i + f);
+    }
+
+    std::vector<scalar> actual(l, 0);
 
     INFO("ignore: " << ignore);
 
@@ -115,7 +122,7 @@ TEMPLATE_TEST_CASE("eve_extra.compress_store_ignore", "[eve_extra]",
     REQUIRE(expected == actual);
 
     // Compress store unsafe
-    actual = std::vector<scalar>(l - x.begin(), 0);
+    actual = std::vector<scalar>(l, 0);
     compress_store_unsafe(x, actual.data(), mask, ignore);
     actual.erase(actual.begin(), actual.begin() + ignored_from_the_beginning);
 

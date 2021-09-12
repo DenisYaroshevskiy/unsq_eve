@@ -45,7 +45,11 @@ TEMPLATE_TEST_CASE("eve_extra.constatns", "[eve_extra]", ALL_TEST_PACKS) {
 
   SECTION("iota") {
     wide x;
-    std::iota(x.begin(), x.end(), 0);
+    for (int i = 0; i != wide::size(); ++i)
+    {
+      x.set(i, (eve::element_type_t<wide>)i);
+    }
+
     auto actual = eve_extra::iota(eve::as<wide>{});
     REQUIRE(eve::all(x == actual));
   }

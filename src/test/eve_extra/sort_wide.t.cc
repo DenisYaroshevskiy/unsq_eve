@@ -32,11 +32,12 @@ TEST_CASE("eve_extra.sort_wide", "[eve_extra]") {
   using wide = eve::wide<std::int64_t, eve::fixed<4>>;
 
   const wide expected = eve_extra::iota(eve::as<wide>{}) + wide{5};
-  wide input = expected;
+  std::array<eve::element_type_t<wide>, wide::size()> input;
+  eve::store(expected, input.data());
 
   do {
-    wide actual = eve_extra::sort_4(input);
-    INFO("input:    " << input);
+    wide actual = eve_extra::sort_4(wide(input.data()));
+    // INFO("input:    " << input);
     INFO("expected: " << expected);
     INFO("actual:   " << actual);
     REQUIRE(eve::all(expected == actual));

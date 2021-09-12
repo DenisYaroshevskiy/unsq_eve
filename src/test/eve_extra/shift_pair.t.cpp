@@ -47,8 +47,12 @@ void shift_pair_right_test(Op op) {
     const wide actual = op(wrapped_shift, lhs, rhs);
 
     wide expected;
-    std::copy(lhs.end() - shift, lhs.end(), expected.begin());
-    std::copy(rhs.begin(), rhs.end() - shift, expected.begin() + shift);
+    for (int i = 0; i != shift; ++i) {
+      expected.set(i, lhs.get(wide::size() - shift + i));
+    }
+    for (int i = shift; i != wide::size(); ++i) {
+      expected.set(i, rhs.get(i - shift));
+    }
 
     INFO("lhs: " << lhs << " rhs: " << rhs);
     INFO("shift " << shift);
@@ -113,6 +117,7 @@ TEST_CASE("trying shifts (left for reference)", "[eve_extra]") {
   }
 }
 
+#if 0
 TEST_CASE("eve_extra.shift_pair_right_in_groups", "[eve_extra]") {
   using wide = eve::wide<std::int64_t, eve::fixed<4>>;
   using TestType = wide;
@@ -151,5 +156,6 @@ TEST_CASE("eve_extra.shift_pair_right_in_groups", "[eve_extra]") {
 
   unroll<half_size>(run);
 }
+#endif
 
 }  // namespace
