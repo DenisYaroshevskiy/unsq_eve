@@ -52,7 +52,7 @@
       padding: 'min',
       group: 'intel_9700K',
       percentage: 100,
-    }, ['reduce<256, 4>/char/char', 'reduce<256, 4>/short/short', 'reduce<256, 4>/int/int',
+    }, ['eve::algo::reduce/char/char', 'eve::algo::reduce/short/short', 'eve::algo::reduce/int/int',
       'std::reduce/char/char', 'std::reduce/short/short', 'std::reduce/int/int']);
   </script>
 
@@ -68,7 +68,7 @@
       padding: 'minmax',
       group: 'intel_9700K',
       percentage: 100,
-    }, ['reduce<256, 4>/char/char', 'reduce<256, 4>/short/short', 'reduce<256, 4>/int/int']);
+    }, ['eve::algo::reduce/char/char', 'eve::algo::reduce/short/short', 'eve::algo::reduce/int/int']);
   </script>
 
   <h4> reducing to the same type, code alignment, `std::reduce` </h4>
@@ -131,7 +131,7 @@
       padding: 'min',
       group: 'intel_9700K',
       percentage: 100,
-    }, ['std::reduce/char', 'reduce<256, 4>/char']);
+    }, ['std::reduce/char', 'eve::algo::reduce/char']);
   </script>
 
   <h4> reducing shorts 40 bytes data </h4>
@@ -147,7 +147,7 @@
       padding: 'min',
       group: 'intel_9700K',
       percentage: 100,
-    }, ['std::reduce/short', 'reduce<256, 4>/short']);
+    }, ['std::reduce/short', 'eve::algo::reduce/short']);
   </script>
 
   <h3> reducing 1000 bytes </h3>
@@ -173,7 +173,7 @@
       padding: 'min',
       group: 'intel_9700K',
       percentage: 100,
-    }, ['std::reduce/char', 'reduce<256, 4>/char']);
+    }, ['std::reduce/char', 'eve::algo::reduce/char']);
   </script>
 
   <h4> reducing shorts 1000 bytes data </h4>
@@ -189,7 +189,7 @@
       padding: 'min',
       group: 'intel_9700K',
       percentage: 100,
-    }, ['std::reduce/short', 'reduce<256, 4>/short']);
+    }, ['std::reduce/short', 'eve::algo::reduce/short']);
   </script>
 
   <h3> reducing 10000 bytes </h3>
@@ -209,7 +209,7 @@
       padding: 'min',
       group: 'intel_9700K',
       percentage: 100,
-    }, ['std::reduce/char', 'reduce<256, 4>/char']);
+    }, ['std::reduce/char', 'eve::algo::reduce/char']);
   </script>
 
   <div id='reduce_shorts_10000_bytes'></div>
@@ -223,7 +223,7 @@
       padding: 'min',
       group: 'intel_9700K',
       percentage: 100,
-    }, ['std::reduce/short', 'reduce<256, 4>/short']);
+    }, ['std::reduce/short', 'eve::algo::reduce/short']);
   </script>
 
   <h2> Total benchmark </h2>
