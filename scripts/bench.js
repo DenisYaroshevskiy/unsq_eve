@@ -259,7 +259,7 @@ function drawLinesBenchmark(element, width, data, traceFilter) {
     };
   }).filter(traceFilter);
 
-  const layout = {
+  let layout = {
     title: data.title,
     xaxis: {
       type: 'category',
@@ -278,6 +278,9 @@ function drawLinesBenchmark(element, width, data, traceFilter) {
     height: 600,
     hovermode: 'x'
   };
+  if (typeof unsq_eve_customize_layout == 'function') {
+    layout = unsq_eve_customize_layout(layout);
+  }
 
   Plotly.newPlot(element, traces, layout);
 }
@@ -292,7 +295,7 @@ function drawBarsBenchmars(element, width, data, traceFilter) {
     }
   }).filter(traceFilter);
 
-  const layout = {
+  let layout = {
     title: data.title,
     barmode: 'group',
     width: width,
@@ -303,6 +306,10 @@ function drawBarsBenchmars(element, width, data, traceFilter) {
       }
     }
   };
+
+  if (typeof unsq_eve_customize_layout == 'function') {
+    layout = unsq_eve_customize_layout(layout);
+  }
   Plotly.newPlot(element, traces, layout);
 }
 
