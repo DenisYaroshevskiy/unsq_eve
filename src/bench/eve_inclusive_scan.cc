@@ -17,23 +17,17 @@
 
 #include "bench/inplace_transform.h"
 
-#include "unsq_eve/inclusive_scan.h"
+#include <eve/algo/as_range.hpp>
+#include <eve/algo/inclusive_scan.hpp>
 
 namespace {
 
-template <std::size_t width, std::size_t unroll>
-struct unsq_eve_inclusive_scan_inplace {
-  std::string name() const {
-    return "unsq_eve::inclusive_scan_inplace<" + std::to_string(width) + ", " +
-           std::to_string(unroll) + '>';
-  }
+struct eve_inclusive_scan_inplace {
+  std::string name() const { return "eve::algo::inclusive_scan_inplace"; }
 
   template <typename I>
   BENCH_ALWAYS_INLINE void operator()(I f, I l) const {
-    using traits =
-        unsq_eve::algorithm_traits<unsq_eve::value_type<I>, width, unroll>;
-
-    unsq_eve::inclusive_scan_inplace<traits>(f, l);
+    eve::algo::inclusive_scan_inplace(eve::algo::as_range(f, l), eve::zero);
   }
 };
 
@@ -41,16 +35,13 @@ struct unsq_eve_inclusive_scan_inplace {
 
 int main(int argc, char** argv) {
   using char_bench =
-      bench::inplace_transform_bench<char,
-                                     unsq_eve_inclusive_scan_inplace<256, 1>>;
+      bench::inplace_transform_bench<char, eve_inclusive_scan_inplace>;
 
   using short_bench =
-      bench::inplace_transform_bench<short,
-                                     unsq_eve_inclusive_scan_inplace<256, 1>>;
+      bench::inplace_transform_bench<short, eve_inclusive_scan_inplace>;
 
   using int_bench =
-      bench::inplace_transform_bench<int,
-                                     unsq_eve_inclusive_scan_inplace<256, 1>>;
+      bench::inplace_transform_bench<int, eve_inclusive_scan_inplace>;
 
   bench::bench_main<char_bench, short_bench, int_bench>(argc, argv);
 }
