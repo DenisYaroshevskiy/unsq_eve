@@ -1,8 +1,10 @@
 #include <eve/algo/remove.hpp>
 #include <eve/algo/as_range.hpp>
 
-using T = double;
+#include <eve/algo/inclusive_scan.hpp>
 
-T* remove(T* f, T* l, T v) {
-  return eve::algo::remove(eve::algo::as_range(f, l), v);
+using T = int;
+
+void inclusive_scan(T* f, T* l) {
+  eve::algo::inclusive_scan_inplace(eve::algo::as_range(f, l), eve::zero);
 }
