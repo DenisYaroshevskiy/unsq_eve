@@ -276,6 +276,7 @@ function drawLinesBenchmark(element, width, data, traceFilter) {
     },
     width: width,
     height: 600,
+    hovermode: 'x'
   };
 
   Plotly.newPlot(element, traces, layout);
