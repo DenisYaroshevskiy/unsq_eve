@@ -411,7 +411,7 @@ async function dynamicEntryPoint(elementID, defaultSelection, defaultFilter = []
     const [varying, fixed] = inputParse(selection, byKeys);
     const traceFilter = filterParse(filter);
     const asVisualized = visualizationDataFromMeasurements(varying, fixed, measurements);
-    drawBenchmark(drawHere, 1200, asVisualized, traceFilter, ['any_of']);
+    drawBenchmark(drawHere, 1200, asVisualized, traceFilter);
   };
 
   addTextInput(element, '1200px', selection, (value) => {
