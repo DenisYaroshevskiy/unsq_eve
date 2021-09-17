@@ -247,9 +247,9 @@ function visualizationDataFromMeasurements(varying, fixed, measurements) {
   }
 }
 
-function drawLinesBenchmark(element, width, data, traceFilter) {
+function drawLinesBenchmark(element, width, data, traceFilter, offByDefault) {
   const traces = data.lines.map(line => {
-    return {
+    let res = {
       name: line.name,
       x: line.x,
       y: line.y,
@@ -257,6 +257,10 @@ function drawLinesBenchmark(element, width, data, traceFilter) {
       line: { size: 3 },
       type: 'scatter'
     };
+    if (offByDefault.includes(line.name)) {
+      res.visible = 'legendonly';
+    }
+    return res;
   }).filter(traceFilter);
 
   let layout = {
@@ -285,14 +289,18 @@ function drawLinesBenchmark(element, width, data, traceFilter) {
   Plotly.newPlot(element, traces, layout);
 }
 
-function drawBarsBenchmars(element, width, data, traceFilter) {
+function drawBarsBenchmars(element, width, data, traceFilter, offByDefault) {
   const traces = data.traces.map((trace) => {
-    return {
+    let res = {
       name: trace.name,
       x: trace.x,
       y: trace.y,
       type: 'bar'
+    };
+    if (offByDefault.includes(trace.name)) {
+      res.visible = 'legendonly';
     }
+    return res;
   }).filter(traceFilter);
 
   let layout = {
@@ -313,11 +321,12 @@ function drawBarsBenchmars(element, width, data, traceFilter) {
   Plotly.newPlot(element, traces, layout);
 }
 
-function drawBenchmark(element, width, data, traceFilter) {
+function drawBenchmark(element, width, data, traceFilter, offByDefault) {
+  if (!offByDefault) offByDefault = [];
   if (data.x_title) {
-    drawLinesBenchmark(element, width, data, traceFilter);
+    drawLinesBenchmark(element, width, data, traceFilter, offByDefault);
   } else {
-    drawBarsBenchmars(element, width, data, traceFilter);
+    drawBarsBenchmars(element, width, data, traceFilter, offByDefault);
   }
 }
 
