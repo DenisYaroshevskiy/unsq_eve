@@ -257,7 +257,7 @@ function drawLinesBenchmark(element, width, data, traceFilter, offByDefault) {
       line: { size: 3 },
       type: 'scatter'
     };
-    if (offByDefault.includes(line.name)) {
+    if (offByDefault.find(off => line.name.includes(off))) {
       res.visible = 'legendonly';
     }
     return res;
@@ -297,7 +297,7 @@ function drawBarsBenchmars(element, width, data, traceFilter, offByDefault) {
       y: trace.y,
       type: 'bar'
     };
-    if (offByDefault.includes(trace.name)) {
+    if (offByDefault.find(off => trace.name.includes(off))) {
       res.visible = 'legendonly';
     }
     return res;
@@ -411,7 +411,7 @@ async function dynamicEntryPoint(elementID, defaultSelection, defaultFilter = []
     const [varying, fixed] = inputParse(selection, byKeys);
     const traceFilter = filterParse(filter);
     const asVisualized = visualizationDataFromMeasurements(varying, fixed, measurements);
-    drawBenchmark(drawHere, 1200, asVisualized, traceFilter);
+    drawBenchmark(drawHere, 1200, asVisualized, traceFilter, ['any_of']);
   };
 
   addTextInput(element, '1200px', selection, (value) => {
