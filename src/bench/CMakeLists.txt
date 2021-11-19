@@ -35,6 +35,7 @@ add_benchmark(std_transform std_transform.cc)
 
 add_benchmark(eve_any_of eve_any_of.cc)
 add_benchmark(eve_find eve_find.cc)
+add_benchmark(eve_reverse eve_reverse.cc)
 add_benchmark(eve_reduce eve_reduce.cc)
 add_benchmark(eve_remove eve_remove.cc)
 add_benchmark(eve_inclusive_scan eve_inclusive_scan.cc)
