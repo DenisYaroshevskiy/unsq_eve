@@ -27,7 +27,7 @@ struct eve_inclusive_scan_inplace {
 
   template <typename I>
   BENCH_ALWAYS_INLINE void operator()(I f, I l) const {
-    eve::algo::inclusive_scan_inplace(eve::algo::as_range(f, l), eve::algo::value_type_t<I>(0));
+    eve::algo::inclusive_scan_inplace(eve::algo::as_range(f, l), eve::value_type_t<I>(0));
   }
 };
 
