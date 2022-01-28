@@ -17,11 +17,7 @@
 add_executable(tests)
 
 target_sources(tests PRIVATE
-               eve_extra/compress_mask.t.cc
-               eve_extra/compress_store.t.cc
                eve_extra/concepts.t.cc
-               eve_extra/eve_extra.t.cc
-               eve_extra/sort_wide.t.cc
                unsq_eve/concepts.t.cc
                unsq_eve/min_element.t.cc
                unsq_eve/unroll.t.cc

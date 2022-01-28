@@ -23,21 +23,9 @@
 #include <eve/function/load.hpp>
 #include <eve/memory/align.hpp>
 
-#include "eve_extra/compress_store.h"
 #include "eve_extra/concepts.h"
-#include "eve_extra/constants.h"
 
 namespace eve_extra {
-
-constexpr std::ptrdiff_t page_size() { return 1 << 12; }
-
-template <typename T>
-T* end_of_page(T* addr) {
-  std::uintptr_t upage_size = page_size();
-  std::uintptr_t mask = ~(upage_size - 1);
-  return reinterpret_cast<T*>((reinterpret_cast<std::uintptr_t>(addr) & mask) +
-                              upage_size);
-}
 
 /*
 Compiler does not generate this properly, instead of doing things one

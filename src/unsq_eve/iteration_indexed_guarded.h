@@ -50,7 +50,7 @@ template <typename Traits>
 auto wider_iota() {
   std::array<wide_index_t<Traits>, Traits::unroll()> res;
 
-  auto cur = eve_extra::iota(eve::as<wide_index_t<Traits>>{});
+  wide_index_t<Traits> cur { [](int i, int) { return i; }};
 
   for (auto& i : res) {
     i = cur;
@@ -84,7 +84,7 @@ main_loop(Ptr& aligned_f, Ptr aligned_l, wide_index_t<Traits>& wide_i,
     delegate.index_overflow();
     delegate.set_base(aligned_f.get());
     n = max_idx<Traits>();
-    wide_i = eve_extra::iota(eve::as<wide_index_t<Traits>>{});
+    wide_i = wide_index_t<Traits>{[](int i, int) { return i; }};
   }
 
   return StopReason::No;
@@ -153,7 +153,7 @@ EVE_FORCEINLINE StopReason main_loop(Ptr& aligned_f, Ptr aligned_l,
     res = main_loop_unrolled<Traits>(aligned_f, aligned_l, delegate);
     if (res != StopReason::No) return res;
 
-    wide_i = eve_extra::iota(eve::as<wide_index_t<Traits>>{});
+    wide_i = wide_index_t<Traits>{[](int i, int) { return i; }};
   }
 }
 
@@ -171,7 +171,7 @@ EVE_FORCEINLINE Delegate iteration_indexed_aligned(T* f, T* l,
 
   delegate.set_base(aligned_f.get());
 
-  idx_t wide_i = eve_extra::iota(eve::as<idx_t>{});
+  idx_t wide_i { [](int i, int) { return i; } };
 
   if (aligned_f != aligned_l) {
     if (delegate.small_step(aligned_f, indx_c<0>{}, wide_i, ignore_first))
