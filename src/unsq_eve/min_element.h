@@ -18,6 +18,7 @@
 #define UNSQ_EVE_MIN_ELEMENT_H_
 
 #include <array>
+#include <iterator>
 
 #include <eve/function/all.hpp>
 #include <eve/function/convert.hpp>
@@ -25,8 +26,6 @@
 #include <eve/function/reduce.hpp>
 #include <eve/function/replace.hpp>
 
-#include "eve_extra/eve_extra.h"
-#include "unsq_eve/concepts.h"
 #include "unsq_eve/iteration_indexed_guarded.h"
 
 namespace unsq_eve {
@@ -127,8 +126,7 @@ struct min_body {
 
 }  // namespace _min_element
 
-template <typename Traits, contigious_iterator I,
-          wide_selection_for<Traits> Selection>
+template <typename Traits, contigious_iterator I, typename Selection>
 EVE_FORCEINLINE I min_element(I _f, I _l, Selection sel) {
   if (_f == _l) return _f;
 
