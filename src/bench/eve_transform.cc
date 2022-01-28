@@ -17,23 +17,17 @@
 
 #include "bench/inplace_transform.h"
 
-#include "unsq_eve/transform.h"
+#include <eve/algo/transform.hpp>
 
 namespace {
 
-template <std::size_t width, std::size_t unroll>
-struct unsq_eve_transform {
-  std::string name() const {
-    return "unsq_eve::transform<" + std::to_string(width) + ", " +
-           std::to_string(unroll) + '>';
-  }
+struct eve_transform_inplace {
+  std::string name() const { return "eve::algo::transform_inplace"; }
 
   template <typename I>
   BENCH_ALWAYS_INLINE void operator()(I f, I l) {
-    using traits =
-        unsq_eve::algorithm_traits<unsq_eve::value_type<I>, width, unroll>;
-
-    unsq_eve::transform<traits>(f, l, [](auto x) { return x + x; });
+    eve::algo::transform_inplace(eve::algo::as_range(f, l),
+                                 [](auto x) { return x + x; });
   }
 };
 
@@ -41,12 +35,10 @@ struct unsq_eve_transform {
 
 int main(int argc, char** argv) {
   using char_bench =
-      bench::inplace_transform_bench<char, unsq_eve_transform<256, 4>>;
+      bench::inplace_transform_bench<char, eve_transform_inplace>;
   using short_bench =
-      bench::inplace_transform_bench<short, unsq_eve_transform<256, 4>>;
-
-  using int_bench =
-      bench::inplace_transform_bench<int, unsq_eve_transform<256, 4>>;
+      bench::inplace_transform_bench<short, eve_transform_inplace>;
+  using int_bench = bench::inplace_transform_bench<int, eve_transform_inplace>;
 
   bench::bench_main<char_bench, short_bench, int_bench>(argc, argv);
 }
