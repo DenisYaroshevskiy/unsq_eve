@@ -40,7 +40,7 @@ template <typename T>
 struct type_name;
 
 template <>
-struct type_name<char> {
+struct type_name<std::int8_t> {
   const char* operator()() const { return "char"; }
 };
 

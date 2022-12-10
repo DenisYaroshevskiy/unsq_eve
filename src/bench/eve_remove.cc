@@ -37,7 +37,7 @@ struct eve_remove {
 }  // namespace
 
 int main(int argc, char** argv) {
-  using char_bench = bench::remove_bench<char, eve_remove>;
+  using char_bench = bench::remove_bench<std::int8_t, eve_remove>;
   using short_bench = bench::remove_bench<short, eve_remove>;
   using int_bench = bench::remove_bench<int, eve_remove>;
 

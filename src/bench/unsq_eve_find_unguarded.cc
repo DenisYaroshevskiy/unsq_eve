@@ -39,7 +39,7 @@ struct unsq_eve_find_unguarded {
 }  // namespace
 
 int main(int argc, char** argv) {
-  using char_bench = bench::find_0_bench<char, unsq_eve_find_unguarded<256, 4>>;
+  using char_bench = bench::find_0_bench<std::int8_t, unsq_eve_find_unguarded<256, 4>>;
 
   using short_bench =
       bench::find_0_bench<short, unsq_eve_find_unguarded<256, 4>>;

@@ -39,7 +39,7 @@ struct unsq_eve_min_element {
 }  // namespace
 
 int main(int argc, char** argv) {
-  using char_bench = bench::min_bench<char, unsq_eve_min_element<256, 1>>;
+  using char_bench = bench::min_bench<std::int8_t, unsq_eve_min_element<256, 1>>;
 
   using short_bench = bench::min_bench<short, unsq_eve_min_element<256, 1>>;
 

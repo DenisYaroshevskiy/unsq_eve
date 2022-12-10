@@ -36,7 +36,7 @@ struct eve_reverse {
 
 int main(int argc, char** argv) {
   using char_bench =
-      bench::inplace_transform_bench<char, eve_reverse>;
+      bench::inplace_transform_bench<std::int8_t, eve_reverse>;
   using short_bench =
       bench::inplace_transform_bench<short, eve_reverse>;
 

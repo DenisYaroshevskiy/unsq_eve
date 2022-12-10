@@ -33,7 +33,7 @@ struct std_reverse {
 }  // namespace
 
 int main(int argc, char** argv) {
-  bench::bench_main<bench::inplace_transform_bench<char, std_reverse>,
+  bench::bench_main<bench::inplace_transform_bench<std::int8_t, std_reverse>,
                     bench::inplace_transform_bench<short, std_reverse>,
                     bench::inplace_transform_bench<int, std_reverse>>(argc,
                                                                       argv);

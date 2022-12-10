@@ -27,7 +27,7 @@ struct std_strlen {
 
   template <typename I, typename T>
   BENCH_ALWAYS_INLINE I operator()(I f, I, const T&) const {
-    return f + std::strlen(&*f);
+    return f + std::strlen((const char*)&*f);
   }
 };
 
@@ -56,7 +56,7 @@ struct find_unguarded {
 
 int main(int argc, char** argv) {
   using char_bench =
-      bench::find_0_bench<char, std_strlen, std_find, find_unguarded>;
+      bench::find_0_bench<std::int8_t, std_strlen, std_find, find_unguarded>;
 
   using short_bench = bench::find_0_bench<short, std_find, find_unguarded>;
 

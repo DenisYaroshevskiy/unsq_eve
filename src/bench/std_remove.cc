@@ -31,7 +31,7 @@ struct std_remove {
 }  // namespace
 
 int main(int argc, char** argv) {
-  using char_bench = bench::remove_bench<char, std_remove>;
+  using char_bench = bench::remove_bench<std::int8_t, std_remove>;
 
   using short_bench = bench::remove_bench<short, std_remove>;
 

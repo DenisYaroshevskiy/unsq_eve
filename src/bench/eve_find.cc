@@ -35,7 +35,7 @@ struct eve_find_if {
 }  // namespace
 
 int main(int argc, char** argv) {
-  using char_bench = bench::find_0_bench<char, eve_find_if>;
+  using char_bench = bench::find_0_bench<std::int8_t, eve_find_if>;
   using short_bench = bench::find_0_bench<short, eve_find_if>;
   using int_bench = bench::find_0_bench<int, eve_find_if>;
 

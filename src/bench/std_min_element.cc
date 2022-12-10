@@ -32,7 +32,7 @@ struct std_min_element {
 }  // namespace
 
 int main(int argc, char** argv) {
-  bench::bench_main<bench::min_bench<char, std_min_element>,
+  bench::bench_main<bench::min_bench<std::int8_t, std_min_element>,
                     bench::min_bench<short, std_min_element>,
                     bench::min_bench<int, std_min_element>>(argc, argv);
 }

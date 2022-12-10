@@ -35,7 +35,7 @@ struct eve_inclusive_scan_inplace {
 
 int main(int argc, char** argv) {
   using char_bench =
-      bench::inplace_transform_bench<char, eve_inclusive_scan_inplace>;
+      bench::inplace_transform_bench<std::int8_t, eve_inclusive_scan_inplace>;
 
   using short_bench =
       bench::inplace_transform_bench<short, eve_inclusive_scan_inplace>;

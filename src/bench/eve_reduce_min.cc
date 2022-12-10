@@ -16,7 +16,7 @@
 
 #include "bench/min.h"
 
-#include <eve/function/min.hpp>
+#include <eve/module/core.hpp>
 #include <eve/algo/reduce.hpp>
 #include <eve/algo/find.hpp>
 
@@ -38,7 +38,7 @@ struct eve_reduce_find_min {
 }  // namespace
 
 int main(int argc, char** argv) {
-  bench::bench_main<bench::min_bench<char, eve_reduce_find_min>,
+  bench::bench_main<bench::min_bench<std::int8_t, eve_reduce_find_min>,
                     bench::min_bench<short, eve_reduce_find_min>,
                     bench::min_bench<int, eve_reduce_find_min>>(argc, argv);
 }

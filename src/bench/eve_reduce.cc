@@ -37,7 +37,7 @@ struct eve_reduce {
 }  // namespace
 
 int main(int argc, char** argv) {
-  bench::bench_main<bench::sum_bench<char, eve_reduce<char>, eve_reduce<short>,
+  bench::bench_main<bench::sum_bench<std::int8_t, eve_reduce<std::int8_t>, eve_reduce<short>,
                                      eve_reduce<int>>,
                     bench::sum_bench<short, eve_reduce<short>, eve_reduce<int>>,
                     bench::sum_bench<int, eve_reduce<int>>>(argc, argv);

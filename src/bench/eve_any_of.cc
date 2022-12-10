@@ -35,7 +35,7 @@ struct eve_any_of {
 }  // namespace
 
 int main(int argc, char** argv) {
-  using char_bench = bench::find_0_bench<char, eve_any_of>;
+  using char_bench = bench::find_0_bench<std::int8_t, eve_any_of>;
   using short_bench = bench::find_0_bench<short, eve_any_of>;
   using int_bench = bench::find_0_bench<int, eve_any_of>;
 

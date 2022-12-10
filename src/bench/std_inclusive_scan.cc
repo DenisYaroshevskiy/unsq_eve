@@ -33,7 +33,7 @@ struct std_inclusive_scan {
 }  // namespace
 
 int main(int argc, char** argv) {
-  bench::bench_main<bench::inplace_transform_bench<char, std_inclusive_scan>,
+  bench::bench_main<bench::inplace_transform_bench<std::int8_t, std_inclusive_scan>,
                     bench::inplace_transform_bench<short, std_inclusive_scan>,
                     bench::inplace_transform_bench<int, std_inclusive_scan>>(
       argc, argv);
