@@ -21,7 +21,7 @@
 
 #include <eve/memory/aligned_allocator.hpp>
 
-#include "test/catch.h"
+#include <tts/tts.hpp>
 
 namespace {
 
@@ -50,7 +50,7 @@ void specific_tests(Alg alg) {
     const T* f = v.data();
     const T* l = f + v.size();
 
-    REQUIRE(alg(traits{}, f, l, v.back()) - f == 12);
+    TTS_EXPECT(alg(traits{}, f, l, v.back()) - f == 12);
   }
 
   // const iterator
@@ -58,13 +58,12 @@ void specific_tests(Alg alg) {
     std::vector<T> v(27u, T(1));
     v.back() = T(2);
 
-    REQUIRE(alg(traits{}, v.cbegin(), v.cend(), v.back()) - v.cbegin() == 26);
+    TTS_EXPECT(alg(traits{}, v.cbegin(), v.cend(), v.back()) - v.cbegin() == 26);
   }
 }
 
 template <typename Variation, typename Alg>
 void common_find_test_impl(Alg alg) {
-  INFO("" << Variation{});
   specific_tests<Variation>(alg);
 
   using T = typename Variation::type;
@@ -78,9 +77,8 @@ void common_find_test_impl(Alg alg) {
     typename Variation::traits traits{};
 
     for (auto* it = f; it < l; ++it) {
-      INFO("length: " << (l - f) << " from the beginning: " << it - f);
       *it = 1;
-      REQUIRE(alg(traits, f, l, 1) == it);
+      TTS_EXPECT(alg(traits, f, l, 1) == it);
       *it = 0;
     }
   };
@@ -126,10 +124,10 @@ void common_find_test(Alg alg) {
   common_find_test_traits_combinations<double>(alg);
 }
 
-TEST_CASE("unsq_eve.find_unguarded", "[unsq_eve]") {
+TTS_CASE("unsq_eve.find_unguarded") {
   common_find_test([](auto traits, auto f, auto /*l*/, auto v) {
     return unsq_eve::find_unguarded<decltype(traits)>(f, v);
   });
-}
+};
 
 }  // namespace

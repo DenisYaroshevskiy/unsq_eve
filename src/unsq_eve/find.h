@@ -20,8 +20,7 @@
 #include <algorithm>
 #include <array>
 
-#include <eve/eve.hpp>
-#include <eve/function/first_true.hpp>
+#include <eve/module/core.hpp>
 
 #include "eve_extra/eve_extra.h"
 

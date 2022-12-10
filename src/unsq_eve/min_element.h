@@ -20,11 +20,7 @@
 #include <array>
 #include <iterator>
 
-#include <eve/function/all.hpp>
-#include <eve/function/convert.hpp>
-#include <eve/function/min.hpp>
-#include <eve/function/reduce.hpp>
-#include <eve/function/replace.hpp>
+#include <eve/module/core.hpp>
 
 #include "unsq_eve/iteration_indexed_guarded.h"
 

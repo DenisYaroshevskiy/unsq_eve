@@ -19,9 +19,7 @@
 
 #include <type_traits>
 
-#include <eve/eve.hpp>
-#include <eve/function/load.hpp>
-#include <eve/memory/align.hpp>
+#include <eve/module/core.hpp>
 
 #include "eve_extra/concepts.h"
 

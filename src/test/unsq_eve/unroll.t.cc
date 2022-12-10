@@ -20,14 +20,15 @@
 
 #include <eve/eve.hpp>
 
-#include "test/catch.h"
+#include <tts/tts.hpp>
 
 namespace {
 
-#define ALL_UNROLLS \
-  (unsq_eve::indx_c<1>), (unsq_eve::indx_c<2>), (unsq_eve::indx_c<4>)
-
-TEMPLATE_TEST_CASE("unroll", "[unsq_eve]", ALL_UNROLLS) {
+TTS_CASE_TPL("unsq_eve.unroll",
+            tts::types<unsq_eve::indx_c<1>,
+                        unsq_eve::indx_c<2>,
+                        unsq_eve::indx_c<4>>)
+<typename TestType>(tts::type<TestType>) {
   using traits = unsq_eve::iteration_traits<std::uint32_t, 8, TestType{}()>;
 
   std::vector<int> v(1024, 15);
@@ -39,7 +40,7 @@ TEMPLATE_TEST_CASE("unroll", "[unsq_eve]", ALL_UNROLLS) {
     if (ptr - v.data() == stop_at) return true;
 
     *ptr = static_cast<int>(register_idx());
-    REQUIRE(ptr > last_ptr);
+    TTS_EXPECT(ptr > last_ptr);
     last_ptr = ptr;
     return false;
   };
@@ -47,15 +48,15 @@ TEMPLATE_TEST_CASE("unroll", "[unsq_eve]", ALL_UNROLLS) {
   unsq_eve::unroll_iteration<traits>(v.data(), op);
   for (int i = 0, j = 0; i < 1024; i += 8) {
     if (i >= stop_at) {
-      REQUIRE(v[i] == 15);
+      TTS_EXPECT(v[i] == 15);
       continue;
     }
 
     // unguarded does guarantee register order
-    REQUIRE(v[i] == j);
-    REQUIRE(v[i + 1] == 15);
+    TTS_EXPECT(v[i] == j);
+    TTS_EXPECT(v[i + 1] == 15);
     if (++j == traits::unroll()) j = 0;
   }
-}
+};
 
 }  // namespace

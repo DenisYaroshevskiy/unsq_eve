@@ -22,7 +22,7 @@ target_sources(tests PRIVATE
                unsq_eve/find_common.t.cc
                unsq_eve/min_element.t.cc
                unsq_eve/unroll.t.cc
-               catch_main.cc)
+               tts_main.cc)
 
 target_compile_options(tests PRIVATE
                        -Werror -Wall -Wextra -Wpedantic -Wno-deprecated-copy -Og -g
@@ -30,6 +30,5 @@ target_compile_options(tests PRIVATE
                         -fno-omit-frame-pointer
                        --std=c++20
                        -stdlib=libc++
-                       -fsanitize=address
-                       -march=native)
+                       -fsanitize=address)
 target_link_options(tests PRIVATE -fsanitize=address -stdlib=libc++)

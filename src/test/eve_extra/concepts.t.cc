@@ -16,23 +16,22 @@
 
 #include "eve_extra/eve_extra.h"
 
-#include "test/catch.h"
 #include "test/eve_extra/common.h"
 
-TEMPLATE_TEST_CASE("eve_extra.concepts", "[eve_extra]", ALL_TEST_PACKS) {
-  using wide = TestType;
+TTS_CASE_TPL("eve_extra.concepts", all_test_packs)
+<typename wide>(tts::type<wide>) {
   using logical = eve::logical<wide>;
 
-  STATIC_REQUIRE(eve_extra::eve_wide<wide>);
-  STATIC_REQUIRE(eve_extra::native_wide<wide>);
-  STATIC_REQUIRE(eve_extra::eve_logical<logical>);
-  STATIC_REQUIRE(eve_extra::native_logical<logical>);
+  TTS_CONSTEXPR_EXPECT(eve_extra::eve_wide<wide>);
+  TTS_CONSTEXPR_EXPECT(eve_extra::native_wide<wide>);
+  TTS_CONSTEXPR_EXPECT(eve_extra::eve_logical<logical>);
+  TTS_CONSTEXPR_EXPECT(eve_extra::native_logical<logical>);
 
   using T = typename wide::value_type;
   constexpr std::ptrdiff_t size = wide::size();
   using extra_wide = eve::wide<T, eve::fixed<size * 4>>;
   using extra_logical = eve::logical<logical>;
 
-  STATIC_REQUIRE(eve_extra::composite_wide<extra_wide>);
-  STATIC_REQUIRE(eve_extra::eve_logical<extra_logical>);
-}
+  TTS_CONSTEXPR_EXPECT(eve_extra::composite_wide<extra_wide>);
+  TTS_CONSTEXPR_EXPECT(eve_extra::eve_logical<extra_logical>);
+};

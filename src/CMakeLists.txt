@@ -20,6 +20,7 @@ if(NOT CMAKE_BUILD_TYPE)
 endif(NOT CMAKE_BUILD_TYPE)
 
 include_directories(../../eve/include)
+include_directories(../../eve/test)
 include_directories(./)
 add_subdirectory(test)
 add_subdirectory(bench)

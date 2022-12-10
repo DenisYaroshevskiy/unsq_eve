@@ -16,18 +16,18 @@
 
 #include "unsq_eve/concepts.h"
 
-#include "test/catch.h"
+#include <tts/tts.hpp>
 
 namespace {
 
-TEST_CASE("unsq_eve.concepts", "[unsq_eve]") {
-  using wide = eve::wide<char, eve::fixed<32>>;
+TTS_CASE("unsq_eve.concepts") {
+  using wide = eve::wide<std::int8_t>;
 
   auto equal_zero = [](const wide& x) mutable {
     return x == wide{0};
   };
 
-  STATIC_REQUIRE(unsq_eve::wide_predicate<decltype(equal_zero), wide>);
-}
+  TTS_CONSTEXPR_EXPECT((unsq_eve::wide_predicate<decltype(equal_zero), wide>));
+};
 
 }  // namespace
