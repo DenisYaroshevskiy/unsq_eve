@@ -84,6 +84,14 @@ Benchmark                                  Time             CPU   Iterations
 ipBenchmark<eve_transform_reduce>        716 ns          716 ns       853388
 ipBenchmark<fvec_inner_product>         2794 ns         2794 ns       251049
 ipBenchmark<no_pragmas>                 8471 ns         8471 ns        81987
+
+With ffast math
+----------------------------------------------------------------------------
+Benchmark                                  Time             CPU   Iterations
+----------------------------------------------------------------------------
+ipBenchmark<eve_transform_reduce>        718 ns          718 ns       788013
+ipBenchmark<fvec_inner_product>         2786 ns         2785 ns       251514
+ipBenchmark<no_pragmas>                  713 ns          713 ns       975175
 */
 BENCHMARK(ipBenchmark<eve_transform_reduce>);
 BENCHMARK(ipBenchmark<fvec_inner_product>);
