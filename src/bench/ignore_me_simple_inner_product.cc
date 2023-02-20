@@ -57,9 +57,10 @@ float fvec_inner_product(const float* x, const float* y, size_t d) {
 }
 
 BENCH_NOINLINE
-float no_pragmas(const float* x, const float* y, std::size_t d) {
+float autovectorized(const float* x, const float* y, std::size_t d) {
   float res = 0.F;
   for (size_t i = 0; i != d; ++i) {
+_Pragma ("clang fp contract (fast) reassociate(on)")
       res += x[i] * y[i];
   }
   return res;
@@ -81,20 +82,12 @@ Run on M2
 ----------------------------------------------------------------------------
 Benchmark                                  Time             CPU   Iterations
 ----------------------------------------------------------------------------
-ipBenchmark<eve_transform_reduce>        716 ns          716 ns       853388
-ipBenchmark<fvec_inner_product>         2794 ns         2794 ns       251049
-ipBenchmark<no_pragmas>                 8471 ns         8471 ns        81987
-
-With ffast math
-----------------------------------------------------------------------------
-Benchmark                                  Time             CPU   Iterations
-----------------------------------------------------------------------------
-ipBenchmark<eve_transform_reduce>        718 ns          718 ns       788013
-ipBenchmark<fvec_inner_product>         2786 ns         2785 ns       251514
-ipBenchmark<no_pragmas>                  713 ns          713 ns       975175
+ipBenchmark<eve_transform_reduce>        714 ns          714 ns       788892
+ipBenchmark<fvec_inner_product>         2854 ns         2853 ns       251323
+ipBenchmark<autovectorized>              715 ns          715 ns       979638
 */
 BENCHMARK(ipBenchmark<eve_transform_reduce>);
 BENCHMARK(ipBenchmark<fvec_inner_product>);
-BENCHMARK(ipBenchmark<no_pragmas>);
+BENCHMARK(ipBenchmark<autovectorized>);
 
 }  // namespace
