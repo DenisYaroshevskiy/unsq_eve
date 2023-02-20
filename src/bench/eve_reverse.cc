@@ -17,7 +17,7 @@
 
 #include "bench/inplace_transform.h"
 
-#include <eve/algo/reverse.hpp>
+#include <eve/module/algo.hpp>
 
 namespace {
 

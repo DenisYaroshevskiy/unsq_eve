@@ -16,9 +16,7 @@
 
 #include "bench/sum.h"
 
-#include <eve/algo/reduce.hpp>
-
-#include <eve/algo/as_range.hpp>
+#include <eve/module/algo.hpp>
 
 namespace {
 

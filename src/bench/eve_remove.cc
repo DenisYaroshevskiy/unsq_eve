@@ -17,9 +17,7 @@
 
 #include "bench/remove.h"
 
-#include <eve/algo/remove.hpp>
-
-#include <eve/algo/as_range.hpp>
+#include <eve/module/algo.hpp>
 
 namespace {
 

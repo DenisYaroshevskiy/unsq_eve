@@ -16,9 +16,7 @@
 
 #include "bench/find_0.h"
 
-#include <eve/algo/find.hpp>
-
-#include <eve/algo/as_range.hpp>
+#include <eve/module/algo.hpp>
 
 namespace {
 

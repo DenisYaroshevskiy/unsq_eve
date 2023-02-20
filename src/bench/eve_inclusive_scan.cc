@@ -17,8 +17,7 @@
 
 #include "bench/inplace_transform.h"
 
-#include <eve/algo/as_range.hpp>
-#include <eve/algo/inclusive_scan.hpp>
+#include <eve/module/algo.hpp>
 
 namespace {
 

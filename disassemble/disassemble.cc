@@ -1,5 +1,5 @@
 
-#include <eve/algo.hpp>
+#include <eve/module/algo.hpp>
 
 int memcmp_( void const* lhs, void const* rhs, std::size_t count )
 //

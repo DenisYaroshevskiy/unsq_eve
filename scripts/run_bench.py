@@ -48,7 +48,9 @@ def findProcessorFolder(processor):
 
 def getAllBenchmars():
     return [x for x in os.listdir(BENCHMARK_FOLDER)
-            if not x.startswith('CMake') and not x.startswith('cmake')]
+            if not x.startswith('CMake') and not
+            x.startswith('cmake') and not
+            x.startswith('ignore_me')]
 
 
 def filterBecnhmarks(benchmarks, filter_):

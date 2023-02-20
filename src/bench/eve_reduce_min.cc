@@ -17,8 +17,7 @@
 #include "bench/min.h"
 
 #include <eve/module/core.hpp>
-#include <eve/algo/reduce.hpp>
-#include <eve/algo/find.hpp>
+#include <eve/module/algo.hpp>
 
 namespace {
 

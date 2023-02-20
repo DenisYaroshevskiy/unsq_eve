@@ -44,3 +44,5 @@ add_benchmark(eve_transform eve_transform.cc)
 
 add_benchmark(unsq_eve_find_unguarded unsq_eve_find_unguarded.cc)
 add_benchmark(unsq_eve_min_element unsq_eve_min_element.cc)
+
+add_benchmark(ignore_me_simple_inner_product ignore_me_simple_inner_product.cc)
