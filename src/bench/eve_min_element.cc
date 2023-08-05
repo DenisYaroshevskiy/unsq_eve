@@ -16,34 +16,39 @@
 
 #include "bench/min.h"
 
-#include "unsq_eve/min_element.h"
+#include <eve/module/algo.hpp>
 
 namespace {
 
-template <std::size_t width, std::size_t unroll>
-struct unsq_eve_min_element {
+struct eve_min_element {
+  std::string name() const { return "eve::algo::min_element"; }
+
+  template <typename I>
+  BENCH_ALWAYS_INLINE I operator()(I f, I l) const {
+    return eve::algo::min_element(eve::algo::as_range(f, l));
+  }
+};
+
+struct eve_min_element_single_pass {
   std::string name() const {
-    return "unsq_eve::min_element<" + std::to_string(width) + ", " +
-           std::to_string(unroll) + ">";
+    return "eve::algo::min_element[eve::algo::single_pass]";
   }
 
   template <typename I>
-  BENCH_ALWAYS_INLINE I operator()(I f, I l) {
-    using traits =
-        unsq_eve::algorithm_traits<unsq_eve::value_type<I>, width, unroll>;
-
-    return unsq_eve::min_element<traits>(f, l);
+  BENCH_ALWAYS_INLINE I operator()(I f, I l) const {
+    return eve::algo::min_element[eve::algo::single_pass](
+        eve::algo::as_range(f, l));
   }
 };
 
 }  // namespace
 
 int main(int argc, char** argv) {
-  using char_bench = bench::min_bench<std::int8_t, unsq_eve_min_element<256, 1>>;
+  using char_bench = bench::min_bench<std::int8_t, eve_min_element, eve_min_element_single_pass>;
 
-  using short_bench = bench::min_bench<short, unsq_eve_min_element<256, 1>>;
+  using short_bench = bench::min_bench<short, eve_min_element, eve_min_element_single_pass>;
 
-  using int_bench = bench::min_bench<int, unsq_eve_min_element<256, 1>>;
+  using int_bench = bench::min_bench<int, eve_min_element, eve_min_element_single_pass>;
 
   bench::bench_main<char_bench, short_bench, int_bench>(argc, argv);
 }

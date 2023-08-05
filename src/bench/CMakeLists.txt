@@ -37,12 +37,11 @@ add_benchmark(eve_any_of eve_any_of.cc)
 add_benchmark(eve_find eve_find.cc)
 add_benchmark(eve_inclusive_scan eve_inclusive_scan.cc)
 add_benchmark(eve_reduce eve_reduce.cc)
-add_benchmark(eve_reduce_min eve_reduce_min.cc)
+add_benchmark(eve_min_element eve_min_element.cc)
 add_benchmark(eve_remove eve_remove.cc)
 add_benchmark(eve_reverse eve_reverse.cc)
 add_benchmark(eve_transform eve_transform.cc)
 
 add_benchmark(unsq_eve_find_unguarded unsq_eve_find_unguarded.cc)
-add_benchmark(unsq_eve_min_element unsq_eve_min_element.cc)
 
 add_benchmark(ignore_me_simple_inner_product ignore_me_simple_inner_product.cc)

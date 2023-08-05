@@ -20,7 +20,6 @@ target_sources(tests PRIVATE
                eve_extra/concepts.t.cc
                unsq_eve/concepts.t.cc
                unsq_eve/find_common.t.cc
-               unsq_eve/min_element.t.cc
                unsq_eve/unroll.t.cc
                tts_main.cc)
 
