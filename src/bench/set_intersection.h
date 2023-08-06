@@ -67,7 +67,7 @@ struct set_intersection_bench {
 
   set_intersection_driver driver() const { return {}; }
 
-  std::vector<std::size_t> sizes() const { return {480, 2000, 20'000}; }
+  std::vector<std::size_t> sizes() const { return {2000, 20'000}; }
 
   std::vector<std::size_t> percentage_points() const {
     return {5, 20, 50, 80, 100};
