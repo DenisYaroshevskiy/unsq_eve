@@ -24,7 +24,7 @@ struct std_set_intersection {
 
   BENCH_ALWAYS_INLINE auto operator()(const auto& in1, const auto& in2,
                                       auto& out) const {
-    return std::set_intersection(in1.begin(), in1.end(), in2.begin(), in.end(),
+    return std::set_intersection(in1.begin(), in1.end(), in2.begin(), in2.end(),
                                  out.begin());
   }
 };

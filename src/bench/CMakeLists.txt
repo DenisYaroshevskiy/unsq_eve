@@ -31,6 +31,7 @@ add_benchmark(std_min_element std_min_element.cc)
 add_benchmark(std_reduce std_reduce.cc)
 add_benchmark(std_remove std_remove.cc)
 add_benchmark(std_reverse std_reverse.cc)
+add_benchmark(std_set_intersection std_set_intersection.cc)
 add_benchmark(std_transform std_transform.cc)
 
 add_benchmark(eve_any_of eve_any_of.cc)
