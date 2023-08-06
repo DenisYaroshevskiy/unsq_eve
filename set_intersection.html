@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+<meta charset='utf-8'>
+
+<title>remove results</title>
+<script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
+<script type='text/javascript' src='scripts/bench.js'></script>
+
+</html>
+
+<body>
+  <h1>set_intersection</h1>
+
+  <h2> 2000 bytes</h2>
+  <h4> set_intersection std/eve (short) 2000 </h4>
+  <div id='set_intersection std/eve (short) 2000'></div>
+  <script>dynamicEntryPoint('set_intersection std/eve (short) 2000', {
+      name: 'set_intersection',
+      size: 2000,
+      algorithm: "selection",
+      type: 'short',
+      time: 'y',
+      padding: 'min',
+      group: 'apple_m1',
+      percentage: 'x',
+    }, ['set_intersection']);
+  </script>
+
+  <h2> Total benchmark </h2>
+  <div id='total_benchmark'></div>
+  <script>dynamicEntryPoint('total_benchmark', {
+      name: 'set_intersection',
+      size: 'selection',
+      algorithm: 'selection',
+      type: 'selection',
+      time: 'y',
+      padding: 'min',
+      group: 'apple_m1',
+      percentage: 'x',
+    }, ['remove']);
+  </script>
+
+</body>
