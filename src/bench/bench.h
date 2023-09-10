@@ -59,8 +59,6 @@ struct type_name<float> {
   const char* operator()() const { return "float"; }
 };
 
-constexpr std::size_t kTestAlignmentLimit = 65;
-
 namespace _bench {
 
 template <typename Op, std::size_t... idx>
@@ -91,11 +89,11 @@ void cortesian_product(type_list<As...> as, type_list<Bs...> bs,
 
 template <std::size_t... idxs>
 constexpr auto do_all_paddings(std::index_sequence<idxs...>) {
-  return type_list<index_c<idxs>...>{};
+  return type_list<index_c<idxs * 8>...>{};
 }
 
 constexpr auto all_paddings() {
-  return do_all_paddings(std::make_index_sequence<kTestAlignmentLimit>{});
+  return do_all_paddings(std::make_index_sequence<8>{});
 }
 
 template <typename BenchmarkDescription, typename Type, typename Algorithm>

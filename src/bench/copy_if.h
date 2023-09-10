@@ -35,14 +35,14 @@ struct copy_if_driver {
 template <typename Slide, typename Alg, typename T>
 BENCH_NOINLINE void copy_if_driver::operator()(Slide slide,
                                                benchmark::State& state, Alg alg,
-                                               remove_params<T>& params) const {
+                                               copy_if_params<T>& params) const {
   bench::noop_slide(slide);
 
   auto& [in, out] = params;
 
   for (auto _ : state) {
     alg(in, out, [](auto x) { return x != 0; });
-    benchmark::DoNotOptimize(buffer);
+    benchmark::DoNotOptimize(out);
   }
 }
 
@@ -62,7 +62,7 @@ struct copy_if_bench {
   bench::type_list<TestType> types() const { return {}; }
 
   template <typename T>
-  auto input(struct bench::type_t<T>, std::size_t size,
+  copy_if_params<T> input(bench::type_t<T>, std::size_t size,
              std::size_t percentage) const {
     std::size_t size_in_elements = size / sizeof(T);
     std::vector<T> in(size_in_elements, 1);
@@ -70,7 +70,7 @@ struct copy_if_bench {
     std::fill(in.begin(), in.begin() + size_in_elements * percentage / 100, 0);
     std::shuffle(in.begin(), in.end(), std::mt19937{});
 
-    return copy_if_params<T>{data, std::vector<T>(size_in_elements), 0};
+    return copy_if_params<T>{in, std::vector<T>(size_in_elements)};
   }
 };
 

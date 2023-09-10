@@ -17,6 +17,8 @@
 
 #include "bench/copy_if.h"
 
+#include <eve/module/algo.hpp>
+
 namespace {
 
 struct eve_copy_if_dense {

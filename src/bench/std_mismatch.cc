@@ -64,7 +64,7 @@ struct std_memcmp {
     const auto* p1 = r1.data();
     const auto* p2 = r2.data();
 
-    return std::memcmp(p1, p2, r1.size() * sizeof(T))
+    return std::memcmp(p1, p2, r1.size() * sizeof(T));
   }
 };
 

@@ -27,21 +27,19 @@ struct mismatch_parameters {
 
 struct mismatch_driver {
   template <typename Slide, typename Alg, typename T>
-  void operator()(Slide, benchmark::State&, Alg,
-                  set_intersection_parameters<T>&) const;
+  void operator()(Slide, benchmark::State&, Alg, mismatch_parameters<T>&) const;
 };
 
 template <typename Slide, typename Alg, typename T>
 BENCH_NOINLINE void mismatch_driver::operator()(
     Slide slide, benchmark::State& state, Alg alg,
-    set_intersection_parameters<T>& params) const {
+    mismatch_parameters<T>& params) const {
   bench::noop_slide(slide);
 
   auto& [in1, in2] = params;
 
   for (auto _ : state) {
-    alg(in1, in2);
-    benchmark::DoNotOptimize(out);
+    benchmark::DoNotOptimize(alg(in1, in2));
   }
 }
 
@@ -54,6 +52,8 @@ struct mismatch_bench {
   std::vector<std::size_t> sizes() const { return {40, 1000, 10'000}; }
 
   std::vector<std::size_t> percentage_points() const { return {100}; }
+
+  bench::type_list<TestType> types() const { return {}; }
 
   bench::type_list<Algorithms...> algorithms() const { return {}; }
 
