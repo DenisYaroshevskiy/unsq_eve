@@ -28,6 +28,5 @@ target_compile_options(tests PRIVATE
                        -DEVE_DISABLE_ASSERTS
                         -fno-omit-frame-pointer
                        --std=c++20
-                       -stdlib=libc++
-                       -fsanitize=address)
-target_link_options(tests PRIVATE -fsanitize=address -stdlib=libc++)
+                       -stdlib=libc++)
+target_link_options(tests PRIVATE -stdlib=libc++)

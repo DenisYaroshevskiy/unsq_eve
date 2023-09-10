@@ -17,7 +17,7 @@
 find_package(benchmark CONFIG REQUIRED)
 
 function(add_benchmark name source)
-    set(compiler_options --std=c++20 --stdlib=libc++ -arch arm64 -DNDEBUG -DEVE_USE_BMI_ON_AVX2 -g -Werror -Wall -Wextra -Wpedantic -Wno-deprecated-copy -O3 -mllvm -align-all-functions=7)
+    set(compiler_options --std=c++20 --stdlib=libc++ -march=native -DNDEBUG -DEVE_USE_BMI_ON_AVX2 -g -Werror -Wall -Wextra -Wpedantic -Wno-deprecated-copy -O3 -mllvm -align-all-functions=7)
     add_executable(${name})
     target_sources(${name} PRIVATE ${source})
     target_compile_options(${name} PRIVATE ${compiler_options})
@@ -52,5 +52,3 @@ add_benchmark(eve_set_intersection_sparse eve_set_intersection_sparse.cc)
 add_benchmark(eve_transform eve_transform.cc)
 
 add_benchmark(unsq_eve_find_unguarded unsq_eve_find_unguarded.cc)
-
-add_benchmark(ignore_me_simple_inner_product ignore_me_simple_inner_product.cc)
