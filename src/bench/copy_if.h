@@ -65,9 +65,10 @@ struct copy_if_bench {
   copy_if_params<T> input(bench::type_t<T>, std::size_t size,
              std::size_t percentage) const {
     std::size_t size_in_elements = size / sizeof(T);
+    std::size_t zeroes = size_in_elements * (100 - percentage) / 100;
     std::vector<T> in(size_in_elements, 1);
 
-    std::fill(in.begin(), in.begin() + size_in_elements * percentage / 100, 0);
+    std::fill(in.begin(), in.begin() + zeroes, 0);
     std::shuffle(in.begin(), in.end(), std::mt19937{});
 
     return copy_if_params<T>{in, std::vector<T>(size_in_elements)};

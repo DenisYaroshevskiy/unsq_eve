@@ -35,4 +35,3 @@ int main(int argc, char** argv) {
                     bench::mismatch_bench<short, eve_mismatch>,
                     bench::mismatch_bench<int, eve_mismatch>>(argc, argv);
 }
-}
