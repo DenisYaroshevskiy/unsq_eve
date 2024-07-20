@@ -52,4 +52,6 @@ add_benchmark(eve_set_intersection_smaller_0 eve_set_intersection_smaller_0.cc)
 add_benchmark(eve_set_intersection_sparse eve_set_intersection_sparse.cc)
 add_benchmark(eve_transform eve_transform.cc)
 
+add_benchmark(transform_copy_if transform_copy_if.cc)
+
 add_benchmark(unsq_eve_find_unguarded unsq_eve_find_unguarded.cc)
