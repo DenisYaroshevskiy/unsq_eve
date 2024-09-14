@@ -133,6 +133,10 @@ void register_benchmark(BenchDescription description) {
             auto driver = description.driver();
             auto input = description.input(type, size, percentage);
 
+            if constexpr ( requires { algorithm.mutate_input(input); } ) {
+              algorithm.mutate_input(input);
+            }
+
             benchmark::RegisterBenchmark(
                 name.c_str(), [=](benchmark::State& state) mutable {
                   driver(padding, state, algorithm, input);
