@@ -70,8 +70,8 @@ struct strstr_one {
   }
 
   template <typename I, typename T>
-  BENCH_ALWAYS_INLINE auto operator()(I f, I, const T& v) const {
-    char needle[]{static_cast<char>(v), 0};
+  BENCH_ALWAYS_INLINE auto operator()(I f, I, const T&) const {
+    char needle[]{1, 0};
     return std::strstr((const char*)&*f, needle);
   }
 };
