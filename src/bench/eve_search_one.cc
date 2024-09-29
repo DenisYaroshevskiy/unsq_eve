@@ -23,9 +23,9 @@ namespace {
 struct eve_search_one {
   std::string name() const { return "eve::algo::search"; }
 
-  template <typename I, typename T>
-  BENCH_ALWAYS_INLINE auto operator()(I f, I l, const T& v) const {
-    return eve::algo::search(eve::algo::as_range(f, l), eve::algo::as_range(&v, &v + 1));
+  template <typename I>
+  BENCH_ALWAYS_INLINE auto operator()(I f, I l, eve::value_type_t<I> v) const {
+    return eve::algo::search(eve::algo::as_range(f, l), eve::algo::as_range{&v, &v + 1});
   }
 };
 
