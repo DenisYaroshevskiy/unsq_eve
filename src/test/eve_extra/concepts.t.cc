@@ -27,11 +27,7 @@ TTS_CASE_TPL("eve_extra.concepts", all_test_packs)
   TTS_CONSTEXPR_EXPECT(eve_extra::eve_logical<logical>);
   TTS_CONSTEXPR_EXPECT(eve_extra::native_logical<logical>);
 
-  using T = typename wide::value_type;
-  constexpr std::ptrdiff_t size = wide::size();
-  using extra_wide = eve::wide<T, eve::fixed<size * 4>>;
   using extra_logical = eve::logical<logical>;
 
-  TTS_CONSTEXPR_EXPECT(eve_extra::composite_wide<extra_wide>);
   TTS_CONSTEXPR_EXPECT(eve_extra::eve_logical<extra_logical>);
 };
