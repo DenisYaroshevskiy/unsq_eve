@@ -39,11 +39,6 @@ concept eve_wide = specialization<T, eve::wide>;
 template <typename T>
 concept eve_logical = specialization<T, eve::logical>;
 
-template <typename Wide>
-concept composite_wide = eve_wide<Wide>&& requires(const Wide& x) {
-  {x.storage().segments};
-};
-
 template <eve_wide Wide>
 constexpr std::size_t element_size_v = sizeof(typename Wide::value_type);
 
@@ -64,10 +59,6 @@ concept wide_32_bytes = eve_wide<Wide>&& static_byte_size_v<Wide> == 32;
 template <typename Logical>
 concept native_logical =
     eve_logical<Logical>&& native_wide<typename Logical::bits_type>;
-
-template <composite_wide Wide>
-constexpr std::ptrdiff_t small_size =
-    Wide::storage_type::subvalue_type::size();
 
 }  // namespace eve_extra
 
