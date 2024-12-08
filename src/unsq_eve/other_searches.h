@@ -32,15 +32,14 @@ EVE_FORCEINLINE I1 search_find_equal(I1 f1, I1 l1, I2 f2, I2 l2) {
   if (f2 == l2) return f1;
   if (l2 - f2 > l1 - f1) return l1;
 
-  I1 last_f1 = l1 - (l2 - f2);
+  I1 lf1 = l1 - (l2 - f2) + 1;
 
-  while (f1 <= last_f1) {
-    f1 = std::find(f1, last_f1, *f2);
-    if (std::equal(f2, l2, f1)) return f1;
+  while (true) {
+    f1 = std::find(f1, lf1, *f2);
+    if (f1 == lf1) return l1;
+    if (std::equal(f2 + 1, l2, f1 + 1)) return f1;
     ++f1;
   }
-
-  return l1;
 }
 
 template <std::random_access_iterator I1, std::random_access_iterator I2>
@@ -48,7 +47,7 @@ EVE_FORCEINLINE I1 search_two_loops(I1 f1, I1 l1, I2 f2, I2 l2) {
   if (f2 == l2) return f1;
   if (l2 - f2 > l1 - f1) return l1;
 
-  I1 last_f1 = l1 - (l2 - f2);
+  I1 lf1 = l1 - (l2 - f2) + 1;
 
   auto verify = [&] {
     I1 cmp1 = f1;
@@ -62,7 +61,7 @@ EVE_FORCEINLINE I1 search_two_loops(I1 f1, I1 l1, I2 f2, I2 l2) {
     }
   };
 
-  while (f1 <= last_f1) {
+  while (f1 != lf1) {
     if (verify()) return f1;
     ++f1;
   }
