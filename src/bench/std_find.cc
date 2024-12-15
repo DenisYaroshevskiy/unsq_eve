@@ -20,6 +20,8 @@
 #include <algorithm>
 #include <cstring>
 
+#include "unsq_eve/other_searches.h"
+
 namespace {
 
 struct std_strlen {
@@ -66,12 +68,12 @@ struct strstr_one {
 
   void mutate_input(auto& input) const {
     auto l = input.data.end();
-    *(l - 2) = 1;
+    *(l - 2) = 2;
   }
 
   template <typename I, typename T>
   BENCH_ALWAYS_INLINE auto operator()(I f, I, const T&) const {
-    char needle[]{1, 0};
+    const char needle[]{2, 0};
     return std::strstr((const char*)&*f, needle);
   }
 };
@@ -88,13 +90,31 @@ struct string_view_find_string_view_one {
   }
 };
 
+struct search_find_equal_one {
+  std::string name() const { return "search_find_equal(one)"; }
+
+  template <typename I>
+  BENCH_ALWAYS_INLINE auto operator()(I f, I l, eve::value_type_t<I> v) const {
+    return unsq_eve::search_find_equal(f, l, &v, &v + 1);
+  }
+};
+
+struct search_two_loops_one {
+  std::string name() const { return "search_two_loops(one)"; }
+
+  template <typename I>
+  BENCH_ALWAYS_INLINE auto operator()(I f, I l, eve::value_type_t<I> v) const {
+    return unsq_eve::search_two_loops(f, l, &v, &v + 1);
+  }
+};
+
 }  // namespace
 
 int main(int argc, char** argv) {
   using char_bench =
       bench::find_0_bench<std::int8_t, std_strlen, std_find, find_unguarded,
                           strstr_one, string_view_find_string_view_one,
-                          search_one>;
+                          search_one, search_find_equal_one, search_two_loops_one>;
 
   using short_bench =
       bench::find_0_bench<short, std_find, find_unguarded, search_one>;
