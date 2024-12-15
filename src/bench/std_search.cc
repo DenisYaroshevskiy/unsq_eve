@@ -40,7 +40,7 @@ struct search_two_loops {
 
   BENCH_ALWAYS_INLINE auto operator()(const auto& haystack,
                                       const auto& needle) const {
-    return unsq_eve::search_find_equal(haystack.begin(), haystack.end(),
+    return unsq_eve::search_two_loops(haystack.begin(), haystack.end(),
                                        needle.begin(), needle.end());
   }
 };
@@ -95,7 +95,7 @@ struct string_view_find_string_view {
 
 int main(int argc, char** argv) {
   using char_bench = bench::search_121_in_1111s_bench<
-      std::int8_t, std_strstr, string_view_find_string_view, std_search,
+      std::int8_t, std_strstr, std_strstr_112, string_view_find_string_view, std_search,
       search_find_equal, search_two_loops>;
 
   using short_bench =
