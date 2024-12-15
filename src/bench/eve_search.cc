@@ -28,12 +28,24 @@ struct eve_search {
   }
 };
 
+struct eve_search_112 {
+  std::string name() const { return "eve::algo::search112"; }
+
+  void mutate_input(auto& input) const {
+    input.needle = {1, 1, 2};
+  }
+
+  BENCH_ALWAYS_INLINE auto operator()(const auto& haystack, const auto& needle) const {
+    return eve::algo::search(haystack, needle);
+  }
+};
+
 }  // namespace
 
 int main(int argc, char** argv) {
-  using char_bench = bench::search_121_in_1111s_bench<std::int8_t, eve_search>;
-  using short_bench = bench::search_121_in_1111s_bench<short, eve_search>;
-  using int_bench = bench::search_121_in_1111s_bench<int, eve_search>;
+  using char_bench = bench::search_121_in_1111s_bench<std::int8_t, eve_search, eve_search_112>;
+  using short_bench = bench::search_121_in_1111s_bench<short, eve_search, eve_search_112>;
+  using int_bench = bench::search_121_in_1111s_bench<int, eve_search, eve_search_112>;
 
   bench::bench_main<char_bench, short_bench, int_bench>(argc, argv);
 }
