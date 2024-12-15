@@ -65,6 +65,20 @@ struct std_strstr {
   }
 };
 
+struct std_strstr_112 {
+  std::string name() const { return "std::strstr112"; }
+
+  void mutate_input(auto& input) const {
+    input.needle = {1, 1, 2};
+  }
+
+  BENCH_ALWAYS_INLINE auto operator()(const auto& haystack,
+                                      const auto& needle) const {
+    return std::strstr((const char*)haystack.data(),
+                       (const char*)needle.data());
+  }
+};
+
 struct string_view_find_string_view {
   std::string name() const { return "string_view::find"; }
 
