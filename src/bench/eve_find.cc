@@ -26,16 +26,26 @@ struct eve_find_if {
   template <typename I, typename T>
   BENCH_ALWAYS_INLINE auto operator()(I f, I l, const T& v) const {
     return eve::algo::find_if(eve::algo::as_range(f, l),
-                             [v](auto x) { return x == v; });
+                              [v](auto x) { return x == v; });
+  }
+};
+
+struct eve_find_if_no_unrolling {
+  std::string name() const { return "eve::algo::find_if[no_unrolling]"; }
+
+  template <typename I, typename T>
+  BENCH_ALWAYS_INLINE auto operator()(I f, I l, const T& v) const {
+    return eve::algo::find_if[eve::algo::no_unrolling](
+        eve::algo::as_range(f, l), [v](auto x) { return x == v; });
   }
 };
 
 }  // namespace
 
 int main(int argc, char** argv) {
-  using char_bench = bench::find_0_bench<std::int8_t, eve_find_if>;
-  using short_bench = bench::find_0_bench<short, eve_find_if>;
-  using int_bench = bench::find_0_bench<int, eve_find_if>;
+  using char_bench = bench::find_0_bench<std::int8_t, eve_find_if, eve_find_if_no_unrolling>;
+  using short_bench = bench::find_0_bench<short, eve_find_if, eve_find_if_no_unrolling>;
+  using int_bench = bench::find_0_bench<int, eve_find_if, eve_find_if_no_unrolling>;
 
   bench::bench_main<char_bench, short_bench, int_bench>(argc, argv);
 }
