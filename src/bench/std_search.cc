@@ -122,7 +122,7 @@ struct std_strstr_112 {
 };
 
 struct std_strstr_2 {
-  std::string name() const { return "std::strstr(112)"; }
+  std::string name() const { return "std::strstr(2)"; }
 
   void mutate_input(auto& input) const {
     std::fill(input.haystack.begin(), input.haystack.end(), 1);
