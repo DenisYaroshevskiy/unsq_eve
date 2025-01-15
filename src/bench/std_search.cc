@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#include "bench/search_121_1111s_bench.h"
+#include "bench/search.h"
 
 #include <algorithm>
 #include <cstring>
@@ -25,8 +25,8 @@
 
 namespace {
 
-struct search_find_equal {
-  std::string name() const { return "search find equal"; }
+struct search_find_equal_22 {
+  std::string name() const { return "search_find_equal(22)"; }
 
   BENCH_ALWAYS_INLINE auto operator()(const auto& haystack,
                                       const auto& needle) const {
@@ -35,18 +35,42 @@ struct search_find_equal {
   }
 };
 
-struct search_two_loops {
-  std::string name() const { return "search two loops"; }
+struct search_find_equal_12 {
+  std::string name() const { return "search_find_equal(12)"; }
+
+  void mutate_input(auto& input) const { input.needle = {1, 2}; }
 
   BENCH_ALWAYS_INLINE auto operator()(const auto& haystack,
                                       const auto& needle) const {
-    return unsq_eve::search_two_loops(haystack.begin(), haystack.end(),
+    return unsq_eve::search_find_equal(haystack.begin(), haystack.end(),
                                        needle.begin(), needle.end());
   }
 };
 
-struct std_search {
-  std::string name() const { return "std::search"; }
+struct search_two_loops_22 {
+  std::string name() const { return "search_two_loops(22)"; }
+
+  BENCH_ALWAYS_INLINE auto operator()(const auto& haystack,
+                                      const auto& needle) const {
+    return unsq_eve::search_two_loops(haystack.begin(), haystack.end(),
+                                      needle.begin(), needle.end());
+  }
+};
+
+struct search_two_loops_12 {
+  std::string name() const { return "search_two_loops(12)"; }
+
+  void mutate_input(auto& input) const { input.needle = {1, 2}; }
+
+  BENCH_ALWAYS_INLINE auto operator()(const auto& haystack,
+                                      const auto& needle) const {
+    return unsq_eve::search_two_loops(haystack.begin(), haystack.end(),
+                                      needle.begin(), needle.end());
+  }
+};
+
+struct std_search_22 {
+  std::string name() const { return "std::search(22)"; }
 
   BENCH_ALWAYS_INLINE auto operator()(const auto& haystack,
                                       const auto& needle) const {
@@ -55,11 +79,24 @@ struct std_search {
   }
 };
 
-struct std_strstr {
-  std::string name() const { return "std::strstr"; }
+struct std_search_12 {
+  std::string name() const { return "std::search(12)"; }
+
+  void mutate_input(auto& input) const { input.needle = {1, 2}; }
+
+  BENCH_ALWAYS_INLINE auto operator()(const auto& haystack,
+                                      const auto& needle) const {
+    return std::search(haystack.begin(), haystack.end(), needle.begin(),
+                       needle.end());
+  }
+};
+
+struct std_strstr_22 {
+  std::string name() const { return "std::strstr(22)"; }
 
   void mutate_input(auto& input) const {
-    input.needle = {1, 2, 1, 0};
+    input.haystack.push_back(0);
+    input.needle.push_back(0);
   }
 
   BENCH_ALWAYS_INLINE auto operator()(const auto& haystack,
@@ -70,9 +107,10 @@ struct std_strstr {
 };
 
 struct std_strstr_112 {
-  std::string name() const { return "std::strstr112"; }
+  std::string name() const { return "std::strstr(112)"; }
 
   void mutate_input(auto& input) const {
+    input.haystack.push_back(0);
     input.needle = {1, 1, 2, 0};
   }
 
@@ -83,32 +121,67 @@ struct std_strstr_112 {
   }
 };
 
-struct string_view_find_string_view {
-  std::string name() const { return "string_view::find"; }
+struct std_strstr_2 {
+  std::string name() const { return "std::strstr(112)"; }
+
+  void mutate_input(auto& input) const {
+    std::fill(input.haystack.begin(), input.haystack.end(), 1);
+    input.haystack.push_back(0);
+    input.needle = {2, 0};
+  }
 
   BENCH_ALWAYS_INLINE auto operator()(const auto& haystack,
                                       const auto& needle) const {
-    std::string_view haystack_sv(reinterpret_cast<const char*>(haystack.data()), haystack.size());
-    std::string_view needle_sv(reinterpret_cast<const char*>(needle.data()), needle.size());
+    return std::strstr((const char*)haystack.data(),
+                       (const char*)needle.data());
+  }
+};
+
+struct string_view_find_string_view_22 {
+  std::string name() const { return "string_view::find(22)"; }
+
+  BENCH_ALWAYS_INLINE auto operator()(const auto& haystack,
+                                      const auto& needle) const {
+    std::string_view haystack_sv(reinterpret_cast<const char*>(haystack.data()),
+                                 haystack.size());
+    std::string_view needle_sv(reinterpret_cast<const char*>(needle.data()),
+                               needle.size());
 
     return haystack_sv.find(needle_sv);
   }
 };
 
+struct string_view_find_string_view_12 {
+  std::string name() const { return "string_view::find(12)"; }
+
+  void mutate_input(auto& input) const { input.needle = {1, 2}; }
+
+  BENCH_ALWAYS_INLINE auto operator()(const auto& haystack,
+                                      const auto& needle) const {
+    std::string_view haystack_sv(reinterpret_cast<const char*>(haystack.data()),
+                                 haystack.size());
+    std::string_view needle_sv(reinterpret_cast<const char*>(needle.data()),
+                               needle.size());
+
+    return haystack_sv.find(needle_sv);
+  }
+};
+
+template <typename T>
+using all_types_searches =
+    bench::search<T, search_find_equal_22, search_find_equal_12,
+                  search_two_loops_22, search_two_loops_12, std_search_22,
+                  std_search_12>;
+
 }  // namespace
 
 int main(int argc, char** argv) {
-  using char_bench = bench::search_121_in_1111s_bench<
-      std::int8_t, std_strstr, std_strstr_112, string_view_find_string_view, std_search,
-      search_find_equal, search_two_loops>;
+  using char_special_bench =
+      bench::search<std::int8_t, std_strstr_22, std_strstr_112, std_strstr_2,
+                    string_view_find_string_view_22,
+                    string_view_find_string_view_12>;
 
-  using short_bench =
-      bench::search_121_in_1111s_bench<short, std_search, search_find_equal,
-                                       search_two_loops>;
-
-  using int_bench =
-      bench::search_121_in_1111s_bench<int, std_search, search_find_equal,
-                                       search_two_loops>;
-
-  bench::bench_main<char_bench, short_bench, int_bench>(argc, argv);
+  bench::bench_main<char_special_bench, all_types_searches<std::int8_t>,
+                    all_types_searches<short>, all_types_searches<int>>(argc,
+                                                                        argv);
 }

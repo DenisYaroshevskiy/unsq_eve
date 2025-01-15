@@ -23,10 +23,9 @@ namespace {
 struct eve_any_of {
   std::string name() const { return "eve::algo::any_of"; }
 
-  template <typename I, typename T>
-  BENCH_ALWAYS_INLINE auto operator()(I f, I l, const T& v) const {
-    return eve::algo::any_of(eve::algo::as_range(f, l),
-                             [v](auto x) { return x == v; });
+  BENCH_ALWAYS_INLINE auto operator()(const auto& haystack,
+                                      const auto& needle) const {
+    return eve::algo::any_of(haystack, [&](auto x) { return x == needle[0]; });
   }
 };
 

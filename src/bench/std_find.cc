@@ -27,84 +27,30 @@ namespace {
 struct std_strlen {
   const char* name() const { return "std::strlen"; }
 
-  template <typename I, typename T>
-  BENCH_ALWAYS_INLINE I operator()(I f, I, const T&) const {
-    return f + std::strlen((const char*)&*f);
+  BENCH_ALWAYS_INLINE auto operator()(const auto& haystack, const auto&) const {
+    return std::strlen((const char*)haystack.data());
   }
 };
 
 struct std_find {
   const char* name() const { return "std::find"; }
 
-  template <typename I, typename T>
-  BENCH_ALWAYS_INLINE I operator()(I f, I l, const T& x) const {
-    return std::find(f, l, x);
+  BENCH_ALWAYS_INLINE auto operator()(const auto& haystack,
+                                      const auto& needle) const {
+    return std::find(haystack.begin(), haystack.end(), needle[0]);
   }
 };
 
 struct find_unguarded {
   const char* name() const { return "std_::find_unguarded"; }
 
-  template <typename I, typename T>
-  BENCH_ALWAYS_INLINE I operator()(I f, I, const T& x) const {
+  BENCH_ALWAYS_INLINE auto operator()(const auto& haystack,
+                                      const auto& needle) const {
+    auto f = haystack.begin();
     while (true) {
-      if (*f == x) return f;
+      if (*f == needle[0]) return f;
       ++f;
     }
-  }
-};
-
-struct search_one {
-  const char* name() const { return "std::search"; }
-
-  template <typename I, typename T>
-  BENCH_ALWAYS_INLINE I operator()(I f, I l, const T& x) const {
-    return std::search(f, l, &x, &x + 1);
-  }
-};
-
-struct strstr_one {
-  std::string name() const { return "strstr"; }
-
-  void mutate_input(auto& input) const {
-    auto l = input.data.end();
-    *(l - 2) = 2;
-  }
-
-  template <typename I, typename T>
-  BENCH_ALWAYS_INLINE auto operator()(I f, I, const T&) const {
-    const char needle[]{2, 0};
-    return std::strstr((const char*)&*f, needle);
-  }
-};
-
-struct string_view_find_string_view_one {
-  std::string name() const { return "string_view::find(string_view)"; }
-
-  template <typename I, typename T>
-  BENCH_ALWAYS_INLINE auto operator()(I f, I l, const T& v) const {
-    std::string_view haystack(reinterpret_cast<const char*>(&*f), l - f);
-
-    std::array<char, 1> needle{static_cast<char>(v)};
-    return haystack.find(std::string_view(needle.data(), 1U));
-  }
-};
-
-struct search_find_equal_one {
-  std::string name() const { return "search_find_equal(one)"; }
-
-  template <typename I>
-  BENCH_ALWAYS_INLINE auto operator()(I f, I l, eve::value_type_t<I> v) const {
-    return unsq_eve::search_find_equal(f, l, &v, &v + 1);
-  }
-};
-
-struct search_two_loops_one {
-  std::string name() const { return "search_two_loops(one)"; }
-
-  template <typename I>
-  BENCH_ALWAYS_INLINE auto operator()(I f, I l, eve::value_type_t<I> v) const {
-    return unsq_eve::search_two_loops(f, l, &v, &v + 1);
   }
 };
 
@@ -112,15 +58,11 @@ struct search_two_loops_one {
 
 int main(int argc, char** argv) {
   using char_bench =
-      bench::find_0_bench<std::int8_t, std_strlen, std_find, find_unguarded,
-                          strstr_one, string_view_find_string_view_one,
-                          search_one, search_find_equal_one, search_two_loops_one>;
+      bench::find_0_bench<std::int8_t, std_strlen, std_find, find_unguarded>;
 
-  using short_bench =
-      bench::find_0_bench<short, std_find, find_unguarded, search_one>;
+  using short_bench = bench::find_0_bench<short, std_find, find_unguarded>;
 
-  using int_bench =
-      bench::find_0_bench<int, std_find, find_unguarded, search_one>;
+  using int_bench = bench::find_0_bench<int, std_find, find_unguarded>;
 
   bench::bench_main<char_bench, short_bench, int_bench>(argc, argv);
 }

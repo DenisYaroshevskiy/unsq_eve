@@ -49,8 +49,8 @@ BENCH_NOINLINE void search_driver::operator()(
 
 // Benchmarks ------------------------------------------------------
 template <typename TestType, typename... Algorithms>
-struct search_121_in_1111s_bench {
-  const char* name() const { return "search 121 in 1111s"; }
+struct search {
+  const char* name() const { return "search"; }
 
   search_driver driver() const { return {}; }
 
@@ -67,8 +67,11 @@ struct search_121_in_1111s_bench {
              std::size_t /*percentage*/) const {
     std::size_t size_in_elements = size / sizeof(T);
     search_parameters<T> res;
-    res.needle = {1, 2, 1};
+    res.needle = {2, 2};
+
     res.haystack.resize(size_in_elements, T(1));
+    std::copy_backward(res.needle.begin(), res.needle.end(), res.haystack.end());
+
     return res;
   }
 };
