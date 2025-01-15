@@ -15,58 +15,21 @@
  * limitations under the License.
  */
 
-#include "bench/bench.h"
+#include "bench/search.h"
 
 namespace bench {
-
-template <typename T>
-struct find_0_parameters {
-  std::vector<T> data;
-};
-
-struct find_0_driver {
-  template <typename Slide, typename Alg, typename T>
-  void operator()(Slide, benchmark::State&, Alg, find_0_parameters<T>&) const;
-};
-
-template <typename Slide, typename Alg, typename T>
-BENCH_NOINLINE void find_0_driver::operator()(
-    Slide slide, benchmark::State& state, Alg alg,
-    find_0_parameters<T>& params) const {
-  bench::noop_slide(slide);
-
-  auto& data = params.data;
-
-  for (auto _ : state) {
-    auto v = alg(data.begin(), data.end(), 0);
-    benchmark::DoNotOptimize(data);
-    benchmark::DoNotOptimize(v);
-  }
-}
 
 // Benchmarks ------------------------------------------------------
 
 template <typename TestType, typename... Algorithms>
-struct find_0_bench {
-  const char* name() const { return "find 0"; }
-
-  find_0_driver driver() const { return {}; }
-
-  std::vector<std::size_t> sizes() const { return {40, 1000, 10'000}; }
-
-  std::vector<std::size_t> percentage_points() const { return {100}; }
-
-  bench::type_list<Algorithms...> algorithms() const { return {}; }
-
-  bench::type_list<TestType> types() const { return {}; }
-
+struct find_0_bench : search<TestType, Algorithms...> {
   template <typename T>
-  auto input(struct bench::type_t<T>, std::size_t size,
-             std::size_t /*percentage*/) const {
-    std::size_t size_in_elements = size / sizeof(T);
-    find_0_parameters<T> res;
-    res.data.resize(size_in_elements, T(1));
-    res.data.back() = T(0);
+  auto input(bench::type_t<T> tgt, std::size_t size,
+             std::size_t percentage) const {
+    auto res = search<TestType, Algorithms...>::input(tgt, size, percentage);
+    std::fill(res.haystack.begin(), res.haystack.end(), 1);
+    res.needle = {0};
+    res.haystack.back() = 0;
     return res;
   }
 };

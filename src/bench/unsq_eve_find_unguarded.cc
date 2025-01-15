@@ -27,19 +27,20 @@ struct unsq_eve_find_unguarded {
            std::to_string(unroll) + '>';
   }
 
-  template <typename I, typename T>
-  BENCH_ALWAYS_INLINE I operator()(I f, I, const T& x) const {
-    using traits =
-        unsq_eve::algorithm_traits<unsq_eve::value_type<I>, width, unroll>;
+  template <typename T>
+  BENCH_ALWAYS_INLINE auto operator()(const std::vector<T>& haystack,
+                                      const std::vector<T>& needle) const {
+    using traits = unsq_eve::algorithm_traits<T, width, unroll>;
 
-    return unsq_eve::find_unguarded<traits>(f, x);
+    return unsq_eve::find_unguarded<traits>(haystack.begin(), needle[0]);
   }
 };
 
 }  // namespace
 
 int main(int argc, char** argv) {
-  using char_bench = bench::find_0_bench<std::int8_t, unsq_eve_find_unguarded<256, 4>>;
+  using char_bench =
+      bench::find_0_bench<std::int8_t, unsq_eve_find_unguarded<256, 4>>;
 
   using short_bench =
       bench::find_0_bench<short, unsq_eve_find_unguarded<256, 4>>;

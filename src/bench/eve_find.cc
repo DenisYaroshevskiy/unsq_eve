@@ -23,20 +23,20 @@ namespace {
 struct eve_find_if {
   std::string name() const { return "eve::algo::find_if"; }
 
-  template <typename I, typename T>
-  BENCH_ALWAYS_INLINE auto operator()(I f, I l, const T& v) const {
-    return eve::algo::find_if(eve::algo::as_range(f, l),
-                              [v](auto x) { return x == v; });
+  BENCH_ALWAYS_INLINE auto operator()(const auto& haystack,
+                                      const auto& needle) const {
+    return eve::algo::find_if(haystack,
+                              [&](auto x) { return x == needle[0]; });
   }
 };
 
 struct eve_find_if_no_unrolling {
   std::string name() const { return "eve::algo::find_if[no_unrolling]"; }
 
-  template <typename I, typename T>
-  BENCH_ALWAYS_INLINE auto operator()(I f, I l, const T& v) const {
+  BENCH_ALWAYS_INLINE auto operator()(const auto& haystack,
+                                      const auto& needle) const {
     return eve::algo::find_if[eve::algo::no_unrolling](
-        eve::algo::as_range(f, l), [v](auto x) { return x == v; });
+        haystack, [&](auto x) { return x == needle[0]; });
   }
 };
 

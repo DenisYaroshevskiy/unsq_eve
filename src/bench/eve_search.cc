@@ -14,38 +14,66 @@
  * limitations under the License.
  */
 
-#include "bench/search_121_1111s_bench.h"
+#include "bench/search.h"
 
 #include <eve/module/algo.hpp>
 
 namespace {
 
-struct eve_search {
-  std::string name() const { return "eve::algo::search"; }
+struct eve_search_22 {
+  std::string name() const { return "eve::algo::search(22)"; }
 
-  BENCH_ALWAYS_INLINE auto operator()(const auto& haystack, const auto& needle) const {
+  BENCH_ALWAYS_INLINE auto operator()(const auto& haystack,
+                                      const auto& needle) const {
     return eve::algo::search(haystack, needle);
   }
 };
 
-struct eve_search_112 {
-  std::string name() const { return "eve::algo::search112"; }
+struct eve_search_good_unroll_22 {
+  std::string name() const { return "eve::algo::search[unroll<2>](22)"; }
+
+  BENCH_ALWAYS_INLINE auto operator()(const auto& haystack,
+                                      const auto& needle) const {
+    return eve::algo::search[eve::algo::unroll<2>](haystack, needle);
+  }
+};
+
+struct eve_search_121 {
+  std::string name() const { return "eve::algo::search(121)"; }
+
+  void mutate_input(auto& input) const { input.needle = {1, 2, 1}; }
+
+  BENCH_ALWAYS_INLINE auto operator()(const auto& haystack,
+                                      const auto& needle) const {
+    return eve::algo::search(haystack, needle);
+  }
+};
+
+struct eve_search_2 {
+  std::string name() const { return "eve::algo::search(2)"; }
 
   void mutate_input(auto& input) const {
-    input.needle = {1, 1, 2};
+    std::fill(input.haystack.begin(), input.haystack.end(), 1);
+    input.needle = {2};
   }
 
-  BENCH_ALWAYS_INLINE auto operator()(const auto& haystack, const auto& needle) const {
+  BENCH_ALWAYS_INLINE auto operator()(const auto& haystack,
+                                      const auto& needle) const {
     return eve::algo::search(haystack, needle);
   }
 };
+
+template <typename T>
+using eve_searches_for_type =
+    bench::search<T, eve_search_22, eve_search_good_unroll_22,
+                  eve_search_121, eve_search_2>;
 
 }  // namespace
 
 int main(int argc, char** argv) {
-  using char_bench = bench::search_121_in_1111s_bench<std::int8_t, eve_search, eve_search_112>;
-  using short_bench = bench::search_121_in_1111s_bench<short, eve_search, eve_search_112>;
-  using int_bench = bench::search_121_in_1111s_bench<int, eve_search, eve_search_112>;
+  using char_bench = eve_searches_for_type<std::int8_t>;
+  using short_bench = eve_searches_for_type<short>;
+  using int_bench = eve_searches_for_type<int>;
 
   bench::bench_main<char_bench, short_bench, int_bench>(argc, argv);
 }
