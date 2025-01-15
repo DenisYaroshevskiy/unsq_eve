@@ -443,7 +443,7 @@ async function presentationEntryPoint(elementID, selection_, filter_ = []) {
 
 function miniumTimesBySizeTemplate(elementID) {
   dynamicEntryPoint(elementID, {
-    name: 'find 0',
+    name: 'search',
     algorithm: 'selection',
     type: 'char',
     size: 'x',
@@ -456,7 +456,7 @@ function miniumTimesBySizeTemplate(elementID) {
 
 function codeAlignmentTemplate(elementID) {
   dynamicEntryPoint(elementID, {
-    name: 'find 0',
+    name: 'search',
     size: 1000,
     type: 'char',
     algorithm: 'selection',
