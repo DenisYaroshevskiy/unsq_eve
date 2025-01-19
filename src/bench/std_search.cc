@@ -106,6 +106,22 @@ struct std_strstr_22 {
   }
 };
 
+struct std_strstr_12 {
+  std::string name() const { return "std::strstr(12)"; }
+
+  void mutate_input(auto& input) const {
+    std::fill(input.haystack.begin(), input.haystack.end(), 1);
+    input.haystack.push_back(0);
+    input.needle = {1, 2, 0};
+  }
+
+  BENCH_ALWAYS_INLINE auto operator()(const auto& haystack,
+                                      const auto& needle) const {
+    return std::strstr((const char*)haystack.data(),
+                       (const char*)needle.data());
+  }
+};
+
 struct std_strstr_112 {
   std::string name() const { return "std::strstr(112)"; }
 
@@ -178,7 +194,7 @@ using all_types_searches =
 int main(int argc, char** argv) {
   using char_special_bench =
       bench::search<std::int8_t, std_strstr_22, std_strstr_112, std_strstr_2,
-                    string_view_find_string_view_22,
+                    std_strstr_12, string_view_find_string_view_22,
                     string_view_find_string_view_12>;
 
   bench::bench_main<char_special_bench, all_types_searches<std::int8_t>,
