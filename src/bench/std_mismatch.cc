@@ -17,6 +17,8 @@
 
 #include "bench/mismatch.h"
 
+#include "unsq_eve/other_mismatches.h"
+
 #include <algorithm>
 
 namespace {
@@ -68,12 +70,22 @@ struct std_memcmp {
   }
 };
 
+struct mismatch_scalar {
+  std::string name() const { return "mismatch_scalar"; }
+
+  BENCH_ALWAYS_INLINE auto operator()(const auto& r1, const auto& r2) const {
+    return unsq_eve::mismatch_scalar(r1.begin(), r1.end(), r2.begin());
+  }
+};
+
 }  // namespace
 
 int main(int argc, char** argv) {
-  bench::bench_main<
-      bench::mismatch_bench<std::int8_t, std_mismatch, use_int64s, std_memcmp>,
-      bench::mismatch_bench<short, std_mismatch, use_int64s, std_memcmp>,
-      bench::mismatch_bench<int, std_mismatch, use_int64s, std_memcmp>>(argc,
+  bench::bench_main<bench::mismatch_bench<std::int8_t, std_mismatch, use_int64s,
+                                          std_memcmp, mismatch_scalar>,
+                    bench::mismatch_bench<short, std_mismatch, use_int64s,
+                                          std_memcmp, mismatch_scalar>,
+                    bench::mismatch_bench<int, std_mismatch, use_int64s,
+                                          std_memcmp, mismatch_scalar>>(argc,
                                                                         argv);
 }

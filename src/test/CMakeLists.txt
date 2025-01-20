@@ -21,6 +21,7 @@ target_sources(tests PRIVATE
                unsq_eve/concepts.t.cc
                unsq_eve/find_common.t.cc
                unsq_eve/other_searches.t.cc
+               unsq_eve/other_mismatches.t.cc
                unsq_eve/unroll.t.cc
                tts_main.cc)
 
