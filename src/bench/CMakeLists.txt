@@ -17,7 +17,7 @@
 find_package(benchmark CONFIG REQUIRED)
 
 function(add_benchmark name source)
-    set(compiler_options --std=c++20 --stdlib=libc++ -DEVE_USE_BMI_ON_AVX2 -mcpu=apple-m2 -DNDEBUG -g -Werror -Wall -Wextra -Wpedantic -Wno-deprecated-copy -O3 -mllvm -align-all-functions=7)
+    set(compiler_options --std=c++20 --stdlib=libc++ -DEVE_USE_BMI_ON_AVX2 -march=native -DNDEBUG -g -Werror -Wall -Wextra -Wpedantic -Wno-deprecated-copy -O3 -mllvm -align-all-functions=7)
     add_executable(${name})
     target_sources(${name} PRIVATE ${source})
     target_compile_options(${name} PRIVATE ${compiler_options})
