@@ -77,8 +77,8 @@ struct find_unguarded {
 }  // namespace
 
 int main(int argc, char** argv) {
-  using char_bench = bench::find_0_bench<std::int8_t, std_strlen, std_find,
-                                         std_find_if, find_unguarded>;
+  using char_bench = bench::find_0_bench<std::int8_t, std_strlen, std_memchr,
+                                         std_find, std_find_if, find_unguarded>;
 
   using short_bench =
       bench::find_0_bench<short, std_find, std_find_if, find_unguarded>;
