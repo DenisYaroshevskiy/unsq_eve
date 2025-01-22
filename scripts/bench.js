@@ -297,7 +297,7 @@ function drawBarsBenchmars(element, width, data, traceFilter, offByDefault) {
       y: trace.y,
       type: 'bar'
     };
-    if (offByDefault.find(off => trace.name.includes(off))) {
+    if (offByDefault.find(off => off == trace.name)) {
       res.visible = 'legendonly';
     }
     return res;
