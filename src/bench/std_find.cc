@@ -32,12 +32,32 @@ struct std_strlen {
   }
 };
 
+struct std_memchr {
+  const char* name() const { return "std::memchr"; }
+
+  BENCH_ALWAYS_INLINE auto operator()(const auto& haystack,
+                                      const auto& needle) const {
+    return std::memchr((const char*)haystack.data(), needle[0],
+                       haystack.size());
+  }
+};
+
 struct std_find {
   const char* name() const { return "std::find"; }
 
   BENCH_ALWAYS_INLINE auto operator()(const auto& haystack,
                                       const auto& needle) const {
     return std::find(haystack.begin(), haystack.end(), needle[0]);
+  }
+};
+
+struct std_find_if {
+  const char* name() const { return "std::find_if"; }
+
+  BENCH_ALWAYS_INLINE auto operator()(const auto& haystack,
+                                      const auto& needle) const {
+    return std::find_if(haystack.begin(), haystack.end(),
+                        [&](auto x) { return needle[0] == x; });
   }
 };
 
@@ -57,12 +77,14 @@ struct find_unguarded {
 }  // namespace
 
 int main(int argc, char** argv) {
-  using char_bench =
-      bench::find_0_bench<std::int8_t, std_strlen, std_find, find_unguarded>;
+  using char_bench = bench::find_0_bench<std::int8_t, std_strlen, std_find,
+                                         std_find_if, find_unguarded>;
 
-  using short_bench = bench::find_0_bench<short, std_find, find_unguarded>;
+  using short_bench =
+      bench::find_0_bench<short, std_find, std_find_if, find_unguarded>;
 
-  using int_bench = bench::find_0_bench<int, std_find, find_unguarded>;
+  using int_bench =
+      bench::find_0_bench<int, std_find, std_find_if, find_unguarded>;
 
   bench::bench_main<char_bench, short_bench, int_bench>(argc, argv);
 }
