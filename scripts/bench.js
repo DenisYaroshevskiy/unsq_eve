@@ -257,7 +257,7 @@ function drawLinesBenchmark(element, width, data, traceFilter, offByDefault) {
       line: { size: 3 },
       type: 'scatter'
     };
-    if (offByDefault.find(off => line.name.includes(off))) {
+    if (offByDefault.find((off) => off == line.name)) {
       res.visible = 'legendonly';
     }
     return res;
